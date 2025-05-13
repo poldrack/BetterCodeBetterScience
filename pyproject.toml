@@ -1,0 +1,38 @@
+[project]
+name = "BetterCodeBetterScience"
+version = "0.1.0"
+description = "Code for BetterCodeBetterScience book"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    "jupyter-book>=1.0.2",
+    "numpy>=2.1.2",
+    "scipy>=1.14.1",
+    "jupyter>=1.1.1",
+    "jupytext>=1.16.4",
+    "pytest>=8.3.3",
+    "ruff>=0.6.9",
+    "pygithub>=2.4.0",
+    "pandas>=2.2.3",
+    "docutils==0.17.1",
+    "pyppeteer>=2.0.0",
+    "matplotlib>=3.9.2",
+    "openai>=1.51.2",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "hypothesis>=6.115.3",
+    "black>=24.10.0",
+    "scikit-learn>=1.5.2",
+    "seaborn>=0.13.2",
+    "transformers>=4.49.0",
+    "torch>=2.6.0",
+    "accelerate>=1.4.0",
+    "icecream>=2.1.4",
+    "python-dotenv>=1.0.1",
+    "pyyaml>=6.0.2",
+    "numba>=0.61.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
