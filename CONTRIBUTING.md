@@ -6,7 +6,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 This book is an open source project and we love to receive contributions from our community — you! There are many ways to contribute, from contributing new sections or even complete chapters, to submitting reports on typos or writing errors, to everything in between!
 
-tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into Elasticsearch itself.
+Note: This book may be licensed for publication by a commercial publisher in the future.  In such a case the open source version will remain openly available under the same (CC-BY-NC) license.  See below for more information on acknowledgment of contributions.
 
 ### Ground Rules
 
@@ -31,6 +31,11 @@ Working on your first Pull Request? You can learn how from this *free* series, [
 
 At this point, you're ready to make your changes! Feel free to ask for help; everyone is a beginner at first :smile_cat:
 
+### Recognizing contributors
+
+Individuals who make line-level contributions (such as fixing typos) will be listed in the acknowledgements of the text.  
+
+Contributors who create significant new sections or chapters may be listed as coauthors.  Individuals who wish to be listed as a coauthor should discuss this with the maintainer prior to contributing, to avoid any misunderstandings. 
 
 This Contributors Guide is based on the template from https://github.com/nayafia/contributing-template (CC0).
 
