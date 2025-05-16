@@ -30,11 +30,10 @@ jobs:
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv sync
-          source activate .venv/bin/activate
           
       - name: Build book
         run: |
-          jupyter-book build book/
+          uv run jupyter-book build book/
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
