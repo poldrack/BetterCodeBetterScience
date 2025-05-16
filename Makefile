@@ -2,7 +2,7 @@ clean:
 	- rm -rf book/_build
 
 build: clean
-	jupyter-book build book/
+	uv run jupyter-book build book/
 
 pdf:
 	jupyter-book build book/ --builder pdflatex
