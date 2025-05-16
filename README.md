@@ -1,4 +1,4 @@
-## BetterCodeBetterScience
+## Better Code, Better Science
 An open-source book on building better code for science using AI.  
 
 Authors: [Russ Poldrack](http://poldrack.github.io), others TBD.
