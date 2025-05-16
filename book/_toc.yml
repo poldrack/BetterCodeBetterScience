@@ -6,4 +6,4 @@ root: frontmatter
 chapters:
 - file: introduction
 - file: bibliography
-- file: acknowledgements
+- file: acknowledgments
