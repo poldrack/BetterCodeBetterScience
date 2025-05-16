@@ -5,3 +5,5 @@ format: jb-book
 root: frontmatter
 chapters:
 - file: introduction
+- file: bibliography
+- file: acknowledgements
