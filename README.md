@@ -11,6 +11,7 @@ A rendered version of the complete book is available at [https://poldrack.github
 
 - Introduction
     - [Part 1](https://russpoldrack.substack.com/p/better-code-better-science)
+    - [Part 2](https://russpoldrack.substack.com/p/why-better-code-can-lead-to-better)
 - Essential Tools and Techniques
 - Principles of Software Engineering
 - Project Structure and Management
