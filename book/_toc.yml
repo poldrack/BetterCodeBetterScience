@@ -5,5 +5,16 @@ format: jb-book
 root: frontmatter
 chapters:
 - file: introduction
+- file: essential_tools_and_techniques
+# - file: software_engineering
+# - file: project_organization
+# - file: AI_coding_assistants
+# - file: testing
+# - file: validation
+# - file: performance
+# - file: data_management
+# - file: workflows
+# - file: HPC
+# - file: sharing
 - file: bibliography
-- file: acknowledgments
+- file: acknowledgements
