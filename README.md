@@ -13,6 +13,8 @@ A rendered version of the complete book is available at [https://poldrack.github
     - [Part 1](https://russpoldrack.substack.com/p/better-code-better-science)
     - [Part 2](https://russpoldrack.substack.com/p/why-better-code-can-lead-to-better)
 - Essential Tools and Techniques
+    - [Part 1: Version control](https://russpoldrack.substack.com/p/essential-tools-for-writing-better?r=1n86gc)
+    - [Part 2: Large Language Models](https://russpoldrack.substack.com/p/essential-tools-for-writing-better-f69?r=1n86gc)
 - Principles of Software Engineering
 - Project Structure and Management
 - Coding with AI
