@@ -6,7 +6,7 @@ root: frontmatter
 chapters:
 - file: introduction
 - file: essential_tools_and_techniques
-# - file: software_engineering
+- file: software_engineering
 # - file: project_organization
 # - file: AI_coding_assistants
 # - file: testing
