@@ -1,0 +1,586 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Principles of software engineering &#8212; Better Code, Better Science</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'software_engineering';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Bibliography" href="bibliography.html" />
+    <link rel="prev" title="Essential tools and techniques" href="essential_tools_and_techniques.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="frontmatter.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Better Code, Better Science</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="frontmatter.html">
+                    Better Code, Better Science
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="essential_tools_and_techniques.html">Essential tools and techniques</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Principles of software engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Fsoftware_engineering.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/software_engineering.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Principles of software engineering</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-software-engineering-matters-in-the-age-of-ai-assisted-coding">Why software engineering matters in the age of AI-assisted coding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agile-development-processes">Agile development processes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#designing-software-through-user-stories">Designing software through user stories</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refactoring-code">Refactoring code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-driven-development">Test-driven development</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="principles-of-software-engineering">
+<h1>Principles of software engineering<a class="headerlink" href="#principles-of-software-engineering" title="Permalink to this heading">#</a></h1>
+<p>Just as mechanical engineering is the science of building physical things like airports or engines, software engineering is the science of building software.  Its goal is to identify the principles and practices that allow building of software that is robust, efficient, and maintainable.  Just as a person can build a table at home without any formal knowledge of mechanical engineering, one can build software without knowing any of the principles of software engineering. However, this software is likely to suffer from exactly the same kinds of instability and poor functionality as the average homemade table.  Knowing a few basic ideas from software engineering can help scientists build software more effectively and generate outputs that will be more robust and maintainable over time.</p>
+<p>We have already talked about some of the basic tools of software engineering, such as version control. In this chapter we will focus on some of the “big ideas” from software engineering, highlighting how their adoption can improve the life of nearly anyone who develops software.</p>
+<section id="why-software-engineering-matters-in-the-age-of-ai-assisted-coding">
+<h2>Why software engineering matters in the age of AI-assisted coding<a class="headerlink" href="#why-software-engineering-matters-in-the-age-of-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
+<p>One might ask why we are spending an entire chapter talking about software engineering; when it’s likely that AI tools going to write much of the code in our projects going forward.  First, think back to the point we made in Chapter 1: Programming is not equivalent to writing code.  Even if the AI system can write computer code (e.g. in Python), a human needs to describe the problem(s) that the software is meant to solve, and to iterate with the code to debug any failures to solve the problem.  This requires that a human write the specification that tells the computer how to solve the problem: we may have traded Python for English as the programming language of choice, but nonetheless the human needs to precisely specify the goals of the software.  Thus, an understanding of the software development process will remain essential even as AI assistants write an increasing amount of code.</p>
+<p>Software development processes may be less important for small one-off projects written by a single developer, but they become essential once a project becomes large and involves multiple developers.  Coordination costs can quickly eat into the added benefit of more developers on a project, particularly if there is not a strong development process in place.  And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineering codebase can just be too large.  Similarly, poorly written code can result in a high “bus factor” (i.e., what happens if your lead developer gets hit by a bus?), which can be major risk for groups that rely heavily upon a particular software project for their work.</p>
+</section>
+<section id="agile-development-processes">
+<h2>Agile development processes<a class="headerlink" href="#agile-development-processes" title="Permalink to this heading">#</a></h2>
+<p>When I was in graduate school, I spent countless hours developing a tool for analyzing data that was general enough to process not just the data that I needed to analyze for his project, but also nearly any other kind of data that one might envision from similar experiments.  How many of those other kinds of data did I ever actually analyze?  You guessed it: Zilch.  There is an admirable tendency amongst some scientists to want to solve a problem in a maximally general way, but this problem is not limited to scientists. In fact, it has a name within software circles: “gold plating”.  Unfortunately, humans are generally bad at predicting what is actually needed to solve a problem, and the extra work spent adding gold plating might be fun for the developer but rarely pays off in the longer term.  Software engineers love acronyms, and a commonly used acronym that targets this kind of overengineering is YAGNI: “You Aren’t Gonna Need It”.</p>
+<p>Within commercial software engineering, it was once common to develop a detailed requirements document before one ever started writing code, and then move on to code writing using those fixed requirements.  This is known as the “waterfall” method for project management; it can work well in some domains (like physical construction, where the plans can’t change halfway through building, and the materials need to be on hand before construction starts), but in software development it often led to long delays that occurred once the initial plan ran into challenges at the coding phase.  Instead, most software development projects now use methods generally referred to as <em>Agile</em>, in which there are much faster cycles between planning and development. One of the most important <a class="reference external" href="https://agilemanifesto.org/principles.html">principles</a> of the Agile movement is that “Working software is the primary measure of progress.”.  It’s worth noting that a lot of dogma has grown up around Agile and related software development methodologies (such as <em>Scrum</em> and <em>Kanban</em>), most of which is overkill for scientists producing code for research.  But there are nonetheless some very useful concepts and processes that we can take from these methodologies to help us build scientific software better and faster.</p>
+<p>In our laboratory, we focus heavily on the idea of the “minimum viable product” (MVP) that grows out of the Agile philosophy.  We shoot for code that solves the scientific or technical problem at hand: no more, and no less.  We try to write that code as cleanly as possible (as described in the next section), but we realize that the code will never be perfect, and that’s ok.  If it’s code that will be reused in the future, then we will likely spend some additional time refactoring it to improve its clarity and robustness and providing additional documentation.  This philosophy is the rationale for the “test-driven development” approach that we outline later in this chapter.</p>
+</section>
+<section id="designing-software-through-user-stories">
+<h2>Designing software through user stories<a class="headerlink" href="#designing-software-through-user-stories" title="Permalink to this heading">#</a></h2>
+<p>It’s important to think through the ways that a piece of software will be used, and one useful way to address this is through <em>user stories</em>.  Understanding specific use cases for the software from the standpoint of users can be very useful in helping to ensure that the software is actually solving real problems, rather than solving problems that might theoretically exist but that no user will ever engage with.  We often see this with the development of visualization tools, where the developer thinks that a visualization feature would be “cool” but it doesn’t actually solve a real scientific problem for a user of the software.</p>
+<p>A user story is often framed in the following way: “As a [type of user], I want [a particular functionality] so that [what problem the functionality will solve]”.
+As an example, say that a researcher wanted to develop a tool to convert between different genomic data formats. A couple of potential user stories for this software could be:</p>
+<ul class="simple">
+<li><p>“As a user of the ABC123 sequencer, I want to convert my raw data to the current version of the SuperMegaFormat, so that I can submit my data to the OmniData Repository.”</p></li>
+<li><p>“As a user of software that that requires my data to be in a specific version of the SuperMegaFormat, I want to validate that my data have been properly converted to comply with that version of the format so that I can ensure that my data can be analyzed.”</p></li>
+</ul>
+<p>These two stories already point to several functions that need to be implemented:</p>
+<ul class="simple">
+<li><p>The code needs to be able to access specific versions of the SuperMegaFormat, including the current version and older versions.</p></li>
+<li><p>The code needs to be able to read data from the ABC123 sequencer.</p></li>
+<li><p>The code needs to be able to validate that a dataset meets any particular version of the SuperMegaFormat.</p></li>
+</ul>
+<p>User stories are also useful for thinking through the potential impact of new features that are envisioned by the coder.  Perhaps the most common example of violations of YAGNI comes about in the development of visualization tools.  In this example, the developer might decide to create an visualizer to show how the original dataset is being converted into the new format, with interactive features that would allow the user to view features of individual files.  The question that you should always ask yourself is: What user stories would this feature address?  If it’s difficult to come up with stories that make clear how the feature would help solve particular problems for users, then the feature is probably not needed. “If you build it, they will come” might work in baseball, but it rarely works in scientific software. This is the reason that one of us (RP) regularly tells his trainees to post a note in their workspace with one simple mantra: “MVP”.</p>
+</section>
+<section id="refactoring-code">
+<h2>Refactoring code<a class="headerlink" href="#refactoring-code" title="Permalink to this heading">#</a></h2>
+<p>Throughout our discussion we will regularly mention the concept of <em>refactoring</em> (as we just did in the previous section), so we should introduce it here.  When we refactor a piece of code, we modify it in a way that doesn’t change its external behavior. The idea long existed in software development but was made prominent by Martin Fowler in his book <em>Refactoring: Improving the Design of Existing Code</em>.  As the title suggests, the goal of refactoring is to improve existing code rather than adding features or fixing bugs - but why would we spend time modifying code once it’s working, unless our goal is to add something new or fix something that is broken?</p>
+<p>In fact, the idea of refactoring is closely aligned with the Agile development philosophy mentioned above.  Rather than designing a software product in detail before coding, we can instead design as we go, understanding that this is just a first pass.  As Fowler says:</p>
+<blockquote>
+<div><p>“With refactoring, we can take a bad, even chaotic, design and rework it into well-structured code. Each step is simple — even simplistic. I move a field from one class to another, pull some code out of a method to make it into its own method, or push some code up or down a hierarchy. Yet the cumulative effect of these small changes can radically improve the design.” - Fowler (p. xiv)</p>
+</div></blockquote>
+<p>There are several reasons why we might want to refactor existing code.  Most importantly, we may want to make the code <em>easier to maintain</em>.  This in turn often implies making it easier to read and understand, as we discuss further below in the context of <em>clean coding</em>.  For example, we might want to break a large function out into several smaller functions so that the logical structure of the code is clearer from the code itself. Making code easier to understand and maintain also helps make it easier to add features to in the future. There are many other ways in which one can improve code, which are the focus of Fowler’s book; we will outline more of them below when we turn later to the problem of “code smells”.</p>
+<p>It is increasingly possible to use AI tools to refactor code. As long as one has a solid testing program in place, this can help save time and also help learn how to refactor code more effectively. This suggests that testing needs to be a central part of our coding process, which is why we will devote an entire chapter to it later in the book.</p>
+</section>
+<section id="test-driven-development">
+<h2>Test-driven development<a class="headerlink" href="#test-driven-development" title="Permalink to this heading">#</a></h2>
+<p>Let’s say that you have a software project you want to undertake, and you have in mind what the Minimum Viable Product would be: A script that takes in a dataset and transforms the data into a standardized format that can be uploaded to a particular data repository.  How would you get started?  And how would you know when you are done?</p>
+<p>After decomposing the problem into its components, many coders would simply start writing code to implement each of the components.  For example, one might start by creating a script with comments that describe each of the needed components:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 1: index the data files</span>
+
+<span class="c1"># Step 2: load the files</span>
+
+<span class="c1"># Step 3: reformat the metadata to match the repository standard</span>
+
+<span class="c1"># Step 4: combine the data and metadata</span>
+
+<span class="c1"># Step 5: save the data to the required format</span>
+</pre></div>
+</div>
+<p>A sensible way to get started would be march through the steps and write a function to accomplish each one, and then test the entire package once all of the functions are created.  However, this approach has a couple of drawbacks.  First, since you can’t run the application until all of the code is written, you can’t know whether each component is working properly until the entire package is built.  Second, it’s easy to end up writing code that will end up not needing, since you haven’t specified exactly what the inputs and outputs are for each component.  Finally, once you start integrating all of the components, you won’t have a way to know if you have introduced a bug.</p>
+<p>One answer to these problems is to start the process by creating a set of <em>tests</em>, which tell us whether the code has solved our intended problems.  The process of writing tests before writing code to solve the problem is known as <em>test-driven development</em> (TDD), and we think that it is a very useful framework to use when writing scientific code, especially if one plans to use LLMs for code generation.  Test-driven development is somewhat controversial within the software engineering field, in part because many people take it too far and become obsessive with testing, such that the tests come to be the tail that wags the dog; in particular we would caution against using the amount of test coverage as a metric for success. But we think that when it is used in a thoughtful way, TDD can be a powerful way to increase the effectiveness and accuracy of one’s code.</p>
+<p>We will dive deeply into testing in a later chapter; here we will simply outline a simple test-driven development workflow for the data transformation problem described above.  The TDD workflow can be summarized in a cycle involving three steps:</p>
+<ul class="simple">
+<li><p><em>Red</em>: Create a test that initially fails for the intended function.</p></li>
+<li><p><em>Green</em>: Create a function that passes the test.</p></li>
+<li><p><em>Refactor</em>: Modify the code to make it more maintainable, readable, and robust</p></li>
+</ul>
+<p>These processes are then repeated until the software solves the intended problem. This process helps prevent the developer from writing code to solve problems that don’t exist yet, since the only aim is to create code that passes the specific test in question.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="essential_tools_and_techniques.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Essential tools and techniques</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="bibliography.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Bibliography</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-software-engineering-matters-in-the-age-of-ai-assisted-coding">Why software engineering matters in the age of AI-assisted coding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#agile-development-processes">Agile development processes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#designing-software-through-user-stories">Designing software through user stories</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refactoring-code">Refactoring code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-driven-development">Test-driven development</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Russell Poldrack et al.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
