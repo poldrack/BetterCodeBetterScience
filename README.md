@@ -16,6 +16,7 @@ A rendered version of the complete book is available at [https://poldrack.github
     - [Part 1: Version control](https://russpoldrack.substack.com/p/essential-tools-for-writing-better?r=1n86gc)
     - [Part 2: Large Language Models](https://russpoldrack.substack.com/p/essential-tools-for-writing-better-f69?r=1n86gc)
 - Principles of Software Engineering
+    - [Part 1: Intro](https://open.substack.com/pub/russpoldrack/p/principles-of-software-engineering)
 - Project Structure and Management
 - Coding with AI
 - Software Testing
