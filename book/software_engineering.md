@@ -414,3 +414,21 @@ run_llm_prompt(config)
 
 This is a Python-specific anti-pattern that is commonly seen in software written by researchers.  
 
+
+```python
+from scipy.stats import *
+from numpy.random import *
+
+random_sample = vonmises(10, 2, size=1000)
+```
+
+In this example we have no idea where the vonmises() function is being specified.  In fact, both numpy.random and scipy.stats have an object named vonmises,  so function that is called will depend on the order in which the two import functions are run.  It’s much better to explicitly import functions that are used:
+
+
+```pythonimport scipy.stats as stats
+from numpy.random import vonmises
+
+random_sample = vonmises(10, 2, size=1000)
+# or
+random_sample = stats.vonmises.rvs(2, loc=10, size=1000)
+```
