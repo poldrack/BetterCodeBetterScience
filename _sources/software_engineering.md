@@ -427,3 +427,163 @@ random_sample = vonmises(10, 2, size=1000)
 # or
 random_sample = stats.vonmises.rvs(2, loc=10, size=1000)
 ```
+
+
+## Modularity
+
+Another key to making a system understandable is to make it *modular*, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.  Complex modular systems are also usually *hierarchical*, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.  In a 1962 paper entitled *The Architecture of Complexity*{cite:p}`Simon:1962aa`, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the *near-decomposability* that arises in systems where the different modules are insulated from each other except through specific interfaces.  The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas {cite:p}`Parnas:1972aa`, who pointed out that decomposing code based on the concept of "information hiding" can make code much easier to modify than a decomposition based on the logical "flowchart" of the problem being solved.
+
+A common expression of the idea of modularity in software development is the *Single Responsibility Principle*, which states that a function or class should only have one reason to change. This principle is often summarized as saying that a function or class should only "do one thing", but that's too vague; a clearer way to state this is that a function or class should have a clear and cohesive purpose at the appropriate level of abstraction. Let's look at an example to help make this clearer.  Say that we are developing an analysis workflow for RNA-sequencing data, involving the following steps:
+
+- Read trimming and filtering
+- Alignment to reference genome
+- Quantification of expresssion
+- Normalization
+- Differential expression analysis
+
+At the highest level, we could specify a function that runs the entire workflow, taking in a raw data array and an object that contains configuration information:
+
+```python
+def run_workflow(raw_data, config):
+    data = data_setup{raw_data, config}
+    data['trimfilt'] = run_trim_filt(data, config)
+    data['aligned'] = run_alignment(data, config)
+    data['quant'] = run_expression_quantification(data, config)
+    data['normalized'] = run_normalization(data, config)
+    data['diffexpress'] = run_differential_expression(data, config)
+    return data
+```
+
+This function clearly performs several operations, but viewed from the appropriate level of abstraction, it does one thing: it executes the workflow.  Importantly, the only thing that would cause this function to change is if the workflow changed; any changes within the components of the workflow would not require changes to this function. In this way, the high level workflow manager is *insulated* from the details of each of the components, interacting with them only through their outputs.  Each of the different workflow components can also be insulated from the other components, as long as they rely only upon the arguments provided to the function. 
+
+### The "God object"
+
+There is often a temptation when using object-oriented programming approaches to generate a single very large object that contains all relevant data and code for a particular problem.  These kinds of objects are sometimes referred to as "God objects" since they are meant to have a God's-eye view of an entire project. 
+
+In 2019, I started developing data processing and analysis code for large project called the Neuroimaging Analysis Replication and Prediction Study (NARPS).  We won't go into the details here; if you are interested, you can find more detail in a paper that we published in 2020 {cite:p}`Botvinik-Nezer:2020aa`, and the codebase is available at [https://github.com/poldrack/narps](https://github.com/poldrack/narps). The brief description is that 70 research groups were given the same raw brain imaging dataset and asked to analyze it and submit their results; it was these results that I was analyzing in order to determine how different analysis methods might lead to different results.  It had been a while since I had developed a project of scope, and I decided to use an object-oriented approach to developing the code.  This project ended up being one of the main reasons I became more interested in software engineering practices, but at this point I had not yet dived into the literature on good coding practices.  
+
+I started by creating a main object, called `Narps`, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:
+
+- Preprocessing the images submitted by the teams
+- Preparing the metdata necessary for the analysis of the images
+- Performing statistical analyses of the images
+- Performing statistical analysis on the hypothesis testing decisions reported by the teams.
+- Performing an image-based meta-analysis to combine results across teams
+- Performing a coordinate-based meta-analysis using activation likelihood estimation (ALE)
+
+In total, there were 5,619 total lines of code across all source files, with 578 of those located within the `Narps` object and its 14 methods which ranged from 9 to 86 lines of code each (see the full code [here](https://github.com/poldrack/narps/blob/0a9d71a5ab435b40dcd50fea82d2961a43f0a3fc/ImageAnalyses/narps.py#L404)):
+
+```
+Class: Narps [object]: 
+  - check_image_values()
+  - compute_image_stats()
+  - convert_to_zscores()
+  - create_concat_images()
+  - create_mean_thresholded_images()
+  - create_rectified_images()
+  - estimate_smoothness()
+  - get_binarized_thresh_masks()
+  - get_input_dirs()
+  - get_orig_images()
+  - get_resampled_images()
+  - load_data()
+  - mk_full_mask_img()
+  - write_data()
+```
+
+This falls clearly within "God object" territory.  Let's have a closer look at the `__init__` constructor method for the `Narps` object, which sets up the object:
+
+
+```
+class Narps(object):
+    """
+    main class for NARPS analysis
+    """
+    def __init__(self, basedir, metadata_file=None,
+                 verbose=False, overwrite=False,
+                 dataurl=None, testing=False):
+        self.basedir = basedir
+        self.dirs = NarpsDirs(basedir, dataurl=dataurl,
+                              testing=testing)
+        self.verbose = verbose
+        self.teams = {}
+        self.overwrite = overwrite
+        self.started_at = datetime.datetime.now()
+        self.testing = testing
+
+        # create the full mask image if it doesn't already exist
+        if not os.path.exists(self.dirs.full_mask_img):
+            print('making full image mask')
+            self.mk_full_mask_img(self.dirs)
+        assert os.path.exists(self.dirs.full_mask_img)
+
+        # get input dirs for orig data
+        self.image_jsons = None
+        self.input_dirs = self.get_input_dirs(self.dirs)
+
+        # check images for each team
+        self.complete_image_sets = {}
+        self.get_orig_images(self.dirs)
+        for imgtype in ['thresh', 'unthresh']:
+            log_to_file(
+                self.dirs.logfile,
+                'found %d teams with complete original %s datasets' % (
+                    len(self.complete_image_sets[imgtype]), imgtype))
+
+        # set up metadata
+        if metadata_file is None:
+            self.metadata_file = os.path.join(
+                self.dirs.dirs['orig'],
+                'analysis_pipelines_for_analysis.xlsx')
+        else:
+            self.metadata_file = metadata_file
+
+        self.metadata = get_metadata(self.metadata_file)
+
+        self.hypothesis_metadata = pandas.DataFrame(
+            columns=['teamID', 'hyp', 'n_na', 'n_zero'])
+
+        self.all_maps = {'thresh': {'resampled': None},
+                         'unthresh': {'resampled': None}}
+        self.rectified_list = []
+
+```
+
+There are a few problems with this constructor.  
+
+- The constructor has far too many responsibilities, including everything from creating instance variables to loading, processing, and validating data.  This leads to the execution of time-consuming operations any time one wishes to initialize the object.  Each of these individual steps should be broken out into individual methods or functions, which would simplify the structure (at the cost of some extra code) and would also make it easier to test each of the methods/functions independently without having to initialize the entire class.
+- The constructor mixes together different levels of abstraction.  These include high-level configuration (such as setting verbosity and recording start time), low-level file operations (including loading of various files), and analytic logic (such as mask generation).  The constructor should probably focus only on high-level configuration.
+- The constructor is tightly coupled to the file system, reading and writing files directly.  This makes testing very difficult since it depends on the current state of the file system.
+
+More generally, there are a couple of problems with the use of a single large class for this project:
+
+- It's very difficult to test individual operations without initializing the full class.  In addition, later functions may sometimes depend on earlier functions having been performed, which introduces temporal dependences that make testing difficult.
+- All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code's operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.
+
+
+Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python *data classes* to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.   
+
+
+### Global variables
+
+>  Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)
+
+In Python, the accessibility (or *scope*) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has *global scope*, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by the function.  They can in theory be modified anywhere within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the `ic` function from the `icecream` library to report the value of the global variable before and after executing the function that modifies it:
+
+ ```python
+from icecream import ic
+GLOBAL_VAR = 1
+
+def myfunc():
+    global GLOBALVAR
+    GLOBALVAR += 1
+
+ic(GLOBALVAR)
+myfunc()
+ic(GLOBALVAR)
+ ```
+
+If we were to use the global variable elsewhere, we couldn't know what its value would be without knowing how many times `myfunc()` had been executed.  
+
+
+*TODO*: there are several ways to potentially address this.  what do we want to recommend?

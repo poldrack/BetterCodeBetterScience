@@ -418,6 +418,11 @@ document.write(`
 </li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity">Modularity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-god-object">The “God object”</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-variables">Global variables</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -808,6 +813,150 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 </section>
 </section>
+<section id="modularity">
+<h2>Modularity<a class="headerlink" href="#modularity" title="Permalink to this heading">#</a></h2>
+<p>Another key to making a system understandable is to make it <em>modular</em>, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.  Complex modular systems are also usually <em>hierarchical</em>, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.  In a 1962 paper entitled <em>The Architecture of Complexity</em><span id="id4">[<a class="reference internal" href="bibliography.html#id9" title="Herbert A. Simon. The architecture of complexity. Proceedings of the American Philosophical Society, 106(6):467-482, 1962.">Simon, 1962</a>]</span>, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the <em>near-decomposability</em> that arises in systems where the different modules are insulated from each other except through specific interfaces.  The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas <span id="id5">[<a class="reference internal" href="bibliography.html#id8" title="D. L. Parnas. On the criteria to be used in decomposing systems into modules. Commun. ACM, 15(12):1053–1058, December 1972. URL: https://doi.org/10.1145/361598.361623, doi:10.1145/361598.361623.">Parnas, 1972</a>]</span>, who pointed out that decomposing code based on the concept of “information hiding” can make code much easier to modify than a decomposition based on the logical “flowchart” of the problem being solved.</p>
+<p>A common expression of the idea of modularity in software development is the <em>Single Responsibility Principle</em>, which states that a function or class should only have one reason to change. This principle is often summarized as saying that a function or class should only “do one thing”, but that’s too vague; a clearer way to state this is that a function or class should have a clear and cohesive purpose at the appropriate level of abstraction. Let’s look at an example to help make this clearer.  Say that we are developing an analysis workflow for RNA-sequencing data, involving the following steps:</p>
+<ul class="simple">
+<li><p>Read trimming and filtering</p></li>
+<li><p>Alignment to reference genome</p></li>
+<li><p>Quantification of expresssion</p></li>
+<li><p>Normalization</p></li>
+<li><p>Differential expression analysis</p></li>
+</ul>
+<p>At the highest level, we could specify a function that runs the entire workflow, taking in a raw data array and an object that contains configuration information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_workflow</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data_setup</span><span class="p">{</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">config</span><span class="p">}</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;trimfilt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_trim_filt</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;aligned&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_alignment</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;quant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_expression_quantification</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;normalized&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_normalization</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;diffexpress&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_differential_expression</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>This function clearly performs several operations, but viewed from the appropriate level of abstraction, it does one thing: it executes the workflow.  Importantly, the only thing that would cause this function to change is if the workflow changed; any changes within the components of the workflow would not require changes to this function. In this way, the high level workflow manager is <em>insulated</em> from the details of each of the components, interacting with them only through their outputs.  Each of the different workflow components can also be insulated from the other components, as long as they rely only upon the arguments provided to the function.</p>
+<section id="the-god-object">
+<h3>The “God object”<a class="headerlink" href="#the-god-object" title="Permalink to this heading">#</a></h3>
+<p>There is often a temptation when using object-oriented programming approaches to generate a single very large object that contains all relevant data and code for a particular problem.  These kinds of objects are sometimes referred to as “God objects” since they are meant to have a God’s-eye view of an entire project.</p>
+<p>In 2019, I started developing data processing and analysis code for large project called the Neuroimaging Analysis Replication and Prediction Study (NARPS).  We won’t go into the details here; if you are interested, you can find more detail in a paper that we published in 2020 <span id="id6">[<a class="reference internal" href="bibliography.html#id7" title="Rotem Botvinik-Nezer, Felix Holzmeister, Colin F Camerer, Anna Dreber, Juergen Huber, Magnus Johannesson, Michael Kirchler, Roni Iwanir, Jeanette A Mumford, R Alison Adcock, Paolo Avesani, Blazej M Baczkowski, Aahana Bajracharya, Leah Bakst, Sheryl Ball, Marco Barilari, Nadège Bault, Derek Beaton, Julia Beitner, Roland G Benoit, Ruud M W J Berkers, Jamil P Bhanji, Bharat B Biswal, Sebastian Bobadilla-Suarez, Tiago Bortolini, Katherine L Bottenhorn, Alexander Bowring, Senne Braem, Hayley R Brooks, Emily G Brudner, Cristian B Calderon, Julia A Camilleri, Jaime J Castrellon, Luca Cecchetti, Edna C Cieslik, Zachary J Cole, Olivier Collignon, Robert W Cox, William A Cunningham, Stefan Czoschke, Kamalaker Dadi, Charles P Davis, Alberto De Luca, Mauricio R Delgado, Lysia Demetriou, Jeffrey B Dennison, Xin Di, Erin W Dickie, Ekaterina Dobryakova, Claire L Donnat, Juergen Dukart, Niall W Duncan, Joke Durnez, Amr Eed, Simon B Eickhoff, Andrew Erhart, Laura Fontanesi, G Matthew Fricke, Shiguang Fu, Adriana Galván, Remi Gau, Sarah Genon, Tristan Glatard, Enrico Glerean, Jelle J Goeman, Sergej A E Golowin, Carlos González-García, Krzysztof J Gorgolewski, Cheryl L Grady, Mikella A Green, João F Guassi Moreira, Olivia Guest, Shabnam Hakimi, J Paul Hamilton, Roeland Hancock, Giacomo Handjaras, Bronson B Harry, Colin Hawco, Peer Herholz, Gabrielle Herman, Stephan Heunis, Felix Hoffstaedter, Jeremy Hogeveen, Susan Holmes, Chuan-Peng Hu, Scott A Huettel, Matthew E Hughes, Vittorio Iacovella, Alexandru D Iordan, Peder M Isager, Ayse I Isik, Andrew Jahn, Matthew R Johnson, Tom Johnstone, Michael J E Joseph, Anthony C Juliano, Joseph W Kable, Michalis Kassinopoulos, Cemal Koba, Xiang-Zhen Kong, Timothy R Koscik, Nuri Erkut Kucukboyaci, Brice A Kuhl, Sebastian Kupek, Angela R Laird, Claus Lamm, Robert Langner, Nina Lauharatanahirun, Hongmi Lee, Sangil Lee, Alexander Leemans, Andrea Leo, Elise Lesage, Flora Li, Monica Y C Li, Phui Cheng Lim, Evan N Lintz, Schuyler W Liphardt, Annabel B Losecaat Vermeer, Bradley C Love, Michael L Mack, Norberto Malpica, Theo Marins, Camille Maumet, Kelsey McDonald, Joseph T McGuire, Helena Melero, Adriana S Méndez Leal, Benjamin Meyer, Kristin N Meyer, Glad Mihai, Georgios D Mitsis, Jorge Moll, Dylan M Nielson, Gustav Nilsonne, Michael P Notter, Emanuele Olivetti, Adrian I Onicas, Paolo Papale, Kaustubh R Patil, Jonathan E Peelle, Alexandre Pérez, Doris Pischedda, Jean-Baptiste Poline, Yanina Prystauka, Shruti Ray, Patricia A Reuter-Lorenz, Richard C Reynolds, Emiliano Ricciardi, Jenny R Rieck, Anais M Rodriguez-Thompson, Anthony Romyn, Taylor Salo, Gregory R Samanez-Larkin, Emilio Sanz-Morales, Margaret L Schlichting, Douglas H Schultz, Qiang Shen, Margaret A Sheridan, Jennifer A Silvers, Kenny Skagerlund, Alec Smith, David V Smith, Peter Sokol-Hessner, Simon R Steinkamp, Sarah M Tashjian, Bertrand Thirion, John N Thorp, Gustav Tinghög, Loreen Tisdall, Steven H Tompson, Claudio Toro-Serey, Juan Jesus Torre Tresols, Leonardo Tozzi, Vuong Truong, Luca Turella, Anna E van 't Veer, Tom Verguts, Jean M Vettel, Sagana Vijayarajah, Khoi Vo, Matthew B Wall, Wouter D Weeda, Susanne Weis, David J White, David Wisniewski, Alba Xifra-Porxas, Emily A Yearling, Sangsuk Yoon, Rui Yuan, Kenneth S L Yuen, Lei Zhang, Xu Zhang, Joshua E Zosky, Thomas E Nichols, Russell A Poldrack, and Tom Schonberg. Variability in the analysis of a single neuroimaging dataset by many teams. Nature, 582(7810):84-88, Jun 2020. doi:10.1038/s41586-020-2314-9.">Botvinik-Nezer <em>et al.</em>, 2020</a>]</span>, and the codebase is available at <a class="github reference external" href="https://github.com/poldrack/narps">poldrack/narps</a>. The brief description is that 70 research groups were given the same raw brain imaging dataset and asked to analyze it and submit their results; it was these results that I was analyzing in order to determine how different analysis methods might lead to different results.  It had been a while since I had developed a project of scope, and I decided to use an object-oriented approach to developing the code.  This project ended up being one of the main reasons I became more interested in software engineering practices, but at this point I had not yet dived into the literature on good coding practices.</p>
+<p>I started by creating a main object, called <code class="docutils literal notranslate"><span class="pre">Narps</span></code>, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:</p>
+<ul class="simple">
+<li><p>Preprocessing the images submitted by the teams</p></li>
+<li><p>Preparing the metdata necessary for the analysis of the images</p></li>
+<li><p>Performing statistical analyses of the images</p></li>
+<li><p>Performing statistical analysis on the hypothesis testing decisions reported by the teams.</p></li>
+<li><p>Performing an image-based meta-analysis to combine results across teams</p></li>
+<li><p>Performing a coordinate-based meta-analysis using activation likelihood estimation (ALE)</p></li>
+</ul>
+<p>In total, there were 5,619 total lines of code across all source files, with 578 of those located within the <code class="docutils literal notranslate"><span class="pre">Narps</span></code> object and its 14 methods which ranged from 9 to 86 lines of code each (see the full code <a class="reference external" href="https://github.com/poldrack/narps/blob/0a9d71a5ab435b40dcd50fea82d2961a43f0a3fc/ImageAnalyses/narps.py#L404">here</a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Class</span><span class="p">:</span> <span class="n">Narps</span> <span class="p">[</span><span class="nb">object</span><span class="p">]:</span> 
+  <span class="o">-</span> <span class="n">check_image_values</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">compute_image_stats</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">convert_to_zscores</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">create_concat_images</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">create_mean_thresholded_images</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">create_rectified_images</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">estimate_smoothness</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">get_binarized_thresh_masks</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">get_input_dirs</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">get_orig_images</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">get_resampled_images</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">load_data</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">mk_full_mask_img</span><span class="p">()</span>
+  <span class="o">-</span> <span class="n">write_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This falls clearly within “God object” territory.  Let’s have a closer look at the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> constructor method for the <code class="docutils literal notranslate"><span class="pre">Narps</span></code> object, which sets up the object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Narps</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    main class for NARPS analysis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">,</span> <span class="n">metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dataurl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">testing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">basedir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span> <span class="o">=</span> <span class="n">NarpsDirs</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">dataurl</span><span class="o">=</span><span class="n">dataurl</span><span class="p">,</span>
+                              <span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span> <span class="o">=</span> <span class="n">overwrite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">started_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">testing</span> <span class="o">=</span> <span class="n">testing</span>
+
+        <span class="c1"># create the full mask image if it doesn&#39;t already exist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">full_mask_img</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;making full image mask&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mk_full_mask_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">full_mask_img</span><span class="p">)</span>
+
+        <span class="c1"># get input dirs for orig data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_jsons</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input_dirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">)</span>
+
+        <span class="c1"># check images for each team</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complete_image_sets</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_orig_images</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">imgtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;thresh&#39;</span><span class="p">,</span> <span class="s1">&#39;unthresh&#39;</span><span class="p">]:</span>
+            <span class="n">log_to_file</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">logfile</span><span class="p">,</span>
+                <span class="s1">&#39;found </span><span class="si">%d</span><span class="s1"> teams with complete original </span><span class="si">%s</span><span class="s1"> datasets&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">complete_image_sets</span><span class="p">[</span><span class="n">imgtype</span><span class="p">]),</span> <span class="n">imgtype</span><span class="p">))</span>
+
+        <span class="c1"># set up metadata</span>
+        <span class="k">if</span> <span class="n">metadata_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirs</span><span class="o">.</span><span class="n">dirs</span><span class="p">[</span><span class="s1">&#39;orig&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;analysis_pipelines_for_analysis.xlsx&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span> <span class="o">=</span> <span class="n">metadata_file</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hypothesis_metadata</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;teamID&#39;</span><span class="p">,</span> <span class="s1">&#39;hyp&#39;</span><span class="p">,</span> <span class="s1">&#39;n_na&#39;</span><span class="p">,</span> <span class="s1">&#39;n_zero&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_maps</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;thresh&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;resampled&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="s1">&#39;unthresh&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;resampled&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rectified_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+</pre></div>
+</div>
+<p>There are a few problems with this constructor.</p>
+<ul class="simple">
+<li><p>The constructor has far too many responsibilities, including everything from creating instance variables to loading, processing, and validating data.  This leads to the execution of time-consuming operations any time one wishes to initialize the object.  Each of these individual steps should be broken out into individual methods or functions, which would simplify the structure (at the cost of some extra code) and would also make it easier to test each of the methods/functions independently without having to initialize the entire class.</p></li>
+<li><p>The constructor mixes together different levels of abstraction.  These include high-level configuration (such as setting verbosity and recording start time), low-level file operations (including loading of various files), and analytic logic (such as mask generation).  The constructor should probably focus only on high-level configuration.</p></li>
+<li><p>The constructor is tightly coupled to the file system, reading and writing files directly.  This makes testing very difficult since it depends on the current state of the file system.</p></li>
+</ul>
+<p>More generally, there are a couple of problems with the use of a single large class for this project:</p>
+<ul class="simple">
+<li><p>It’s very difficult to test individual operations without initializing the full class.  In addition, later functions may sometimes depend on earlier functions having been performed, which introduces temporal dependences that make testing difficult.</p></li>
+<li><p>All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code’s operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.</p></li>
+</ul>
+<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
+</section>
+<section id="global-variables">
+<h3>Global variables<a class="headerlink" href="#global-variables" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p>Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)</p>
+</div></blockquote>
+<p>In Python, the accessibility (or <em>scope</em>) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has <em>global scope</em>, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by the function.  They can in theory be modified anywhere within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the <code class="docutils literal notranslate"><span class="pre">ic</span></code> function from the <code class="docutils literal notranslate"><span class="pre">icecream</span></code> library to report the value of the global variable before and after executing the function that modifies it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">icecream</span> <span class="kn">import</span> <span class="n">ic</span>
+<span class="n">GLOBAL_VAR</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">myfunc</span><span class="p">():</span>
+   <span class="k">global</span> <span class="n">GLOBALVAR</span>
+   <span class="n">GLOBALVAR</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">ic</span><span class="p">(</span><span class="n">GLOBALVAR</span><span class="p">)</span>
+<span class="n">myfunc</span><span class="p">()</span>
+<span class="n">ic</span><span class="p">(</span><span class="n">GLOBALVAR</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we were to use the global variable elsewhere, we couldn’t know what its value would be without knowing how many times <code class="docutils literal notranslate"><span class="pre">myfunc()</span></code> had been executed.</p>
+<p><em>TODO</em>: there are several ways to potentially address this.  what do we want to recommend?</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -915,6 +1064,11 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#wild-card-imports">Wild-card imports</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity">Modularity</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-god-object">The “God object”</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-variables">Global variables</a></li>
 </ul>
 </li>
 </ul>
