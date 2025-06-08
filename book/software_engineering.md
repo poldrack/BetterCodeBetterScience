@@ -662,7 +662,7 @@ Using this method thus prevents the value of our constant from being inadvertent
 
 ## Defensive coding
 
-Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  *Defensive coding* means writing code in a way that protects against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in Chapter XXX.  Here we focus on robustness to *runtime errors*; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the data that are being used by code, or invalid assumptions about those data.  
+Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  *Defensive coding* means writing code in a way that tries to protect against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in a later chapter.  Here we focus on robustness to *runtime errors*; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the logic of the code or errors or invalid assumptions about the data that are being used by code.  
 
 A central aspect of defensive coding is to detect errors and announce them in a loud way.  For example, in a recent code review, a researcher showed the following code:
 
@@ -688,7 +688,9 @@ def get_subject_label(file):
         return None
 ```
 
-When one of us asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was `None`, meaning that such an error would go unnoticed until it caused an error later when `subject_label` was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is None, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particulary if the code has a large amount of text output in which the message might be lost.
+When one of us asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was `None`, meaning that such an error would go unnoticed until it caused an error later when `subject_label` was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is `None`, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.
+
+### Announcing errors loudly using exceptions
 
 A better practice here would be to raise an *exception*. Unlike passing `None`, raising an exception will cause the program to stop unless the exception is handled.  In the previous example, we could do the following (removing the docstring for brevity):
 
@@ -722,7 +724,7 @@ Cell In[1], line 3, in get_subject_label(file)
 AttributeError: 'NoneType' object has no attribute 'group'
 ```
 
-In other cases we might want to handle the exception without halting the program, in which case we can embed the functiona call in a `try/catch` statement that tries to run the function and then handles any exceptions that might occur.  Let's say that we simply want to skip any files for which there is no subject label:
+In other cases we might want to handle the exception without halting the program, in which case we can embed the function call in a `try/catch` statement that tries to run the function and then handles any exceptions that might occur.  Let's say that we simply want to skip over any files for which there is no subject label:
 
 ```python
 In [13]: for file in files:
@@ -788,13 +790,23 @@ AssertionError: Error: Not all ages are between 18 and 80
 
 ```
 
-Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. For example:
+Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. Examples of such variables include:
+
+- Counts (>= 0; in some cases an upper limit may also be plausible, such as a count of the number of planets in the solar system)
+- Elapsed time (> 0)
+- Discrete values (e.g. atomic numbers in the periodic table, or mass numbers for a particular element)
+
+For example:
 
 ```python
 ## Count values should always be non-negative integers
 assert np.all(counts >= 0) and np.issubdtype(counts.dtype, np.integer), \
      "Count must contain non-negative integers only"
 
-## Times should be non-negative
-assert np.all(response_times >= 0)
+## Measured times should be positive
+assert np.all(response_times > 0)
+
+## Discrete values
+carbon_isotope_mass_numbers = list(range(8, 21)) + [22]
+assert mass_number in carbon_isotope_mass_numbers
 ```
