@@ -658,3 +658,143 @@ AttributeError: Constants cannot be modified
 ```
 
 Using this method thus prevents the value of our constant from being inadvertently changed.
+
+
+## Defensive coding
+
+Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  *Defensive coding* means writing code in a way that protects against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in Chapter XXX.  Here we focus on robustness to *runtime errors*; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the data that are being used by code, or invalid assumptions about those data.  
+
+A central aspect of defensive coding is to detect errors and announce them in a loud way.  For example, in a recent code review, a researcher showed the following code:
+
+```python
+def get_subject_label(file):
+    """
+    Extract the subject label from a given file path.
+
+    Parameters:
+    - file (str): The file path from which to extract the subject label.
+
+    Returns:
+    - str or None: The extracted subject label (e.g., 's001') if found, 
+                   otherwise returns None and prints a message.
+    """
+    
+    match = re.search(r'/sub-(s\d{3})/', file)
+    
+    if match:
+        subject_label = match.group(1)
+        return subject_label
+    else:
+        return None
+```
+
+When one of us asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was `None`, meaning that such an error would go unnoticed until it caused an error later when `subject_label` was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is None, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particulary if the code has a large amount of text output in which the message might be lost.
+
+A better practice here would be to raise an *exception*. Unlike passing `None`, raising an exception will cause the program to stop unless the exception is handled.  In the previous example, we could do the following (removing the docstring for brevity):
+
+```python
+def get_subject_label(file: str) -> str:
+    match = re.search(r'/sub-(s\d{3})/', file)
+    return match.group(1)
+```
+
+In some cases we might want the script to stop if it encounters a filename without a subject label, in which case we simply call the function:
+
+```python
+In [11]: file = '/data/sub-s001/run-1_bold.nii.gz'
+
+In [12]: get_subject_label(file)
+Out[12]: 's001'
+
+In [13]: file = '/data/nolabel/run-1_bold.nii.gz'
+
+In [14]: get_subject_label(file)
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[14], line 1
+----> 1 get_subject_label(file)
+
+Cell In[1], line 3, in get_subject_label(file)
+      1 def get_subject_label(file: str) -> str:
+      2     match = re.search(r'/sub-(s\d{3})/', file)
+----> 3     return match.group(1)
+
+AttributeError: 'NoneType' object has no attribute 'group'
+```
+
+In other cases we might want to handle the exception without halting the program, in which case we can embed the functiona call in a `try/catch` statement that tries to run the function and then handles any exceptions that might occur.  Let's say that we simply want to skip any files for which there is no subject label:
+
+```python
+In [13]: for file in files:
+            try:
+                subject_label = get_subject_label(file)
+                print(subject_label)
+            except AttributeError:
+                print(f'no subject label, skipping: {file}')
+s001
+no subject label, skipping: /tmp/foo
+
+```
+
+In most cases our `try/catch` statement should catch specific errors.  In this case, we know that the function will return an `AttributeError` its input is a string that doesn't contain a subject label. But what if the input is `None`?  
+
+```python
+
+In [14]: file = None
+            try:
+                subject_label = get_subject_label(file)
+            except AttributeError:
+                print(f'no subject label, skipping: {file}')
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+Cell In[14], line 3
+      1 file = None
+      2 try:
+----> 3     subject_label = get_subject_label(file)
+      4 except AttributeError:
+      5     print(f'no subject label, skipping: {file}')
+
+Cell In[1], line 2, in get_subject_label(file)
+      1 def get_subject_label(file: str) -> str:
+----> 2     match = re.search(r'/sub-(s\d{3})/', file)
+      3     return match.group(1)
+...
+TypeError: expected string or bytes-like object, got 'NoneType'
+```
+
+Because `None` is not a string and `re.search()` expects a string, we get a `TypeError`, which is not caught by the catch statement and subsequently stops the execution.
+
+### Checking assumptions using assertions
+
+In 2013, a group of researchers published a paper in the journal *PLOS One* reporting a relationship between belief in conspiracy theories and rejection of science {cite:p}`Lewandowsky:2013aa`.  This result was based on a panel of participants (presumably adults) who completed a survey regarding a number of topics along with reporting their age and gender.  In order to rule out the potential for age to confound the relationships that they identified, they reported that "Age turned out not to correlate with any of the indicator variables".  They were later forced to issue a correction to the paper after a reader examined the dataset (which had been shared along with the paper, as required by the journal) and found the following: "The dataset included two notable age outliers (reported ages 5 and 32757)."  
+
+No one wants to publish research that requires later correction, and in this case this correction could have been avoided by including a single line of code.  Assuming that the age values are stored in a column called 'age' within a data frame, and the range of legitimate ages is 18 to 80:
+
+```python
+assert df['age'].between(18, 80).all(), "Error: ages out of bound"
+```
+
+If all values are in bounds, then this simply passes to the next statement, but if a value is out of bounds it raises and exception:
+
+```python
+In [23]: df.loc[0, 'age'] = 32757
+In [24]: assert df['age'].between(18, 80).all(), "Error: Not all ages are between 18 and 80"
+---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+Cell In[24], line 1
+----> 1 assert df['age'].between(18, 80).all(), "Error: Not all ages are between 18 and 80"
+
+AssertionError: Error: Not all ages are between 18 and 80
+
+```
+
+Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. For example:
+
+```python
+## Count values should always be non-negative integers
+assert np.all(counts >= 0) and np.issubdtype(counts.dtype, np.integer), \
+     "Count must contain non-negative integers only"
+
+## Times should be non-negative
+assert np.all(response_times >= 0)
+```
