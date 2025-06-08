@@ -568,11 +568,11 @@ Perhaps unsurprisingly, working with this code base became increasingly unwieldy
 
 >  Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)
 
-In Python, the accessibility (or *scope*) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has *global scope*, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by the function.  They can in theory be modified anywhere within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the `ic` function from the `icecream` library to report the value of the global variable before and after executing the function that modifies it:
+In Python, the accessibility (or *scope*) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has *global scope*, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by functions.  Global variables can in theory be modified anywhere they appear within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the `ic` function from the `icecream` library to report the value of the global variable before and after executing the function that modifies it:
 
  ```python
 from icecream import ic
-GLOBAL_VAR = 1
+GLOBALVAR = 1
 
 def myfunc():
     global GLOBALVAR
@@ -583,7 +583,78 @@ myfunc()
 ic(GLOBALVAR)
  ```
 
-If we were to use the global variable elsewhere, we couldn't know what its value would be without knowing how many times `myfunc()` had been executed.  
+If we were to use the global variable elsewhere, we couldn't know what its value would be without knowing how many times `myfunc()` had been executed.   
 
+In general, we want to restrict the scope of a variable to be as limited as possible, akin to a "need to know basis".  In particular, one should never use global variables to share information into and/or out of a function.  Instead, one should pass the relevant information into the function as an argument, and return the modified variable as an output.  This helps make testing of functions easier by preventing *side effects* - that is, effects on the state of the system that are not mediated by the return values of the function.  
 
-*TODO*: there are several ways to potentially address this.  what do we want to recommend?
+### Defining constants
+
+Global variables are most often used to define *constants* - that is, variables that are meant to take a single value that doesn't change, such as *pi* or *e* in mathematics and *c* (speed of light) or *h* (the Planck constant) in physics.  
+
+A simple way to define a constant is to define it within a module and import it.  For example, we could create a module file called `constants.py` and within it define a constant for the speed of light, using the common convention of defining constants using uppercase letters:
+
+```
+# project constants
+
+# speed of light in a vacuum
+C = 299792458
+```
+
+We could then import this from our module within the iPython shell:
+
+```
+In: from BetterCodeBetterScience.constants import C
+
+In: C
+Out: 299792458
+```
+
+#### Creating immutable variables
+
+We would generally like to define constants in such a way that their value is *immutable*, i.e. it is not allowed to be modified.  Unfortunately, importing a variable from a module doesn't prevent it from being modified:
+
+```
+In: C = 43
+
+In: C
+Out: 43
+```
+
+Unlike some other languages, Python doesn't offer a simple way to define a variable as a constant in a way that prevents it from being modified, but there are several tricks we can play to create an immutable constant. Here we demonstrate one simple way, in which we create a class but override its `__setattr__` method to prevent the value from being changed:
+
+We first add the class definition to our `constants.py` file:
+
+```python
+
+class Constants:
+    C = 299792458
+
+    def __setattr__(self, name, value):
+        raise AttributeError("Constants cannot be modified")
+```
+
+Then within our iPython shell, we generate an instance of the Constants class, and see what happens if we try to change the value once it's instantiated:
+
+```
+In: from BetterCodeBetterScience.constants import Constants
+
+In: constants = Constants()
+
+In: constants.C
+Out: 299792458
+
+In: constants.C = 42
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[4], line 1
+----> 1 constants.C = 42
+
+File ~/Dropbox/code/BetterCodeBetterScience/src/BetterCodeBetterScience/constants.py:11, in Constants.__setattr__(self, name, value)
+     10 def __setattr__(self, name, value):
+---> 11     raise AttributeError("Constants cannot be modified")
+
+AttributeError: Constants cannot be modified
+
+```
+
+Using this method thus prevents the value of our constant from being inadvertently changed.
