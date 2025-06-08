@@ -18,6 +18,8 @@ A rendered version of the complete book is available at [https://poldrack.github
 - Principles of Software Engineering
     - [Part 1: Intro](https://open.substack.com/pub/russpoldrack/p/principles-of-software-engineering)
     - [Part 2: Clean Coding](https://russpoldrack.substack.com/p/clean-coding)
+    - Part 3: Modularity and the "God object"
+    - Part 4: Global variables
 - Project Structure and Management
 - Coding with AI
 - Software Testing
