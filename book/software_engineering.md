@@ -810,3 +810,129 @@ assert np.all(response_times > 0)
 carbon_isotope_mass_numbers = list(range(8, 21)) + [22]
 assert mass_number in carbon_isotope_mass_numbers
 ```
+
+
+## Portable coding
+
+If you have ever tried to run other people's research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinaed. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:
+
+```python
+image_path = '/home/brain/workingdir/data/dwi/hcp/preprocessed/response_dhollander/100206/T1w/Diffusion/100206_WM_FOD_norm.mif'
+data_path = '/data/pt_02101/fmri_data/'
+image_path = '/Users/kevinsitek/Downloads/pt_02101/'
+fmripath = '/home/jb07/joe_python/fmri_analysis/'
+```
+
+Even if you don't plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.  
+
+A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public, and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
+
+*Never* place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.
+
+### Environment variables
+
+Environment variables are variables that exist in the environment and are readable from within the code; here we use examples from the UNIX shell.  Environment variables can be set from the command line using the `export` command:
+
+```bash
+❯ export MY_API_KEY='5lkjdlvkni5lkj5sklc'
+❯ echo $MY_API_KEY
+5lkjdlvkni5lkj5sklc
+```
+
+In addition, these environment variables can be made persistent by adding them to shell startup files (such as .bashrc for the `bash` shell), in which case they are loaded whenever a new shell is opened.  The values of these environment variables can then be obtained within Python using the `os.environ` object:
+
+```python
+In [1]: import os
+In [2]: os.environ['MY_API_KEY']
+Out[2]: '5lkjdlvkni5lkj5sklc'
+```
+
+Often we may have environment variables that are project-specific, such that we only want them loaded when working on that project.  A good solution for this problem is to create a `.env` file within the project and include those settings within this file.  
+
+```bash
+❯ echo "PROJECT_KEY=934kjdflk5k5ks592kskx" > .env
+
+❯ cat .env
+───────┬─────────────────────────────────────────────────────────────────────────
+       │ File: .env
+───────┼─────────────────────────────────────────────────────────────────────────
+   1   │ PROJECT_KEY=934kjdflk5k5ks592kskx
+───────┴─────────────────────────────────────────────────────────────────────────
+```
+
+Once that file exists, we can use the `python-dotenv` project to load the contents into our environment within Python:
+
+```python
+In [1]: import dotenv
+In [2]: dotenv.load_dotenv()
+Out[2]: True
+In [4]: import os
+In [5]: os.environ['PROJECT_KEY']
+Out[5]: '934kjdflk5k5ks592kskx'
+```
+
+### Configuration files
+
+In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
+
+```yaml
+---
+# Project Configuration
+project:
+  name: "Multi-source astronomy analysis"
+  version: "1.0.0"
+  description: "Analysis of multi-source astronomical data"
+  lead_scientist: "Dr. Jane Doe"
+  team:
+    - "John Smith"
+    - "Emily Brown"
+    - "Michael Wong"
+
+# Input Data Sources
+data_sources:
+  telescope_data:
+    path: "/data/telescope/"
+    file_pattern: "*.fits"
+  catalog:
+    type: "sql"
+    connection_string: "postgresql://username:password@localhost:5432/star_catalog"
+
+# Analysis Parameters
+analysis:
+  image_processing:
+    noise_reduction:
+      algorithm: "wavelet"
+      threshold: 0.05
+    background_subtraction:
+      method: "median"
+      kernel_size: [50, 50]
+```
+
+We can easily load this configuration file into Python using the `PyYAML` module, which loads it into a dictionary:
+
+```python
+In [1]: import yaml
+In [2]: config_file = 'config.yaml'
+In [3]: with open(config_file, 'r') as f:
+           config = yaml.safe_load(f)
+In [6]: config
+Out[6]:
+{'project': {'name': 'Multi-source astronomy analysis',
+  'version': '1.0.0',
+  'description': 'Analysis of multi-source astronomical data',
+  'lead_scientist': 'Dr. Jane Doe',
+  'team': ['John Smith', 'Emily Brown', 'Michael Wong']},
+ 'data_sources': {'telescope_data': {'path': '/data/telescope/',
+   'file_pattern': '*.fits'},
+  'catalog': {'type': 'sql',
+   'connection_string': 'postgresql://username:password@localhost:5432/star_catalog'}},
+ 'analysis': {'image_processing': {'noise_reduction': {'algorithm': 'wavelet',
+    'threshold': 0.05},
+   'background_subtraction': {'method': 'median', 'kernel_size': [50, 50]}}}}
+```
+
+### Protecting private credentials
+
+It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.  For this reason, one should always add any configuration files to the `.gitignore` file, which will prevent them from being checked into the repository by accident.  
+
+
