@@ -20,6 +20,8 @@ A rendered version of the complete book is available at [https://poldrack.github
     - [Part 2: Clean Coding](https://russpoldrack.substack.com/p/clean-coding)
     - Part 3: Modularity and the "God object"
     - Part 4: Global variables
+    - Part 5: Defensive coding
+    - Part 6: Coding portably
 - Project Structure and Management
 - Coding with AI
 - Software Testing
