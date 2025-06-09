@@ -812,9 +812,9 @@ assert mass_number in carbon_isotope_mass_numbers
 ```
 
 
-## Portable coding
+## Coding portably
 
-If you have ever tried to run other people's research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinaed. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:
+If you have ever tried to run other people's research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinated. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:
 
 ```python
 image_path = '/home/brain/workingdir/data/dwi/hcp/preprocessed/response_dhollander/100206/T1w/Diffusion/100206_WM_FOD_norm.mif'
@@ -825,7 +825,7 @@ fmripath = '/home/jb07/joe_python/fmri_analysis/'
 
 Even if you don't plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.  
 
-A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public, and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
+A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
 
 *Never* place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.
 
@@ -935,4 +935,29 @@ Out[6]:
 
 It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.  For this reason, one should always add any configuration files to the `.gitignore` file, which will prevent them from being checked into the repository by accident.  
 
+## Managing technical debt
+
+The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
+
+The concept of *technical debt* refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:
+
+- become dysfunctional with newer Python releases
+- come in conflict with newer versions of other packages, e.g. relying upon a function in another package that becomes deprecated 
+- introduce security risks
+- fail to address bugs or errors in the code that are discovered by users
+
+At the same time, there are very good reasons for using well-maintained packages:
+
+- Linus' law ("given enough eyeballs, all bugs are shallow") {cite:ts}`Raymond:1999aa` suggests that highly used software is less likely to retain bugs 
+- A well-maintained package is likely to be well-tested
+- Using a well-maintained package can save a great deal of time compared to writing one's own implementation
+
+While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
+
+- Multiple active contributors (not just a single developer)
+- Automated testing with a high degree of code coverage
+- Testing across multiple python versions, including recent ones
+- An active issues page, with developers responding to issues relatively quickly
+
+You may well decide that the code from a project that doesn't meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.
 

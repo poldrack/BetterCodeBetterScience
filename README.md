@@ -22,6 +22,7 @@ A rendered version of the complete book is available at [https://poldrack.github
     - Part 4: Global variables
     - Part 5: Defensive coding
     - Part 6: Coding portably
+    - Part 7: Technical debt
 - Project Structure and Management
 - Coding with AI
 - Software Testing
