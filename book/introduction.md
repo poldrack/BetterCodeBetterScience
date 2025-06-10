@@ -76,7 +76,7 @@ Cold fusion was a case in which science worked as it should, with other research
 There are many different senses of the term "reproducibility", which can cause confusion.  A framework that we like for this concept comes from the [Turing Way](https://book.the-turing-way.org/), an oustanding guide for open and reproducible science practices.  This framework, shown in {numref}`Figure {number} <TuringWayReproducibility-fig>`, distinguishes between whether the data and analysis are either same or different between two analyses.  
 
 :::{figure-md} TuringWayReproducibility-fig
-<img src="https://ttw-rtd.readthedocs.io/en/latest/_images/reproducible-matrix.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
+<img src="https://book.the-turing-way.org/build/reproducible-matrix-1f714c1d292747c95fe172a47d6a0937.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
 
 A schematic of the Turing Way framework for different concepts of reproducibility.  Reproduced from The Turing Way under CC-BY.
 :::
