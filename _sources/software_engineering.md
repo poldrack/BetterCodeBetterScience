@@ -568,11 +568,11 @@ Perhaps unsurprisingly, working with this code base became increasingly unwieldy
 
 >  Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)
 
-In Python, the accessibility (or *scope*) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has *global scope*, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by the function.  They can in theory be modified anywhere within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the `ic` function from the `icecream` library to report the value of the global variable before and after executing the function that modifies it:
+In Python, the accessibility (or *scope*) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has *global scope*, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by functions.  Global variables can in theory be modified anywhere they appear within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the `ic` function from the `icecream` library to report the value of the global variable before and after executing the function that modifies it:
 
  ```python
 from icecream import ic
-GLOBAL_VAR = 1
+GLOBALVAR = 1
 
 def myfunc():
     global GLOBALVAR
@@ -583,7 +583,381 @@ myfunc()
 ic(GLOBALVAR)
  ```
 
-If we were to use the global variable elsewhere, we couldn't know what its value would be without knowing how many times `myfunc()` had been executed.  
+If we were to use the global variable elsewhere, we couldn't know what its value would be without knowing how many times `myfunc()` had been executed.   
+
+In general, we want to restrict the scope of a variable to be as limited as possible, akin to a "need to know basis".  In particular, one should never use global variables to share information into and/or out of a function.  Instead, one should pass the relevant information into the function as an argument, and return the modified variable as an output.  This helps make testing of functions easier by preventing *side effects* - that is, effects on the state of the system that are not mediated by the return values of the function.  
+
+### Defining constants
+
+Global variables are most often used to define *constants* - that is, variables that are meant to take a single value that doesn't change, such as *pi* or *e* in mathematics and *c* (speed of light) or *h* (the Planck constant) in physics.  
+
+A simple way to define a constant is to define it within a module and import it.  For example, we could create a module file called `constants.py` and within it define a constant for the speed of light, using the common convention of defining constants using uppercase letters:
+
+```
+# project constants
+
+# speed of light in a vacuum
+C = 299792458
+```
+
+We could then import this from our module within the iPython shell:
+
+```
+In: from BetterCodeBetterScience.constants import C
+
+In: C
+Out: 299792458
+```
+
+#### Creating immutable variables
+
+We would generally like to define constants in such a way that their value is *immutable*, i.e. it is not allowed to be modified.  Unfortunately, importing a variable from a module doesn't prevent it from being modified:
+
+```
+In: C = 43
+
+In: C
+Out: 43
+```
+
+Unlike some other languages, Python doesn't offer a simple way to define a variable as a constant in a way that prevents it from being modified, but there are several tricks we can play to create an immutable constant. Here we demonstrate one simple way, in which we create a class but override its `__setattr__` method to prevent the value from being changed:
+
+We first add the class definition to our `constants.py` file:
+
+```python
+
+class Constants:
+    C = 299792458
+
+    def __setattr__(self, name, value):
+        raise AttributeError("Constants cannot be modified")
+```
+
+Then within our iPython shell, we generate an instance of the Constants class, and see what happens if we try to change the value once it's instantiated:
+
+```
+In: from BetterCodeBetterScience.constants import Constants
+
+In: constants = Constants()
+
+In: constants.C
+Out: 299792458
+
+In: constants.C = 42
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[4], line 1
+----> 1 constants.C = 42
+
+File ~/Dropbox/code/BetterCodeBetterScience/src/BetterCodeBetterScience/constants.py:11, in Constants.__setattr__(self, name, value)
+     10 def __setattr__(self, name, value):
+---> 11     raise AttributeError("Constants cannot be modified")
+
+AttributeError: Constants cannot be modified
+
+```
+
+Using this method thus prevents the value of our constant from being inadvertently changed.
 
 
-*TODO*: there are several ways to potentially address this.  what do we want to recommend?
+## Defensive coding
+
+Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  *Defensive coding* means writing code in a way that tries to protect against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in a later chapter.  Here we focus on robustness to *runtime errors*; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the logic of the code or errors or invalid assumptions about the data that are being used by code.  
+
+A central aspect of defensive coding is to detect errors and announce them in a loud way.  For example, in a recent code review, a researcher showed the following code:
+
+```python
+def get_subject_label(file):
+    """
+    Extract the subject label from a given file path.
+
+    Parameters:
+    - file (str): The file path from which to extract the subject label.
+
+    Returns:
+    - str or None: The extracted subject label (e.g., 's001') if found, 
+                   otherwise returns None and prints a message.
+    """
+    
+    match = re.search(r'/sub-(s\d{3})/', file)
+    
+    if match:
+        subject_label = match.group(1)
+        return subject_label
+    else:
+        return None
+```
+
+When one of us asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was `None`, meaning that such an error would go unnoticed until it caused an error later when `subject_label` was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is `None`, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.
+
+### Announcing errors loudly using exceptions
+
+A better practice here would be to raise an *exception*. Unlike passing `None`, raising an exception will cause the program to stop unless the exception is handled.  In the previous example, we could do the following (removing the docstring for brevity):
+
+```python
+def get_subject_label(file: str) -> str:
+    match = re.search(r'/sub-(s\d{3})/', file)
+    return match.group(1)
+```
+
+In some cases we might want the script to stop if it encounters a filename without a subject label, in which case we simply call the function:
+
+```python
+In [11]: file = '/data/sub-s001/run-1_bold.nii.gz'
+
+In [12]: get_subject_label(file)
+Out[12]: 's001'
+
+In [13]: file = '/data/nolabel/run-1_bold.nii.gz'
+
+In [14]: get_subject_label(file)
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[14], line 1
+----> 1 get_subject_label(file)
+
+Cell In[1], line 3, in get_subject_label(file)
+      1 def get_subject_label(file: str) -> str:
+      2     match = re.search(r'/sub-(s\d{3})/', file)
+----> 3     return match.group(1)
+
+AttributeError: 'NoneType' object has no attribute 'group'
+```
+
+In other cases we might want to handle the exception without halting the program, in which case we can embed the function call in a `try/catch` statement that tries to run the function and then handles any exceptions that might occur.  Let's say that we simply want to skip over any files for which there is no subject label:
+
+```python
+In [13]: for file in files:
+            try:
+                subject_label = get_subject_label(file)
+                print(subject_label)
+            except AttributeError:
+                print(f'no subject label, skipping: {file}')
+s001
+no subject label, skipping: /tmp/foo
+
+```
+
+In most cases our `try/catch` statement should catch specific errors.  In this case, we know that the function will return an `AttributeError` its input is a string that doesn't contain a subject label. But what if the input is `None`?  
+
+```python
+
+In [14]: file = None
+            try:
+                subject_label = get_subject_label(file)
+            except AttributeError:
+                print(f'no subject label, skipping: {file}')
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+Cell In[14], line 3
+      1 file = None
+      2 try:
+----> 3     subject_label = get_subject_label(file)
+      4 except AttributeError:
+      5     print(f'no subject label, skipping: {file}')
+
+Cell In[1], line 2, in get_subject_label(file)
+      1 def get_subject_label(file: str) -> str:
+----> 2     match = re.search(r'/sub-(s\d{3})/', file)
+      3     return match.group(1)
+...
+TypeError: expected string or bytes-like object, got 'NoneType'
+```
+
+Because `None` is not a string and `re.search()` expects a string, we get a `TypeError`, which is not caught by the catch statement and subsequently stops the execution.
+
+### Checking assumptions using assertions
+
+In 2013, a group of researchers published a paper in the journal *PLOS One* reporting a relationship between belief in conspiracy theories and rejection of science {cite:p}`Lewandowsky:2013aa`.  This result was based on a panel of participants (presumably adults) who completed a survey regarding a number of topics along with reporting their age and gender.  In order to rule out the potential for age to confound the relationships that they identified, they reported that "Age turned out not to correlate with any of the indicator variables".  They were later forced to issue a correction to the paper after a reader examined the dataset (which had been shared along with the paper, as required by the journal) and found the following: "The dataset included two notable age outliers (reported ages 5 and 32757)."  
+
+No one wants to publish research that requires later correction, and in this case this correction could have been avoided by including a single line of code.  Assuming that the age values are stored in a column called 'age' within a data frame, and the range of legitimate ages is 18 to 80:
+
+```python
+assert df['age'].between(18, 80).all(), "Error: ages out of bound"
+```
+
+If all values are in bounds, then this simply passes to the next statement, but if a value is out of bounds it raises and exception:
+
+```python
+In [23]: df.loc[0, 'age'] = 32757
+In [24]: assert df['age'].between(18, 80).all(), "Error: Not all ages are between 18 and 80"
+---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+Cell In[24], line 1
+----> 1 assert df['age'].between(18, 80).all(), "Error: Not all ages are between 18 and 80"
+
+AssertionError: Error: Not all ages are between 18 and 80
+
+```
+
+Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. Examples of such variables include:
+
+- Counts (>= 0; in some cases an upper limit may also be plausible, such as a count of the number of planets in the solar system)
+- Elapsed time (> 0)
+- Discrete values (e.g. atomic numbers in the periodic table, or mass numbers for a particular element)
+
+For example:
+
+```python
+## Count values should always be non-negative integers
+assert np.all(counts >= 0) and np.issubdtype(counts.dtype, np.integer), \
+     "Count must contain non-negative integers only"
+
+## Measured times should be positive
+assert np.all(response_times > 0)
+
+## Discrete values
+carbon_isotope_mass_numbers = list(range(8, 21)) + [22]
+assert mass_number in carbon_isotope_mass_numbers
+```
+
+
+## Coding portably
+
+If you have ever tried to run other people's research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinated. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:
+
+```python
+image_path = '/home/brain/workingdir/data/dwi/hcp/preprocessed/response_dhollander/100206/T1w/Diffusion/100206_WM_FOD_norm.mif'
+data_path = '/data/pt_02101/fmri_data/'
+image_path = '/Users/kevinsitek/Downloads/pt_02101/'
+fmripath = '/home/jb07/joe_python/fmri_analysis/'
+```
+
+Even if you don't plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.  
+
+A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
+
+*Never* place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.
+
+### Environment variables
+
+Environment variables are variables that exist in the environment and are readable from within the code; here we use examples from the UNIX shell.  Environment variables can be set from the command line using the `export` command:
+
+```bash
+❯ export MY_API_KEY='5lkjdlvkni5lkj5sklc'
+❯ echo $MY_API_KEY
+5lkjdlvkni5lkj5sklc
+```
+
+In addition, these environment variables can be made persistent by adding them to shell startup files (such as .bashrc for the `bash` shell), in which case they are loaded whenever a new shell is opened.  The values of these environment variables can then be obtained within Python using the `os.environ` object:
+
+```python
+In [1]: import os
+In [2]: os.environ['MY_API_KEY']
+Out[2]: '5lkjdlvkni5lkj5sklc'
+```
+
+Often we may have environment variables that are project-specific, such that we only want them loaded when working on that project.  A good solution for this problem is to create a `.env` file within the project and include those settings within this file.  
+
+```bash
+❯ echo "PROJECT_KEY=934kjdflk5k5ks592kskx" > .env
+
+❯ cat .env
+───────┬─────────────────────────────────────────────────────────────────────────
+       │ File: .env
+───────┼─────────────────────────────────────────────────────────────────────────
+   1   │ PROJECT_KEY=934kjdflk5k5ks592kskx
+───────┴─────────────────────────────────────────────────────────────────────────
+```
+
+Once that file exists, we can use the `python-dotenv` project to load the contents into our environment within Python:
+
+```python
+In [1]: import dotenv
+In [2]: dotenv.load_dotenv()
+Out[2]: True
+In [4]: import os
+In [5]: os.environ['PROJECT_KEY']
+Out[5]: '934kjdflk5k5ks592kskx'
+```
+
+### Configuration files
+
+In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
+
+```yaml
+---
+# Project Configuration
+project:
+  name: "Multi-source astronomy analysis"
+  version: "1.0.0"
+  description: "Analysis of multi-source astronomical data"
+  lead_scientist: "Dr. Jane Doe"
+  team:
+    - "John Smith"
+    - "Emily Brown"
+    - "Michael Wong"
+
+# Input Data Sources
+data_sources:
+  telescope_data:
+    path: "/data/telescope/"
+    file_pattern: "*.fits"
+  catalog:
+    type: "sql"
+    connection_string: "postgresql://username:password@localhost:5432/star_catalog"
+
+# Analysis Parameters
+analysis:
+  image_processing:
+    noise_reduction:
+      algorithm: "wavelet"
+      threshold: 0.05
+    background_subtraction:
+      method: "median"
+      kernel_size: [50, 50]
+```
+
+We can easily load this configuration file into Python using the `PyYAML` module, which loads it into a dictionary:
+
+```python
+In [1]: import yaml
+In [2]: config_file = 'config.yaml'
+In [3]: with open(config_file, 'r') as f:
+           config = yaml.safe_load(f)
+In [6]: config
+Out[6]:
+{'project': {'name': 'Multi-source astronomy analysis',
+  'version': '1.0.0',
+  'description': 'Analysis of multi-source astronomical data',
+  'lead_scientist': 'Dr. Jane Doe',
+  'team': ['John Smith', 'Emily Brown', 'Michael Wong']},
+ 'data_sources': {'telescope_data': {'path': '/data/telescope/',
+   'file_pattern': '*.fits'},
+  'catalog': {'type': 'sql',
+   'connection_string': 'postgresql://username:password@localhost:5432/star_catalog'}},
+ 'analysis': {'image_processing': {'noise_reduction': {'algorithm': 'wavelet',
+    'threshold': 0.05},
+   'background_subtraction': {'method': 'median', 'kernel_size': [50, 50]}}}}
+```
+
+### Protecting private credentials
+
+It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.  For this reason, one should always add any configuration files to the `.gitignore` file, which will prevent them from being checked into the repository by accident.  
+
+## Managing technical debt
+
+The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
+
+The concept of *technical debt* refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:
+
+- become dysfunctional with newer Python releases
+- come in conflict with newer versions of other packages, e.g. relying upon a function in another package that becomes deprecated 
+- introduce security risks
+- fail to address bugs or errors in the code that are discovered by users
+
+At the same time, there are very good reasons for using well-maintained packages:
+
+- Linus' law ("given enough eyeballs, all bugs are shallow") {cite:ts}`Raymond:1999aa` suggests that highly used software is less likely to retain bugs 
+- A well-maintained package is likely to be well-tested
+- Using a well-maintained package can save a great deal of time compared to writing one's own implementation
+
+While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
+
+- Multiple active contributors (not just a single developer)
+- Automated testing with a high degree of code coverage
+- Testing across multiple python versions, including recent ones
+- An active issues page, with developers responding to issues relatively quickly
+
+You may well decide that the code from a project that doesn't meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.
+

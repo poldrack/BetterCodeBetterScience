@@ -421,8 +421,24 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity">Modularity</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-god-object">The “God object”</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-variables">Global variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-constants">Defining constants</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-immutable-variables">Creating immutable variables</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defensive-coding">Defensive coding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#announcing-errors-loudly-using-exceptions">Announcing errors loudly using exceptions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-assumptions-using-assertions">Checking assumptions using assertions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coding-portably">Coding portably</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-variables">Environment variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-files">Configuration files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#protecting-private-credentials">Protecting private credentials</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-technical-debt">Managing technical debt</a></li>
 </ul>
             </nav>
         </div>
@@ -940,9 +956,9 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <blockquote>
 <div><p>Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)</p>
 </div></blockquote>
-<p>In Python, the accessibility (or <em>scope</em>) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has <em>global scope</em>, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by the function.  They can in theory be modified anywhere within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the <code class="docutils literal notranslate"><span class="pre">ic</span></code> function from the <code class="docutils literal notranslate"><span class="pre">icecream</span></code> library to report the value of the global variable before and after executing the function that modifies it:</p>
+<p>In Python, the accessibility (or <em>scope</em>) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has <em>global scope</em>, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by functions.  Global variables can in theory be modified anywhere they appear within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the <code class="docutils literal notranslate"><span class="pre">ic</span></code> function from the <code class="docutils literal notranslate"><span class="pre">icecream</span></code> library to report the value of the global variable before and after executing the function that modifies it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">icecream</span> <span class="kn">import</span> <span class="n">ic</span>
-<span class="n">GLOBAL_VAR</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">GLOBALVAR</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="k">def</span> <span class="nf">myfunc</span><span class="p">():</span>
    <span class="k">global</span> <span class="n">GLOBALVAR</span>
@@ -954,8 +970,337 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </pre></div>
 </div>
 <p>If we were to use the global variable elsewhere, we couldn’t know what its value would be without knowing how many times <code class="docutils literal notranslate"><span class="pre">myfunc()</span></code> had been executed.</p>
-<p><em>TODO</em>: there are several ways to potentially address this.  what do we want to recommend?</p>
+<p>In general, we want to restrict the scope of a variable to be as limited as possible, akin to a “need to know basis”.  In particular, one should never use global variables to share information into and/or out of a function.  Instead, one should pass the relevant information into the function as an argument, and return the modified variable as an output.  This helps make testing of functions easier by preventing <em>side effects</em> - that is, effects on the state of the system that are not mediated by the return values of the function.</p>
 </section>
+<section id="defining-constants">
+<h3>Defining constants<a class="headerlink" href="#defining-constants" title="Permalink to this heading">#</a></h3>
+<p>Global variables are most often used to define <em>constants</em> - that is, variables that are meant to take a single value that doesn’t change, such as <em>pi</em> or <em>e</em> in mathematics and <em>c</em> (speed of light) or <em>h</em> (the Planck constant) in physics.</p>
+<p>A simple way to define a constant is to define it within a module and import it.  For example, we could create a module file called <code class="docutils literal notranslate"><span class="pre">constants.py</span></code> and within it define a constant for the speed of light, using the common convention of defining constants using uppercase letters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># project constants</span>
+
+<span class="c1"># speed of light in a vacuum</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mi">299792458</span>
+</pre></div>
+</div>
+<p>We could then import this from our module within the iPython shell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span><span class="p">:</span> <span class="kn">from</span> <span class="nn">BetterCodeBetterScience.constants</span> <span class="kn">import</span> <span class="n">C</span>
+
+<span class="n">In</span><span class="p">:</span> <span class="n">C</span>
+<span class="n">Out</span><span class="p">:</span> <span class="mi">299792458</span>
+</pre></div>
+</div>
+<section id="creating-immutable-variables">
+<h4>Creating immutable variables<a class="headerlink" href="#creating-immutable-variables" title="Permalink to this heading">#</a></h4>
+<p>We would generally like to define constants in such a way that their value is <em>immutable</em>, i.e. it is not allowed to be modified.  Unfortunately, importing a variable from a module doesn’t prevent it from being modified:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span><span class="p">:</span> <span class="n">C</span> <span class="o">=</span> <span class="mi">43</span>
+
+<span class="n">In</span><span class="p">:</span> <span class="n">C</span>
+<span class="n">Out</span><span class="p">:</span> <span class="mi">43</span>
+</pre></div>
+</div>
+<p>Unlike some other languages, Python doesn’t offer a simple way to define a variable as a constant in a way that prevents it from being modified, but there are several tricks we can play to create an immutable constant. Here we demonstrate one simple way, in which we create a class but override its <code class="docutils literal notranslate"><span class="pre">__setattr__</span></code> method to prevent the value from being changed:</p>
+<p>We first add the class definition to our <code class="docutils literal notranslate"><span class="pre">constants.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="k">class</span> <span class="nc">Constants</span><span class="p">:</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="mi">299792458</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Constants cannot be modified&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then within our iPython shell, we generate an instance of the Constants class, and see what happens if we try to change the value once it’s instantiated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span><span class="p">:</span> <span class="kn">from</span> <span class="nn">BetterCodeBetterScience.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
+
+<span class="n">In</span><span class="p">:</span> <span class="n">constants</span> <span class="o">=</span> <span class="n">Constants</span><span class="p">()</span>
+
+<span class="n">In</span><span class="p">:</span> <span class="n">constants</span><span class="o">.</span><span class="n">C</span>
+<span class="n">Out</span><span class="p">:</span> <span class="mi">299792458</span>
+
+<span class="n">In</span><span class="p">:</span> <span class="n">constants</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span>                            <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="n">constants</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="n">File</span> <span class="o">~/</span><span class="n">Dropbox</span><span class="o">/</span><span class="n">code</span><span class="o">/</span><span class="n">BetterCodeBetterScience</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">BetterCodeBetterScience</span><span class="o">/</span><span class="n">constants</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span> <span class="ow">in</span> <span class="n">Constants</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+     <span class="mi">10</span> <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="o">---&gt;</span> <span class="mi">11</span>     <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Constants cannot be modified&quot;</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="n">Constants</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">modified</span>
+
+</pre></div>
+</div>
+<p>Using this method thus prevents the value of our constant from being inadvertently changed.</p>
+</section>
+</section>
+</section>
+<section id="defensive-coding">
+<h2>Defensive coding<a class="headerlink" href="#defensive-coding" title="Permalink to this heading">#</a></h2>
+<p>Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  <em>Defensive coding</em> means writing code in a way that tries to protect against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in a later chapter.  Here we focus on robustness to <em>runtime errors</em>; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the logic of the code or errors or invalid assumptions about the data that are being used by code.</p>
+<p>A central aspect of defensive coding is to detect errors and announce them in a loud way.  For example, in a recent code review, a researcher showed the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the subject label from a given file path.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - file (str): The file path from which to extract the subject label.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - str or None: The extracted subject label (e.g., &#39;s001&#39;) if found, </span>
+<span class="sd">                   otherwise returns None and prints a message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/sub-(s\d</span><span class="si">{3}</span><span class="s1">)/&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="n">subject_label</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">subject_label</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>When one of us asked the question “Should there ever be a file path that doesn’t include a subject label?”, the answer was “No”, meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that such an error would go unnoticed until it caused an error later when <code class="docutils literal notranslate"><span class="pre">subject_label</span></code> was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.</p>
+<section id="announcing-errors-loudly-using-exceptions">
+<h3>Announcing errors loudly using exceptions<a class="headerlink" href="#announcing-errors-loudly-using-exceptions" title="Permalink to this heading">#</a></h3>
+<p>A better practice here would be to raise an <em>exception</em>. Unlike passing <code class="docutils literal notranslate"><span class="pre">None</span></code>, raising an exception will cause the program to stop unless the exception is handled.  In the previous example, we could do the following (removing the docstring for brevity):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/sub-(s\d</span><span class="si">{3}</span><span class="s1">)/&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In some cases we might want the script to stop if it encounters a filename without a subject label, in which case we simply call the function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;/data/sub-s001/run-1_bold.nii.gz&#39;</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="s1">&#39;s001&#39;</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;/data/nolabel/run-1_bold.nii.gz&#39;</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span>                            <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span><span class="p">,</span> <span class="ow">in</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+      <span class="mi">1</span> <span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+      <span class="mi">2</span>     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/sub-(s\d</span><span class="si">{3}</span><span class="s1">)/&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+<span class="o">----&gt;</span> <span class="mi">3</span>     <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;group&#39;</span>
+</pre></div>
+</div>
+<p>In other cases we might want to handle the exception without halting the program, in which case we can embed the function call in a <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement that tries to run the function and then handles any exceptions that might occur.  Let’s say that we simply want to skip over any files for which there is no subject label:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">subject_label</span> <span class="o">=</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">subject_label</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no subject label, skipping: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">s001</span>
+<span class="n">no</span> <span class="n">subject</span> <span class="n">label</span><span class="p">,</span> <span class="n">skipping</span><span class="p">:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">foo</span>
+
+</pre></div>
+</div>
+<p>In most cases our <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement should catch specific errors.  In this case, we know that the function will return an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> its input is a string that doesn’t contain a subject label. But what if the input is <code class="docutils literal notranslate"><span class="pre">None</span></code>?</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">subject_label</span> <span class="o">=</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no subject label, skipping: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span>                                 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+      <span class="mi">1</span> <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="mi">2</span> <span class="k">try</span><span class="p">:</span>
+<span class="o">----&gt;</span> <span class="mi">3</span>     <span class="n">subject_label</span> <span class="o">=</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+      <span class="mi">4</span> <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+      <span class="mi">5</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no subject label, skipping: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span><span class="p">,</span> <span class="ow">in</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+      <span class="mi">1</span> <span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="o">----&gt;</span> <span class="mi">2</span>     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/sub-(s\d</span><span class="si">{3}</span><span class="s1">)/&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+      <span class="mi">3</span>     <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">expected</span> <span class="n">string</span> <span class="ow">or</span> <span class="nb">bytes</span><span class="o">-</span><span class="n">like</span> <span class="nb">object</span><span class="p">,</span> <span class="n">got</span> <span class="s1">&#39;NoneType&#39;</span>
+</pre></div>
+</div>
+<p>Because <code class="docutils literal notranslate"><span class="pre">None</span></code> is not a string and <code class="docutils literal notranslate"><span class="pre">re.search()</span></code> expects a string, we get a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>, which is not caught by the catch statement and subsequently stops the execution.</p>
+</section>
+<section id="checking-assumptions-using-assertions">
+<h3>Checking assumptions using assertions<a class="headerlink" href="#checking-assumptions-using-assertions" title="Permalink to this heading">#</a></h3>
+<p>In 2013, a group of researchers published a paper in the journal <em>PLOS One</em> reporting a relationship between belief in conspiracy theories and rejection of science <span id="id7">[<a class="reference internal" href="bibliography.html#id6" title="Stephan Lewandowsky, Gilles E Gignac, and Klaus Oberauer. The role of conspiracist ideation and worldviews in predicting rejection of science. PLoS One, 8(10):e75637, 2013. doi:10.1371/journal.pone.0075637.">Lewandowsky <em>et al.</em>, 2013</a>]</span>.  This result was based on a panel of participants (presumably adults) who completed a survey regarding a number of topics along with reporting their age and gender.  In order to rule out the potential for age to confound the relationships that they identified, they reported that “Age turned out not to correlate with any of the indicator variables”.  They were later forced to issue a correction to the paper after a reader examined the dataset (which had been shared along with the paper, as required by the journal) and found the following: “The dataset included two notable age outliers (reported ages 5 and 32757).”</p>
+<p>No one wants to publish research that requires later correction, and in this case this correction could have been avoided by including a single line of code.  Assuming that the age values are stored in a column called ‘age’ within a data frame, and the range of legitimate ages is 18 to 80:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;Error: ages out of bound&quot;</span>
+</pre></div>
+</div>
+<p>If all values are in bounds, then this simply passes to the next statement, but if a value is out of bounds it raises and exception:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">23</span><span class="p">]:</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32757</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">24</span><span class="p">]:</span> <span class="k">assert</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;Error: Not all ages are between 18 and 80&quot;</span>
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">AssertionError</span>                            <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">24</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="k">assert</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;Error: Not all ages are between 18 and 80&quot;</span>
+
+<span class="ne">AssertionError</span><span class="p">:</span> <span class="n">Error</span><span class="p">:</span> <span class="n">Not</span> <span class="nb">all</span> <span class="n">ages</span> <span class="n">are</span> <span class="n">between</span> <span class="mi">18</span> <span class="ow">and</span> <span class="mi">80</span>
+
+</pre></div>
+</div>
+<p>Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. Examples of such variables include:</p>
+<ul class="simple">
+<li><p>Counts (&gt;= 0; in some cases an upper limit may also be plausible, such as a count of the number of planets in the solar system)</p></li>
+<li><p>Elapsed time (&gt; 0)</p></li>
+<li><p>Discrete values (e.g. atomic numbers in the periodic table, or mass numbers for a particular element)</p></li>
+</ul>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## Count values should always be non-negative integers</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">counts</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">),</span> \
+     <span class="s2">&quot;Count must contain non-negative integers only&quot;</span>
+
+<span class="c1">## Measured times should be positive</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">response_times</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">## Discrete values</span>
+<span class="n">carbon_isotope_mass_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">22</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">mass_number</span> <span class="ow">in</span> <span class="n">carbon_isotope_mass_numbers</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="coding-portably">
+<h2>Coding portably<a class="headerlink" href="#coding-portably" title="Permalink to this heading">#</a></h2>
+<p>If you have ever tried to run other people’s research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinated. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;/home/brain/workingdir/data/dwi/hcp/preprocessed/response_dhollander/100206/T1w/Diffusion/100206_WM_FOD_norm.mif&#39;</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;/data/pt_02101/fmri_data/&#39;</span>
+<span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/kevinsitek/Downloads/pt_02101/&#39;</span>
+<span class="n">fmripath</span> <span class="o">=</span> <span class="s1">&#39;/home/jb07/joe_python/fmri_analysis/&#39;</span>
+</pre></div>
+</div>
+<p>Even if you don’t plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.</p>
+<p>A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab’s Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.</p>
+<p><em>Never</em> place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.</p>
+<section id="environment-variables">
+<h3>Environment variables<a class="headerlink" href="#environment-variables" title="Permalink to this heading">#</a></h3>
+<p>Environment variables are variables that exist in the environment and are readable from within the code; here we use examples from the UNIX shell.  Environment variables can be set from the command line using the <code class="docutils literal notranslate"><span class="pre">export</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">MY_API_KEY</span><span class="o">=</span><span class="s1">&#39;5lkjdlvkni5lkj5sklc&#39;</span>
+❯<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$MY_API_KEY</span>
+5lkjdlvkni5lkj5sklc
+</pre></div>
+</div>
+<p>In addition, these environment variables can be made persistent by adding them to shell startup files (such as .bashrc for the <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell), in which case they are loaded whenever a new shell is opened.  The values of these environment variables can then be obtained within Python using the <code class="docutils literal notranslate"><span class="pre">os.environ</span></code> object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">os</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MY_API_KEY&#39;</span><span class="p">]</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="s1">&#39;5lkjdlvkni5lkj5sklc&#39;</span>
+</pre></div>
+</div>
+<p>Often we may have environment variables that are project-specific, such that we only want them loaded when working on that project.  A good solution for this problem is to create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file within the project and include those settings within this file.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;PROJECT_KEY=934kjdflk5k5ks592kskx&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>.env
+
+❯<span class="w"> </span>cat<span class="w"> </span>.env
+───────┬─────────────────────────────────────────────────────────────────────────
+<span class="w">       </span>│<span class="w"> </span>File:<span class="w"> </span>.env
+───────┼─────────────────────────────────────────────────────────────────────────
+<span class="w">   </span><span class="m">1</span><span class="w">   </span>│<span class="w"> </span><span class="nv">PROJECT_KEY</span><span class="o">=</span>934kjdflk5k5ks592kskx
+───────┴─────────────────────────────────────────────────────────────────────────
+</pre></div>
+</div>
+<p>Once that file exists, we can use the <code class="docutils literal notranslate"><span class="pre">python-dotenv</span></code> project to load the contents into our environment within Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">dotenv</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">dotenv</span><span class="o">.</span><span class="n">load_dotenv</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="kc">True</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">os</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PROJECT_KEY&#39;</span><span class="p">]</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="s1">&#39;934kjdflk5k5ks592kskx&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration-files">
+<h3>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">#</a></h3>
+<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="c1"># Project Configuration</span>
+<span class="nt">project</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Multi-source</span><span class="nv"> </span><span class="s">astronomy</span><span class="nv"> </span><span class="s">analysis&quot;</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0.0&quot;</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Analysis</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">multi-source</span><span class="nv"> </span><span class="s">astronomical</span><span class="nv"> </span><span class="s">data&quot;</span>
+<span class="w">  </span><span class="nt">lead_scientist</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dr.</span><span class="nv"> </span><span class="s">Jane</span><span class="nv"> </span><span class="s">Doe&quot;</span>
+<span class="w">  </span><span class="nt">team</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;John</span><span class="nv"> </span><span class="s">Smith&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;Emily</span><span class="nv"> </span><span class="s">Brown&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;Michael</span><span class="nv"> </span><span class="s">Wong&quot;</span>
+
+<span class="c1"># Input Data Sources</span>
+<span class="nt">data_sources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">telescope_data</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/data/telescope/&quot;</span>
+<span class="w">    </span><span class="nt">file_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*.fits&quot;</span>
+<span class="w">  </span><span class="nt">catalog</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sql&quot;</span>
+<span class="w">    </span><span class="nt">connection_string</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;postgresql://username:password@localhost:5432/star_catalog&quot;</span>
+
+<span class="c1"># Analysis Parameters</span>
+<span class="nt">analysis</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image_processing</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">noise_reduction</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;wavelet&quot;</span>
+<span class="w">      </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">    </span><span class="nt">background_subtraction</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;median&quot;</span>
+<span class="w">      </span><span class="nt">kernel_size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">50</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>We can easily load this configuration file into Python using the <code class="docutils literal notranslate"><span class="pre">PyYAML</span></code> module, which loads it into a dictionary:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;config.yaml&#39;</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+           <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">config</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">6</span><span class="p">]:</span>
+<span class="p">{</span><span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Multi-source astronomy analysis&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Analysis of multi-source astronomical data&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;lead_scientist&#39;</span><span class="p">:</span> <span class="s1">&#39;Dr. Jane Doe&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;team&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;John Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Emily Brown&#39;</span><span class="p">,</span> <span class="s1">&#39;Michael Wong&#39;</span><span class="p">]},</span>
+ <span class="s1">&#39;data_sources&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;telescope_data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;/data/telescope/&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;file_pattern&#39;</span><span class="p">:</span> <span class="s1">&#39;*.fits&#39;</span><span class="p">},</span>
+  <span class="s1">&#39;catalog&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;sql&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;connection_string&#39;</span><span class="p">:</span> <span class="s1">&#39;postgresql://username:password@localhost:5432/star_catalog&#39;</span><span class="p">}},</span>
+ <span class="s1">&#39;analysis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;image_processing&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;noise_reduction&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s1">&#39;wavelet&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">},</span>
+   <span class="s1">&#39;background_subtraction&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;kernel_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">]}}}}</span>
+</pre></div>
+</div>
+</section>
+<section id="protecting-private-credentials">
+<h3>Protecting private credentials<a class="headerlink" href="#protecting-private-credentials" title="Permalink to this heading">#</a></h3>
+<p>It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.  For this reason, one should always add any configuration files to the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file, which will prevent them from being checked into the repository by accident.</p>
+</section>
+</section>
+<section id="managing-technical-debt">
+<h2>Managing technical debt<a class="headerlink" href="#managing-technical-debt" title="Permalink to this heading">#</a></h2>
+<p>The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.</p>
+<p>The concept of <em>technical debt</em> refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:</p>
+<ul class="simple">
+<li><p>become dysfunctional with newer Python releases</p></li>
+<li><p>come in conflict with newer versions of other packages, e.g. relying upon a function in another package that becomes deprecated</p></li>
+<li><p>introduce security risks</p></li>
+<li><p>fail to address bugs or errors in the code that are discovered by users</p></li>
+</ul>
+<p>At the same time, there are very good reasons for using well-maintained packages:</p>
+<ul class="simple">
+<li><p>Linus’ law (“given enough eyeballs, all bugs are shallow”) <span id="id8">Raymond [<a class="reference internal" href="bibliography.html#id5" title="Eric S Raymond. The cathedral &amp; the bazaar: musings on Linux and open source by an accidental revolutionary. O'Reilly, Beijing, 1st ed edition, 1999. ISBN 1565927249. URL: http://www.loc.gov/catdir/enhancements/fy0915/99045768-b.html.">1999</a>]</span> suggests that highly used software is less likely to retain bugs</p></li>
+<li><p>A well-maintained package is likely to be well-tested</p></li>
+<li><p>Using a well-maintained package can save a great deal of time compared to writing one’s own implementation</p></li>
+</ul>
+<p>While we don’t want to suggest that one shouldn’t use any old package from PyPI that happens to solve an important problem, we think it’s important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">Scikit-learn project</a>.  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:</p>
+<ul class="simple">
+<li><p>Multiple active contributors (not just a single developer)</p></li>
+<li><p>Automated testing with a high degree of code coverage</p></li>
+<li><p>Testing across multiple python versions, including recent ones</p></li>
+<li><p>An active issues page, with developers responding to issues relatively quickly</p></li>
+</ul>
+<p>You may well decide that the code from a project that doesn’t meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.</p>
 </section>
 </section>
 
@@ -1069,8 +1414,24 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity">Modularity</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-god-object">The “God object”</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-variables">Global variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-constants">Defining constants</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-immutable-variables">Creating immutable variables</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defensive-coding">Defensive coding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#announcing-errors-loudly-using-exceptions">Announcing errors loudly using exceptions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-assumptions-using-assertions">Checking assumptions using assertions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coding-portably">Coding portably</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-variables">Environment variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-files">Configuration files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#protecting-private-credentials">Protecting private credentials</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-technical-debt">Managing technical debt</a></li>
 </ul>
   </nav></div>
 
