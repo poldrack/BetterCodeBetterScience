@@ -15,10 +15,11 @@ A rendered version of the complete book is available at [https://poldrack.github
 - Essential Tools and Techniques
     - [Part 1: Version control](https://russpoldrack.substack.com/p/essential-tools-for-writing-better?r=1n86gc)
     - [Part 2: Large Language Models](https://russpoldrack.substack.com/p/essential-tools-for-writing-better-f69?r=1n86gc)
+    - [Part 3: Managing environments]()
 - Principles of Software Engineering
     - [Part 1: Intro](https://open.substack.com/pub/russpoldrack/p/principles-of-software-engineering)
     - [Part 2: Clean Coding](https://russpoldrack.substack.com/p/clean-coding)
-    - Part 3: Modularity and the "God object"
+    - Part 3: [Modularity and the "God object"](https://russpoldrack.substack.com/p/modularity-and-the-god-object)
     - Part 4: Global variables
     - Part 5: Defensive coding
     - Part 6: Coding portably

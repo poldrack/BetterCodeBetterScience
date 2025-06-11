@@ -275,6 +275,160 @@ Collaborative development requires choosing a workflow that the team will adhere
 
 This type of collaborative development process powers many of the large open source projects that are commonly used today, but can be equally transformative for small groups such as a individual research lab.
 
+## Virtual environments
+
+When developing software, it is essential to have a way to manage the many dependencies and software versions that are necessary, particularly for a language like Python that has a broad landscape of packages.  This problem is generally solved using *virtual environments*, which provide a way to isolate a specific set of software dependencies necessary for a project.  
+
+This is important for several reasons.  First, it allows different projects to use different versions of specific packages without interfering with one another.  One often finds the need to install an older version of a particular dependency, or an older version of Python, in order to use a specific tool.  Without virtual environments, managing different dependencies across projects can become impossible. If one project requires Python ≤3.9 while another needs Python ≥3.12, conflicts arise that virtual environments can easily resolve.  Second, because the virtual environment specifies the exact version of each dependency and allows these to be exported, it is possible for other users on different machines to exactly recreate the package environment required by the author (assuming that those package versions are available on the users's operating system).  This can greatly enhance the reproducibility of computational analyses across systems, and can also ease the implementation of software across multiple machines (e.g. when one wants to move code from a local machine into the cloud).  On shared computing systems (such as academic computing clusters), virtual environments let users install their own packages without needing admin access.
+
+A virtual environment is at its heart simply a directory structure that contains a specified set of executables and software dependencies. When the virtual environment is *activated* using a special command, these directories are added to the system paths, allowing them to be accessed just like any software installed centrally on the system.  They can be easily removed from the path by deactivating the environment.
+
+There are numerous tools within the Python ecosystem for package management and virtual environments, to the degree that some have called it an ["inexcusable pain in the ass"](https://dublog.net/blog/so-many-python-package-managers/).   We will focus on two solutions here (uv and conda), realizing that things will change over time and these recommendations will likely need to be updated (living textbooks FTW!).
+
+
+### Environment management using *uv*
+
+[uv](https://docs.astral.sh/uv/) is a relatively new package management tool that has quickly gained momentum in the Python community, in large part because of its speed (10-100x faster than older tools) and its efficient use of disk space.  To start, we simply initialize a new project, marking it as a package so that it will create the appropriate code structure:
+
+```bash
+❯ uv init --package uv_example
+Initialized project `uv-example` at `/private/tmp/uvtest/uv_example`
+❯ tree uv_example
+uv_example
+├── pyproject.toml
+├── README.md
+└── src
+    └── uv_example
+        └── __init__.py
+```
+
+We can then create a new virtual environment using the command `uv venv`.  This is stored within the directory `.venv`.  
+
+```bash
+❯ cd uv_example
+❯ uv venv
+Using CPython 3.13.1
+Creating virtual environment at: .venv
+Activate with: source .venv/bin/activate
+❯ tree .venv
+.venv
+├── bin
+│   ├── activate
+│   ├── activate.bat
+│   ├── activate.csh
+│   ├── activate.fish
+│   ├── activate.nu
+│   ├── activate.ps1
+│   ├── activate_this.py
+│   ├── deactivate.bat
+│   ├── pydoc.bat
+│   ├── python -> /Users/poldrack/.local/share/uv/python/cpython-3.13.1-macos-aarch64-none/bin/python3.13
+│   ├── python3 -> python
+│   └── python3.13 -> python
+├── CACHEDIR.TAG
+├── lib
+│   └── python3.13
+│       └── site-packages
+│           ├── _virtualenv.pth
+│           └── _virtualenv.py
+└── pyvenv.cfg
+```
+
+One thing to note here is that the `python` executable is actually a symbolic link to a version that is in a central location (under `.local/share/uv`).  This means that we can create numerous virtual environments, but there will only be one copy of that particular version of Python, saving space on disk.
+
+We can activate the environment by running its activation script, after which we see that the system path will point to the virtual environment:
+
+```bash
+❯ which python
+python not found
+❯ source .venv/bin/activate
+❯ which python
+python is /private/tmp/uvtest/uv_example/.venv/bin/python
+```
+
+If we wish to add dependencies, we can simply do this using `uv add`: 
+
+```bash
+❯ uv add numpy
+Resolved 2 packages in 394ms
+   Built uv-example @ file:///private/tmp/uvtest/uv_example
+Prepared 2 packages in 431ms
+Installed 2 packages in 8ms
+ + numpy==2.2.3
+ + uv-example==0.1.0 (from file:///private/tmp/uvtest/uv_example)
+
+```
+
+Here again, if we load this module within Python we will see that it is located within the virtual environment:
+
+```bash
+❯ python
+Python 3.13.1 (main, Dec 19 2024, 14:22:59) [Clang 18.1.8 ] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> print(numpy.__file__)
+/private/tmp/uvtest/uv_example/.venv/lib/python3.13/site-packages/numpy/__init__.py
+```
+
+The details regarding the package are stored within a file called "pyproject.toml" in the main project directory.  Looking inside this file we can see that it contains details about the packages that have been added, including the specific version:
+
+```
+❯ more pyproject.toml
+[project]
+name = "uv-example"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Russell Poldrack", email = "poldrack@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.2.3",
+]
+
+[project.scripts]
+uv-example = "uv_example:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+```
+
+This file allows one to specify many other details about a Python package. It not only stores dependencies but also metadata about the project, making it useful for packaging and distribution, and learning more about its features is important for anyone looking to develop Python packages.
+
+#### Locking dependencies in uv
+
+Computational reproducibility requires that we be able to exactly recreate an environment, including the specific versions of all packages. If you look at the `pyproject.toml` file you will see that it doesn't specify exact versions for Python or the dependencies; instead, it specifies a lower bound; i.e. "numpy>=2.2.3" means that the numpy version should be at least 2.2.3, but could be higher if a newer version became available.  This is often fine, but for purposes of reproducibility we often wish to record the exact package versions that were used for a particular analysis.  This is commonly done using a `requirements.txt` file, and `uv` allows exporting the current environment to such a file:
+
+```bash
+❯ uv pip compile pyproject.toml -o requirements.txt
+Resolved 1 package in 78ms
+# This file was autogenerated by uv via the following command:
+#    uv pip compile pyproject.toml
+numpy==2.2.3
+    # via uv-example (pyproject.toml)
+```
+
+This brief overview only scratches the surface of the many features within `uv`, which we recommend you explore in detail via the project documentation.
+
+### Environment management using *conda*
+
+Another popular tool for managing virtual environments is `conda`.  It has much of the same functionality as uv
+
+TODO: 
+- what additional details do we need to show here?
+- mention other conda-like tools?
+- documenting state - conda export
+- Why not use conda?
+    - inefficient use of disk space compared to uv
+    - relatively slow vs uv
+    - problems with pip vs conda interaction
+
+
+There is one important way in which `conda` differs from `uv`. In fact, one of us (RP) switched to `uv` in 2024 after being a long-time user of `conda`, but still uses `conda` for some projects. The crucial feature of `conda` that has kept us using it for a limited set of projects is its ability to manage non-Python software elements alongside Python packages.  We have found on a couple of occasions that some Python packages have dependencies that rely upon non-Python software components.  Specifically, in cases where Python packages required a specific component (the LLVM compiler), we were unable to easily get the specific required version of that component working on our Mac using `uv`, whereas `conda` simply installs the required component and works out of the box.  The speed and efficiency of `uv` generally outshine `conda` in our experience, but in some cases `conda` may help solve tricky non-Python dependency issues.
+
+
 
 ## Large language models
 
