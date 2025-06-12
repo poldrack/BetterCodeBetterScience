@@ -397,6 +397,14 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-development-using-github">Collaborative development using Github</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#virtual-environments">Virtual environments</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-management-using-uv">Environment management using <em>uv</em></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#locking-dependencies-in-uv">Locking dependencies in uv</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-management-using-conda">Environment management using <em>conda</em></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#large-language-models">Large language models</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-brief-history-of-neural-networks">A brief history of neural networks</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-llms-are-built-and-trained">How LLMs are built and trained</a></li>
@@ -645,6 +653,128 @@ Switched<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </sp
 <p>This type of collaborative development process powers many of the large open source projects that are commonly used today, but can be equally transformative for small groups such as a individual research lab.</p>
 </section>
 </section>
+<section id="virtual-environments">
+<h2>Virtual environments<a class="headerlink" href="#virtual-environments" title="Permalink to this heading">#</a></h2>
+<p>When developing software, it is essential to have a way to manage the many dependencies and software versions that are necessary, particularly for a language like Python that has a broad landscape of packages.  This problem is generally solved using <em>virtual environments</em>, which provide a way to isolate a specific set of software dependencies necessary for a project.</p>
+<p>This is important for several reasons.  First, it allows different projects to use different versions of specific packages without interfering with one another.  One often finds the need to install an older version of a particular dependency, or an older version of Python, in order to use a specific tool.  Without virtual environments, managing different dependencies across projects can become impossible. If one project requires Python ≤3.9 while another needs Python ≥3.12, conflicts arise that virtual environments can easily resolve.  Second, because the virtual environment specifies the exact version of each dependency and allows these to be exported, it is possible for other users on different machines to exactly recreate the package environment required by the author (assuming that those package versions are available on the users’s operating system).  This can greatly enhance the reproducibility of computational analyses across systems, and can also ease the implementation of software across multiple machines (e.g. when one wants to move code from a local machine into the cloud).  On shared computing systems (such as academic computing clusters), virtual environments let users install their own packages without needing admin access.</p>
+<p>A virtual environment is at its heart simply a directory structure that contains a specified set of executables and software dependencies. When the virtual environment is <em>activated</em> using a special command, these directories are added to the system paths, allowing them to be accessed just like any software installed centrally on the system.  They can be easily removed from the path by deactivating the environment.</p>
+<p>There are numerous tools within the Python ecosystem for package management and virtual environments, to the degree that some have called it an <a class="reference external" href="https://dublog.net/blog/so-many-python-package-managers/">“inexcusable pain in the ass”</a>.   We will focus on two solutions here (uv and conda), realizing that things will change over time and these recommendations will likely need to be updated (living textbooks FTW!).</p>
+<section id="environment-management-using-uv">
+<h3>Environment management using <em>uv</em><a class="headerlink" href="#environment-management-using-uv" title="Permalink to this heading">#</a></h3>
+<p><a class="reference external" href="https://docs.astral.sh/uv/">uv</a> is a relatively new package management tool that has quickly gained momentum in the Python community, in large part because of its speed (10-100x faster than older tools) and its efficient use of disk space.  To start, we simply initialize a new project, marking it as a package so that it will create the appropriate code structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>init<span class="w"> </span>--package<span class="w"> </span>uv_example
+Initialized<span class="w"> </span>project<span class="w"> </span><span class="sb">`</span>uv-example<span class="sb">`</span><span class="w"> </span>at<span class="w"> </span><span class="sb">`</span>/private/tmp/uvtest/uv_example<span class="sb">`</span>
+❯<span class="w"> </span>tree<span class="w"> </span>uv_example
+uv_example
+├──<span class="w"> </span>pyproject.toml
+├──<span class="w"> </span>README.md
+└──<span class="w"> </span>src
+<span class="w">    </span>└──<span class="w"> </span>uv_example
+<span class="w">        </span>└──<span class="w"> </span>__init__.py
+</pre></div>
+</div>
+<p>We can then create a new virtual environment using the command <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">venv</span></code>.  This is stored within the directory <code class="docutils literal notranslate"><span class="pre">.venv</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>uv_example
+❯<span class="w"> </span>uv<span class="w"> </span>venv
+Using<span class="w"> </span>CPython<span class="w"> </span><span class="m">3</span>.13.1
+Creating<span class="w"> </span>virtual<span class="w"> </span>environment<span class="w"> </span>at:<span class="w"> </span>.venv
+Activate<span class="w"> </span>with:<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+❯<span class="w"> </span>tree<span class="w"> </span>.venv
+.venv
+├──<span class="w"> </span>bin
+│<span class="w">   </span>├──<span class="w"> </span>activate
+│<span class="w">   </span>├──<span class="w"> </span>activate.bat
+│<span class="w">   </span>├──<span class="w"> </span>activate.csh
+│<span class="w">   </span>├──<span class="w"> </span>activate.fish
+│<span class="w">   </span>├──<span class="w"> </span>activate.nu
+│<span class="w">   </span>├──<span class="w"> </span>activate.ps1
+│<span class="w">   </span>├──<span class="w"> </span>activate_this.py
+│<span class="w">   </span>├──<span class="w"> </span>deactivate.bat
+│<span class="w">   </span>├──<span class="w"> </span>pydoc.bat
+│<span class="w">   </span>├──<span class="w"> </span>python<span class="w"> </span>-&gt;<span class="w"> </span>/Users/poldrack/.local/share/uv/python/cpython-3.13.1-macos-aarch64-none/bin/python3.13
+│<span class="w">   </span>├──<span class="w"> </span>python3<span class="w"> </span>-&gt;<span class="w"> </span>python
+│<span class="w">   </span>└──<span class="w"> </span>python3.13<span class="w"> </span>-&gt;<span class="w"> </span>python
+├──<span class="w"> </span>CACHEDIR.TAG
+├──<span class="w"> </span>lib
+│<span class="w">   </span>└──<span class="w"> </span>python3.13
+│<span class="w">       </span>└──<span class="w"> </span>site-packages
+│<span class="w">           </span>├──<span class="w"> </span>_virtualenv.pth
+│<span class="w">           </span>└──<span class="w"> </span>_virtualenv.py
+└──<span class="w"> </span>pyvenv.cfg
+</pre></div>
+</div>
+<p>One thing to note here is that the <code class="docutils literal notranslate"><span class="pre">python</span></code> executable is actually a symbolic link to a version that is in a central location (under <code class="docutils literal notranslate"><span class="pre">.local/share/uv</span></code>).  This means that we can create numerous virtual environments, but there will only be one copy of that particular version of Python, saving space on disk.</p>
+<p>We can activate the environment by running its activation script, after which we see that the system path will point to the virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>which<span class="w"> </span>python
+python<span class="w"> </span>not<span class="w"> </span>found
+❯<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+❯<span class="w"> </span>which<span class="w"> </span>python
+python<span class="w"> </span>is<span class="w"> </span>/private/tmp/uvtest/uv_example/.venv/bin/python
+</pre></div>
+</div>
+<p>If we wish to add dependencies, we can simply do this using <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">add</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>add<span class="w"> </span>numpy
+Resolved<span class="w"> </span><span class="m">2</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>394ms
+<span class="w">   </span>Built<span class="w"> </span>uv-example<span class="w"> </span>@<span class="w"> </span>file:///private/tmp/uvtest/uv_example
+Prepared<span class="w"> </span><span class="m">2</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>431ms
+Installed<span class="w"> </span><span class="m">2</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>8ms
+<span class="w"> </span>+<span class="w"> </span><span class="nv">numpy</span><span class="o">==</span><span class="m">2</span>.2.3
+<span class="w"> </span>+<span class="w"> </span>uv-example<span class="o">==</span><span class="m">0</span>.1.0<span class="w"> </span><span class="o">(</span>from<span class="w"> </span>file:///private/tmp/uvtest/uv_example<span class="o">)</span>
+</pre></div>
+</div>
+<p>Here again, if we load this module within Python we will see that it is located within the virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>python
+Python<span class="w"> </span><span class="m">3</span>.13.1<span class="w"> </span><span class="o">(</span>main,<span class="w"> </span>Dec<span class="w"> </span><span class="m">19</span><span class="w"> </span><span class="m">2024</span>,<span class="w"> </span><span class="m">14</span>:22:59<span class="o">)</span><span class="w"> </span><span class="o">[</span>Clang<span class="w"> </span><span class="m">18</span>.1.8<span class="w"> </span><span class="o">]</span><span class="w"> </span>on<span class="w"> </span>darwin
+Type<span class="w"> </span><span class="s2">&quot;help&quot;</span>,<span class="w"> </span><span class="s2">&quot;copyright&quot;</span>,<span class="w"> </span><span class="s2">&quot;credits&quot;</span><span class="w"> </span>or<span class="w"> </span><span class="s2">&quot;license&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information.
+&gt;&gt;&gt;<span class="w"> </span>import<span class="w"> </span>numpy
+&gt;&gt;&gt;<span class="w"> </span>print<span class="o">(</span>numpy.__file__<span class="o">)</span>
+/private/tmp/uvtest/uv_example/.venv/lib/python3.13/site-packages/numpy/__init__.py
+</pre></div>
+</div>
+<p>The details regarding the package are stored within a file called “pyproject.toml” in the main project directory.  Looking inside this file we can see that it contains details about the packages that have been added, including the specific version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>❯ more pyproject.toml
+[project]
+name = &quot;uv-example&quot;
+version = &quot;0.1.0&quot;
+description = &quot;Add your description here&quot;
+readme = &quot;README.md&quot;
+authors = [
+    { name = &quot;Russell Poldrack&quot;, email = &quot;poldrack@gmail.com&quot; }
+]
+requires-python = &quot;&gt;=3.13&quot;
+dependencies = [
+    &quot;numpy&gt;=2.2.3&quot;,
+]
+
+[project.scripts]
+uv-example = &quot;uv_example:main&quot;
+
+[build-system]
+requires = [&quot;hatchling&quot;]
+build-backend = &quot;hatchling.build&quot;
+</pre></div>
+</div>
+<p>This file allows one to specify many other details about a Python package. It not only stores dependencies but also metadata about the project, making it useful for packaging and distribution, and learning more about its features is important for anyone looking to develop Python packages.</p>
+<section id="locking-dependencies-in-uv">
+<h4>Locking dependencies in uv<a class="headerlink" href="#locking-dependencies-in-uv" title="Permalink to this heading">#</a></h4>
+<p>Computational reproducibility requires that we be able to exactly recreate an environment, including the specific versions of all packages. If you look at the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file you will see that it doesn’t specify exact versions for Python or the dependencies; instead, it specifies a lower bound; i.e. “numpy&gt;=2.2.3” means that the numpy version should be at least 2.2.3, but could be higher if a newer version became available.  This is often fine, but for purposes of reproducibility we often wish to record the exact package versions that were used for a particular analysis.  This is commonly done using a <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file, and <code class="docutils literal notranslate"><span class="pre">uv</span></code> allows exporting the current environment to such a file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>pip<span class="w"> </span>compile<span class="w"> </span>pyproject.toml<span class="w"> </span>-o<span class="w"> </span>requirements.txt
+Resolved<span class="w"> </span><span class="m">1</span><span class="w"> </span>package<span class="w"> </span><span class="k">in</span><span class="w"> </span>78ms
+<span class="c1"># This file was autogenerated by uv via the following command:</span>
+<span class="c1">#    uv pip compile pyproject.toml</span>
+<span class="nv">numpy</span><span class="o">==</span><span class="m">2</span>.2.3
+<span class="w">    </span><span class="c1"># via uv-example (pyproject.toml)</span>
+</pre></div>
+</div>
+<p>This brief overview only scratches the surface of the many features within <code class="docutils literal notranslate"><span class="pre">uv</span></code>, which we recommend you explore in detail via the project documentation.</p>
+</section>
+</section>
+<section id="environment-management-using-conda">
+<h3>Environment management using <em>conda</em><a class="headerlink" href="#environment-management-using-conda" title="Permalink to this heading">#</a></h3>
+<p>Another popular tool for managing virtual environments is <code class="docutils literal notranslate"><span class="pre">conda</span></code>.  It has much of the same functionality as uv and has been around much longer, but we have largely moved away from it for most projects for several reasons: <code class="docutils literal notranslate"><span class="pre">uv</span></code> is relatively more efficient when it comes to disk space and it is often faster than conda, especially as environments start to have many packages installed.  In addition, there are sometimes conflicts between conda’s native package management and the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package management system.  When using conda it’s usually necessary to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install some packages that aren’t available within the conda library, but this can result in conflicts between the two package management systems.</p>
+<p>There is one important way in which <code class="docutils literal notranslate"><span class="pre">conda</span></code> differs from <code class="docutils literal notranslate"><span class="pre">uv</span></code>. In fact, I switched to <code class="docutils literal notranslate"><span class="pre">uv</span></code> in 2024 after being a long-time user of <code class="docutils literal notranslate"><span class="pre">conda</span></code>, but still uses <code class="docutils literal notranslate"><span class="pre">conda</span></code> for some projects. The crucial feature of <code class="docutils literal notranslate"><span class="pre">conda</span></code> that has kept us using it for a limited set of projects is its ability to manage non-Python software elements alongside Python packages.  We have found on a couple of occasions that some Python packages have dependencies that rely upon non-Python software components.  Specifically, in cases where Python packages required a specific component (the LLVM compiler), we were unable to easily get the specific required version of that component working on our Mac using <code class="docutils literal notranslate"><span class="pre">uv</span></code>, whereas <code class="docutils literal notranslate"><span class="pre">conda</span></code> simply installs the required component and works out of the box.  The speed and efficiency of <code class="docutils literal notranslate"><span class="pre">uv</span></code> generally outshine <code class="docutils literal notranslate"><span class="pre">conda</span></code> in our experience, but in some cases <code class="docutils literal notranslate"><span class="pre">conda</span></code> may help solve tricky non-Python dependency issues.</p>
+</section>
+</section>
 <section id="large-language-models">
 <h2>Large language models<a class="headerlink" href="#large-language-models" title="Permalink to this heading">#</a></h2>
 <figure class="align-default" id="gpt4haiku-fig">
@@ -828,6 +958,14 @@ Remember, it&#39;s important to take care of yourself both physically and mental
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collaborative-development-using-github">Collaborative development using Github</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#virtual-environments">Virtual environments</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-management-using-uv">Environment management using <em>uv</em></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#locking-dependencies-in-uv">Locking dependencies in uv</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-management-using-conda">Environment management using <em>conda</em></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#large-language-models">Large language models</a><ul class="nav section-nav flex-column">
