@@ -19,3 +19,12 @@ test-property:
 
 test-simple:
 	py.test src/codingforscience/simple_testing
+
+docker-build:
+	docker build -t condatest .
+
+docker-shell:
+	docker run -it -w /root --entrypoint=bash condatest 
+
+
+
