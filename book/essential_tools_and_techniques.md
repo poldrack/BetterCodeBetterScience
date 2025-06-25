@@ -503,7 +503,7 @@ Sure, here's a random vegetable: Veggie: Broccoli
 
 In this case we ran each prompt with a different *random seed*, which is a value that allows one to reproducibly generate a set of random numbers.  Open source models, as well as some commercial models, allow specifying the random seed when submitting a prompt, usually requiring use of the API.
 
-When choosing amongst the possible responses based on their probabilities, one could simply always output the token with the highest probability, which is known as "greedy" selection.  However, LLMs often introduce some variability in output (via a *softmax* operator).  This procedure has a parameter known as *temperature* that allows one to scale the degree of randomness, from deterministic (greedy) responding when temperature = 0 to greater randomness at temperature increases.  These systems often default to a small degree of randomness (with temperature in the range of 0.7) to allow some exploration without enabling surprising or bizzare responses.  
+When choosing amongst the possible responses based on their probabilities, one could simply always output the token with the highest probability, which is known as "greedy" selection.  However, LLMs often introduce some variability in output (via a *softmax* operator).  This procedure has a parameter known as *temperature* that allows one to scale the degree of randomness, from deterministic (greedy) responding when temperature = 0 to greater randomness at temperature increases.  These systems often default to a small degree of randomness (with temperature in the range of 0.7) to allow some exploration without enabling surprising or bizarre responses.  
 
 ### Reproducibilty challenges of LLMs
 
