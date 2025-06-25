@@ -9,9 +9,9 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 ### Contributing to the book
 
-This book is meant to be a living open-source document, with the source available online at https://github.com/poldrack/BetterCodeBetterScience. If you find any errors in the book or want to make a suggestion for how to improve it, please open an issue on the Github site. Even better, submit a pull request with your suggested changes!
+This book is meant to be a living open-source document, with the source available online at https://github.com/poldrack/BetterCodeBetterScience. If you find any errors in the book or want to make a suggestion for how to improve it, please open an issue on the GitHub site. Even better, submit a pull request with your suggested changes!
 
-See the [Contributors' Guide](https://github.com/poldrack/BetterCodeBetterScience/blob/main/CONTRIBUTING.md) on Github for more details about contributing to the book.
+See the [Contributors' Guide](https://github.com/poldrack/BetterCodeBetterScience/blob/main/CONTRIBUTING.md) on GitHub for more details about contributing to the book.
 
 ```{tableofcontents}
 ```
