@@ -1,4 +1,4 @@
-# Dockefile for shell example
+# Dockerfile for shell example
 
 FROM ubuntu
 RUN apt-get update && apt-get install -y wget curl
