@@ -1,6 +1,6 @@
 ## Contributors' Guide
 
-First off, thanks for considering a contribution to this living open source book!  It's only through the contributions of many different people that we will be able to keep the book technicall accurate and up to date.
+First off, thanks for considering a contribution to this living open source book!  It's only through the contributions of many different people that we will be able to keep the book technically accurate and up to date.
 
 Following these guidelines helps to communicate that you respect the time of the contributors who are managing and developing this open source project. In return, they should reciprocate that respect in addressing your issues, assessing proposed changes, and helping you finalize your pull requests.
 
