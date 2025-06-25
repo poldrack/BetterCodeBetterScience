@@ -437,7 +437,7 @@ A common expression of the idea of modularity in software development is the *Si
 
 - Read trimming and filtering
 - Alignment to reference genome
-- Quantification of expresssion
+- Quantification of expression
 - Normalization
 - Differential expression analysis
 
@@ -465,7 +465,7 @@ In 2019, I started developing data processing and analysis code for large projec
 I started by creating a main object, called `Narps`, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:
 
 - Preprocessing the images submitted by the teams
-- Preparing the metdata necessary for the analysis of the images
+- Preparing the metadata necessary for the analysis of the images
 - Performing statistical analyses of the images
 - Performing statistical analysis on the hypothesis testing decisions reported by the teams.
 - Performing an image-based meta-analysis to combine results across teams
@@ -561,7 +561,7 @@ More generally, there are a couple of problems with the use of a single large cl
 - All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code's operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.
 
 
-Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python *data classes* to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.   
+Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python *data classes* to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.   
 
 
 ### Global variables
@@ -873,7 +873,7 @@ Out[5]: '934kjdflk5k5ks592kskx'
 
 ### Configuration files
 
-In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
+In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alternative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
 
 ```yaml
 ---
