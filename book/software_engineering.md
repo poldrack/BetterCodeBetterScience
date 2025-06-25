@@ -825,7 +825,7 @@ fmripath = '/home/jb07/joe_python/fmri_analysis/'
 
 Even if you don't plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.  
 
-A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
+A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private GitHub repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
 
 *Never* place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.
 
@@ -937,7 +937,7 @@ It is important to ensure that configuration files do not get checked into versi
 
 ## Managing technical debt
 
-The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
+The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on GitHub that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
 
 The concept of *technical debt* refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:
 
@@ -952,7 +952,7 @@ At the same time, there are very good reasons for using well-maintained packages
 - A well-maintained package is likely to be well-tested
 - Using a well-maintained package can save a great deal of time compared to writing one's own implementation
 
-While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
+While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the GitHub repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
 
 - Multiple active contributors (not just a single developer)
 - Automated testing with a high degree of code coverage
