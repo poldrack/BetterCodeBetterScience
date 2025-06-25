@@ -19,9 +19,9 @@ A rendered version of the complete book is available at [https://poldrack.github
 - Principles of Software Engineering
     - [Part 1: Intro](https://open.substack.com/pub/russpoldrack/p/principles-of-software-engineering)
     - [Part 2: Clean Coding](https://russpoldrack.substack.com/p/clean-coding)
-    - Part 3: [Modularity and the "God object"](https://russpoldrack.substack.com/p/modularity-and-the-god-object)
-    - Part 4: Global variables
-    - Part 5: Defensive coding
+    - [Part 3: Modularity and the "God object"](https://russpoldrack.substack.com/p/modularity-and-the-god-object)
+    - [Part 4: Global variables](https://russpoldrack.substack.com/p/global-variables)
+    - [Part 5: Defensive coding](https://open.substack.com/pub/russpoldrack/p/defensive-coding)
     - Part 6: Coding portably
     - Part 7: Technical debt
 - Project Structure and Management
