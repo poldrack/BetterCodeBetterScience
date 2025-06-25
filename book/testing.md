@@ -2,7 +2,7 @@
 
 Tests define the expected behavior of code, and detect when the code doesn't match that expected behavior.
 
-One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we have all come to know since the pandemic.  These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.  This is known as a *positive control* because it assesses the test's ability to identify a positive response.  Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
+One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.  This is known as a *positive control* because it assesses the test's ability to identify a positive response.  Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
 
 By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.  A positive test assesses whether, given a particular valid input, the component returns the correct output.  A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.  
 
@@ -15,6 +15,10 @@ A second reason for testing was highlighted in our earlier discussion of test-dr
 A third reason to write tests is that they can help drive modularity in the code.  It's much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.  Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored.
 
 A final reason to write tests is that they make it much easier to make changes to the code.  Without a robust test suite, one is always left worried that changing some aspect of the code will have unexpected effects on its former behavior (known as a "regression").  Tests can provide you with the comfort you need to make changes, knowing that you will detect any untoward effects your changes might have.  This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.
+
+## When to write tests
+
+### any time you encounter a bug, write a test 
 
 ## Types of tests
 
@@ -30,6 +34,117 @@ One simple type of integration test is a "smoke test".  This name [apparently](h
 
 Full integration tests assess the function of the entire application; one can think of them as unit tests where the unit is the entire application. Just as with unit tests, we want integration tests that both confirm proper operation under intended conditions, as well as confirming proper behavior (such as exiting with an error message) under improper conditions.
 
+## The anatomy of a test
+
+A test is generally structured as a function that executes without raising an exception as long as the code behaves in an expected way.  Let's say that we want to generate a function that returns the escape velocity of a planet:
+
+```python
+import math
+import numpy as np
+
+def escape_velocity(mass: float, radius: float, G=6.67430e-11):
+    """
+    Calculate the escape velocity from a celestial body, given its mass and radius.
+
+    Args:
+    mass (float): Mass of the celestial body in kg.
+    radius (float): Radius of the celestial body in meters.
+
+    Returns:
+    float: Escape velocity in m/s.
+    """
+    
+    return math.sqrt(2 * G * mass / radius)
+```
+
+We can then generate a test to determine whether the value returned by our function matches the known value for a given planet:
+
+```python
+def test_escape_velocity():
+    """
+    Test the escape_velocity function with known values.
+    """
+    mass_earth = 5.972e24  # Earth mass in kg
+    radius_earth = 6.371e6  # Earth radius in meters
+    ev_expected = 11186.0  # Expected escape velocity for Earth in m/s
+    ev_computed = escape_velocity(mass_earth, radius_earth)
+    assert np.allclose(ev_expected, ev_computed), "Test failed!"
+```
+
+We can run this using `pytest` (more about this later), which tells us that the test passes:
+
+```
+❯ pytest src/BetterCodeBetterScience/escape_velocity.py
+====================== test session starts ======================
+
+src/BetterCodeBetterScience/escape_velocity py .         [100%]
+
+====================== 1 passed in 0.08s ======================
+```
+
+
+If the returned value didn't match the known value (within a given level of tolerance, which is handled by `np.allclose()`), then the assertion will fail and raise an exception, causing the test to fail.  For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:
+
+```
+❯ pytest src/BetterCodeBetterScience/escape_velocity.py
+====================== test session starts ======================
+
+src/BetterCodeBetterScience/escape_velocity.py F          [100%]
+
+=========================== FAILURES ===========================
+_____________________ test_escape_velocity _____________________
+
+    def test_escape_velocity():
+        """
+        Test the escape_velocity function with known values.
+        """
+        mass_earth = 5.972e24  # Earth mass in kg
+        radius_earth = 6.371e6  # Earth radius in meters
+        ev_expected = 1186.0 # 11186.0  # Expected escape velocity for Earth in m/s
+        ev_computed = escape_velocity(mass_earth, radius_earth)
+>       assert np.allclose(ev_expected, ev_computed), "Test failed!"
+E       AssertionError: Test failed!
+E       assert False
+E        +  where False = <function allclose at 0x101403370>(1186.0, 11185.97789184991)
+E        +    where <function allclose at 0x101403370> = np.allclose
+
+src/BetterCodeBetterScience/escape_velocity.py:26: AssertionError
+===================== short test summary info =====================
+FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity - AssertionError: Test failed!
+======================== 1 failed in 0.11s ========================
+```
+
+It's also important to make sure that an exception is raised whenever it should be.  For example, the version of the `escape_velocity()` function above did not check to make sure that the mass and radius arguments had positive values, which means that it would give nonsensical results when passed a negative mass or radius value.  To address this we should add code to the function that causes it to raise an exception if either of the arguments is negative:
+
+```python
+def escape_velocity(mass: float, radius: float, G=6.67430e-11):
+    """
+    Calculate the escape velocity from a celestial body, given its mass and radius.
+
+    Args:
+    mass (float): Mass of the celestial body in kg.
+    radius (float): Radius of the celestial body in meters.
+
+    Returns:
+    float: Escape velocity in m/s.
+    """
+    if mass <= 0 or radius <= 0:
+        raise ValueError("Mass and radius must be positive values.")
+    return math.sqrt(2 * G * mass / radius)
+
+```
+
+We can then specify a test that checks whether the function properly raises an exception when passed a negative value. To do this we can use a feature of the `pytest` package (`pytest.raises`) that passes only if the specified exception is raised:
+
+```python
+def test_escape_velocity_negative():
+    """
+    Make sure the function raises ValueError for negative mass or radius.
+    """
+    with pytest.raises(ValueError):
+        escape_velocity(-5.972e24, 6.371e6)
+```
+
 
 ## The structure of a good test
 
@@ -39,23 +154,123 @@ A commonly used scheme for writing a test is "given/when/then":
 - when something happens (such as a particular input)
 - then something else should happen (such as a particular output or exception)
 
-Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily on test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").
+Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").
 
 How do we test that the output of a function is correct given the input?  There are different answers for different situations:
 
 - *commonly known answer*: Sometimes we possess inputs where the output is known.  For example, if we were creating a function that computes the circumference of a circle, then we know that the output for an input radius of 1 should be 2 * pi.  This is generally only the case for very simple functions.  
-- *reference implementation*: In other cases we may have  
+- *reference implementation*: In other cases we may have a standard implementation of an algorithm that we can compare against.  While in general it's not a good idea to reimplement code that already exists in a standard library, in come cases we may want to extend existing code but also check that the basic version still works as planned. 
 - *parallel implementation*: Some times we don't have a reference implementation, but we can code up another parallel implementation to compare our code to.  It's important that this isn't just a copy of the code used in the function; in that case, it's really not a test at all!
 - *behavioral test*: Sometimes the best we can do is to run the code repeatedly and ensure that it behaves as expected on average.  For example, if a function outputs a numerical value and we know the expected distribution of that value given a particular input, we can ensure that the result matches that distribution with a high probability.  Such *probabilistic tests* are not optimal in the sense that they can occasionally fail even when the code is correct, but they are sometimes the best we can do.
 
+### Test against the interface, not the implementation
 
-- test for boundary conditions
+A good test shouldn't know about the internal implementation details of the function that it is testing, and changes in the internal code that do not modify the input-output relationship should not affect the test.  That is, from the standpoint of the test, a function should be a "black box".  
 
-- any time you encounter a bug, write a test 
+The most common way in which a test can violate this principle is by accessing the internal variables of a class that it is testing.  For example, we might generate a class that performs a scaling operation on a numpy matrix:
 
-- good tests shouldn't know about the internals of the function - changes in the internal code that do not modify the input-output relationship should not affect the test
+```python
+class SimpleScaler:
+    def __init__(self):
+        self.transformed_ = None
 
-- tests should be independent - shared features should be abstracted away (as fixtures)
+    def fit(self, X):
+        self.mean_ = X.mean(axis=0)
+        self.std_ = X.std(axis=0)
+
+    def transform(self, X):
+        self.transformed_ = (X - self.mean_) / self.std_
+        return self.transformed_
+
+    def fit_transform(self, X):
+        self.fit(X)
+        return self.transform(X)
+```
+
+We could write a test that checks the values returned by the `fit_transform()` method, treating the the class as a black box:
+
+```python
+def test_simple_scaler_interface():
+    X = np.array([[1, 2], [3, 4], [5, 6]])
+    scaler = SimpleScaler()
+    
+    # Test the interface without accessing internals
+    transformed_X = scaler.fit_transform(X)
+    assert np.allclose(transformed_X.mean(axis=0), np.array([0, 0]))
+    assert np.allclose(transformed_X.std(axis=0), np.array([1, 1]))
+```
+
+Alternatively one might use knowledge of the internals of the class to test the transformed value:
+
+```python
+def test_simple_scaler_internals():
+
+    X = np.array([[1, 2], [3, 4], [5, 6]])
+    scaler = SimpleScaler()
+    _ = scaler.fit_transform(X)
+    
+    # Test that the transformed data is correct using the internal
+    assert np.allclose(scaler.transformed_.mean(axis=0), np.array([0, 0]))
+    assert np.allclose(scaler.transformed_.std(axis=0), np.array([1, 1]))
+
+```
+
+Both of these tests pass against the class definition shown above. However, if we were to change the way that the transformation is performed (for example, we decide to use the `StandardScaler` function from `scikit-learn` instead of writing our own), then the tests are likely to fail unless the sample internal variable names are used.  In general we should only interact with a function or class via its explicit interfaces.
+
+### Tests should be independent
+
+In scientific computing it's common to compose many different operations into a workflow.  If we want to test the workflow, then the tests of later steps in the workflow must necessarily rely upon earlier steps.  We could in theory write a set of tests that operate on a shared object, but the tests would fail if executed in an incorrect order, even if the code was correct.  Similarly, a failure on an early test would cause cascading failures in later tests, even if their code was correct.  The use of ordered tests also prevents the parallel execution of tests, which may slow down testing for complex projects.  For these reasons, we should always aim to create tests that can be executed independently.
+
+Here is an example where coupling between tests could cause failures.  First we generate two functions that make changes in place to a data frame:
+
+```python
+def split_names(df):
+    df['firstname'] = df['name'].apply(lambda x: x.split()[0])
+    df['lastname'] = df['name'].apply(lambda x: x.split()[1])
+
+def get_initials(df):
+    df['initials'] = df['firstname'].str[0] + df['lastname'].str[0]
+
+```
+
+In this case, the `get_initials()` function relies upon the `split_names()` function having been run, since otherwise the necessary columns won't exist in the data frame. We can then create tests for each of these, and a data frame that they can both use:
+
+```python
+people_df = pd.DataFrame({'name': ['Alice Smith', 'Bob Howard', 'Charlie Ashe']}) 
+
+def test_split_names():
+    split_names(people_df)
+    assert people_df['firstname'].tolist() == ['Alice', 'Bob', 'Charlie']
+    assert people_df['lastname'].tolist() == ['Smith', 'Howard', 'Ashe']
+
+def test_get_initials():
+    get_initials(people_df)
+    assert people_df['initials'].tolist() == ['AS', 'BH', 'CA']
+```
+
+These tests run correctly, but the same tests fail if we change their order such that `test_get_intials()` runs first, because the necessary columns (`initials`) has not yet been created.  
+
+One simple way to deal with this is to set up all of the necessary structure locally within each test:
+
+```python
+
+def get_people_df():
+    return pd.DataFrame({'name': ['Alice Smith', 'Bob Howard', 'Charlie Ashe']}) 
+
+def test_split_names_fullsetup():
+    local_people_df = get_people_df()
+    split_names(local_people_df)
+    assert local_people_df['firstname'].tolist() == ['Alice', 'Bob', 'Charlie']
+    assert local_people_df['lastname'].tolist() == ['Smith', 'Howard', 'Ashe']
+
+def test_get_initials_fullsetup():
+    local_people_df = get_people_df()
+    split_names(local_people_df)
+    get_initials(local_people_df)
+    assert local_people_df['initials'].tolist() == ['AS', 'BH', 'CA']
+```
+
+For simple functions like these this would not cause too much computational overhead, but for computationally intensive functions we would like to be able to reuse the results from the first time each function is run.  In a later section we will discuss the use of *fixtures* which allow this kind of reuse across tests while avoiding the ordering problems that we saw above when using a global variable across tests.
 
 ## Testing frameworks
 
@@ -79,7 +294,7 @@ def distance(p1, p2):
 Now we would like to generate some tests for this code to make sure that it works properly. If we ask Copilot to generate some tests, it does a seeming decent job:
 
 ```
-from codingforscience.simple_testing.distance import distance
+from BetterCodeBetterScience.simple_testing.distance import distance
 
 def test_distance_zero():
     assert distance((0, 0), (0, 0)) == 0
@@ -103,7 +318,7 @@ def test_distance_same_y():
 Now that we have our tests, we need to run them, using the `py.test` command:
 
 ```
-py.test src/codingforscience/simple_testing
+py.test src/BetterCodeBetterScience/simple_testing
 ```
 
 This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".  Running those tests intially, we get an error:
@@ -288,7 +503,7 @@ An alternative strategy to trying to ensure high coverage is the strategy of try
 
 ## Test fixtures
 
-Sometimes we need to use a the same data for multiple tests. Rather than duplicating potentiallly time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a *test fixture*.  
+Sometimes we need to use a the same data for multiple tests. Rather than duplicating potentially time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a *test fixture*.  This also helps maintain isolation between tests, since the order of tests shouldn't matter if an appropriate fixture is generated as soon as it's needed.
 
 For our example above, it's likely that we will need to reuse the list of pubmed IDs from the search to perform various tests on the subsequent functions.  We can create a single version of this list of IDs by creating a fixture. In the `pytest` framework we do this using a special Python operator called a *decorator*, which is denoted by the symbol `@` as a prefix. A decorator is an operator that changes the operator of the function that it decorates; you don't need to understand its operation in detail for this particular usage.  To refactor our tests above, we would first create the fixture by decorating the function that generates the fixture with the `@pytest.fixture` decorator:
 
@@ -617,4 +832,6 @@ If the tests for a project take too long to run, they are not going to be run re
 - use smaller mock datasets rather than full-size datasets
 
 - parallelize testing
+
+- longest tests last
 
