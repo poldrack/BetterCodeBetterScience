@@ -418,7 +418,7 @@ Another popular tool for managing virtual environments is `conda`.  It has much 
 
 There is one important way in which `conda` differs from `uv`. In fact, I switched to `uv` in 2024 after being a long-time user of `conda`, but I still use `conda` for some projects. The crucial feature of `conda` that has kept us using it for a limited set of projects is its ability to manage non-Python software elements alongside Python packages.  We have found on a couple of occasions that some Python packages have dependencies that rely upon non-Python software components.  Specifically, in cases where Python packages required a specific component (the LLVM compiler), we were unable to easily get the specific required version of that component working on our Mac using `uv`, whereas `conda` simply installs the required component and works out of the box.  The speed and efficiency of `uv` generally outshine `conda` in our experience, but in some cases `conda` may help solve tricky non-Python dependency issues.
 
-
+**TODO**: Add section on Pixi?
 
 ## Large language models
 
