@@ -8,29 +8,26 @@ By analogy, we can think of software tests as being either positive or negative 
 
 ## Why use software tests?
 
-The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.  This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming *more important* than code generation as a skill for writing good scientific code.  But creating correct code is far from the only reason for writing tests.
+The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.  This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming *more important* than code generation as a skill for generating good scientific code.  But creating correct code is far from the only reason for writing tests.
 
-A second reason for testing was highlighted in our earlier discussion of test-driven development.  Tests can provide the coder with a measure of task completion; when the tests pass, the job is done, other than refactoring the code to make it cleaner and more robust.  Writing tests make one think harder about what exactly they want/need the code to do, and to specify those goals in as clear a way as possible.  Focusing on tests can help keep the coder's "eyes on the MVP prize" and prevent generating too much extraneous code.
+A second reason for testing was highlighted in our earlier discussion of test-driven development.  Tests can provide the coder with a measure of task completion; when the tests pass, the job is done, other than refactoring the code to make it cleaner and more robust.  Writing tests make one think harder about what exactly they want/need the code to do, and to specify those goals in as clear a way as possible.  Focusing on tests can help keep the coder's "eyes on the MVP prize" and prevent generating too much extraneous code ("gold plating").
 
-A third reason to write tests is that they can help drive modularity in the code.  It's much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.  Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored.
+A third reason to write tests is that they can help drive modularity in the code.  It's much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.  Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored. In this way, writing tests can give us useful insights into the structure of the code.
 
 A final reason to write tests is that they make it much easier to make changes to the code.  Without a robust test suite, one is always left worried that changing some aspect of the code will have unexpected effects on its former behavior (known as a "regression").  Tests can provide you with the comfort you need to make changes, knowing that you will detect any untoward effects your changes might have.  This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.
 
-## When to write tests
-
-### any time you encounter a bug, write a test 
 
 ## Types of tests
 
 ### Unit tests
 
-Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions and classes) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").  
+Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").  
 
 ### Integration tests
 
 As the name suggests, an integration test assesses whether the entire application works as it should, integrating all of the components that were tested via unit testing. 
 
-One simple type of integration test is a "smoke test".  This name [apparently](https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)) derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.  In coding, a smoke test is a simple sanity check meant to ensure that the entire application runs without crashing.  This is usually accomplished by running a top-level function that exercises the entire application.  Smoke tests are useful for quickly identifying major problems, but they don't actually test whether the application performs its function correctly.
+One simple type of integration test is a "smoke test".  This name [apparently](https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)) derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.  In coding, a smoke test is a simple sanity check meant to ensure that the entire application runs without crashing.  This is usually accomplished by running a top-level function that exercises the entire application.  Smoke tests are useful for quickly identifying major problems, but they don't actually test whether the application performs its function correctly.  They can be especially useful for large applications, where the full test suite may take hours to run. An initial smoke test can determine whether something is broken downstream, saving lots of wasted testing time. 
 
 Full integration tests assess the function of the entire application; one can think of them as unit tests where the unit is the entire application. Just as with unit tests, we want integration tests that both confirm proper operation under intended conditions, as well as confirming proper behavior (such as exiting with an error message) under improper conditions.
 
@@ -73,19 +70,19 @@ def test_escape_velocity():
 
 We can run this using `pytest` (more about this later), which tells us that the test passes:
 
-```
+```bash
 ❯ pytest src/BetterCodeBetterScience/escape_velocity.py
 ====================== test session starts ======================
 
-src/BetterCodeBetterScience/escape_velocity py .         [100%]
+src/BetterCodeBetterScience/escape_velocity.py ..          [100%]
 
-====================== 1 passed in 0.08s ======================
+======================= 2 passed in 0.10s =======================
 ```
 
 
 If the returned value didn't match the known value (within a given level of tolerance, which is handled by `np.allclose()`), then the assertion will fail and raise an exception, causing the test to fail.  For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:
 
-```
+```bash
 ❯ pytest src/BetterCodeBetterScience/escape_velocity.py
 ====================== test session starts ======================
 
@@ -146,6 +143,180 @@ def test_escape_velocity_negative():
 ```
 
 
+## When to write tests
+
+Too often researchers decide to write tests after they have written an entire codebase.  Having any tests is certainly better than having no tests, but integrating testing into ones development workflow from the start can help improve the development experience and ultimately lead to better and more maintainable software.  In Chapter 1 we mentioned the idea of *test-driven development*, which we outline in more detail below, but we first discuss a simple approach to introducing testing into the development process.  
+
+### Bug-driven testing: Any time you encounter a bug, write a test
+
+An easy way to introduce testing into the development process is to write a new test any time one encounters a bug, which we refer to as *bug-driven testing*.  This makes it easy to then work on fixing the bug, since the test will determine when the bug has been fixed. In addition, the test will detect if future changes reintroduce the bug.  
+
+As an example, take the following function:
+
+```python
+def find_outliers(data: List[float], threshold: float = 2.0) -> List[int]:
+    """
+    Find outliers in a dataset using z-score method.
+    
+    Parameters
+    ----------
+    data : List[float]
+        List of numerical values.
+    threshold : float, default=2.0
+        Number of standard deviations from the mean to consider a value as an outlier.
+    
+    Returns
+    -------
+    List[int]
+        List of indices of outliers in the data.
+    """
+    
+    mean = sum(data) / len(data)
+    variance = sum((x - mean) ** 2 for x in data) / len(data)
+    std = variance ** 0.5
+    
+    # Bug: division by zero when std is 0 (all values are identical)
+    # This only happens when all data points are the same
+    outliers = []
+    for i, value in enumerate(data):
+        z_score = abs(value - mean) / std 
+        if z_score > threshold:
+            outliers.append(i)
+    
+    return outliers
+```
+
+This code works to properly identify outliers:
+
+```python
+In : data = [1, 2, 3, 1000, 4, 5, 6]
+
+In : find_outliers(data)
+Out: [3]
+```
+
+However, it fails due to a division by zero if all of the values are equal:
+
+```python
+In : data = [1, 1, 1, 1, 1]
+
+In : find_outliers(data)
+---------------------------------------------------------------------------
+ZeroDivisionError                         Traceback (most recent call last)
+Cell In[21], line 1
+----> 1 find_outliers(data)
+
+Cell In[9], line 26, in find_outliers(data, threshold)
+     24 outliers = []
+     25 for i, value in enumerate(data):
+---> 26     z_score = abs(value - mean) / std 
+     27     if z_score > threshold:
+     28         outliers.append(i)
+
+ZeroDivisionError: float division by zero
+
+```
+
+Our intended behavior if all of the values are equal is to return an empty list, since there are by definition no outliers.  But before we do this, let's create a couple of tests to check for the intended behavior and provide useful error messages if the test fails:
+
+```python
+def test_find_outliers_normal_case():
+    data = [1, 2, 3, 4, 5, 100]  # 100 is clearly an outlier
+    outliers = find_outliers(data, threshold=2.0)
+    
+    # Should find the outlier at index 5
+    assert 5 in outliers, f"Failed to detect outlier: {outliers}"
+    assert len(outliers) == 1, f'Expected exactly one outlier, got: {len(outliers)}'
+
+
+def test_find_outliers_identical_values():
+    data = [5, 5, 5, 5, 5]  # All identical values
+    
+    outliers = find_outliers(data, threshold=2.0)
+    assert outliers == [], f"Expected no outliers for identical values, got {outliers}"
+```
+
+Running this with the original function definition, we see that it fails:
+
+```python
+❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+=========================== test session starts ===========================
+collected 2 items
+
+src/BetterCodeBetterScience/bug_driven_testing.py .F                [100%]
+
+================================ FAILURES =================================
+___________________ test_find_outliers_identical_values ___________________
+
+    def test_find_outliers_identical_values():
+        data = [5, 5, 5, 5, 5]  # All identical values
+
+>       outliers = find_outliers(data, threshold=2.0)
+
+src/BetterCodeBetterScience/bug_driven_testing.py:50:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = [5, 5, 5, 5, 5], threshold = 2.0
+
+    def find_outliers(data: List[float], threshold: float = 2.0) -> List[int]:
+        """
+        Find outliers in a dataset using z-score method.
+
+        Parameters
+        ----------
+        data : List[float]
+            List of numerical values.
+        threshold : float, default=2.0
+            Number of standard deviations from the mean to consider a value as an outlier.
+
+        Returns
+        -------
+        List[int]
+            List of indices of outliers in the data.
+        """
+
+        mean = sum(data) / len(data)
+        variance = sum((x - mean) ** 2 for x in data) / len(data)
+        std = variance ** 0.5
+
+        # Bug: division by zero when std is 0 (all values are identical)
+        # This only happens when all data points are the same
+        outliers = []
+        for i, value in enumerate(data):
+>           z_score = abs(value - mean) / std  # Bug: std can be 0!
+E           ZeroDivisionError: float division by zero
+
+src/BetterCodeBetterScience/bug_driven_testing.py:31: ZeroDivisionError
+========================= short test summary info =========================
+FAILED src/BetterCodeBetterScience/bug_driven_testing.py::test_find_outliers_identical_values
+ - ZeroDivisionError: float division by zero
+======================= 1 failed, 1 passed in 0.10s =======================
+```
+
+We can now fix the code by returning an empty list if zero standard deviation is detected:
+
+```python
+    ...
+    if std == 0:
+        # If standard deviation is zero, all values are identical, so no outliers
+        return []
+```
+
+Here we add a comment to explain the logic of the test. Running the tests now will show that the problem is fixed:
+
+```python
+❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+=========================== test session starts ===========================
+collected 2 items
+
+src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
+
+============================ 2 passed in 0.08s ============================
+
+```
+
+Now we can continue coding with confidence that if we happen to accidentally reintroduce the bug, it will be caught.
+
 ## The structure of a good test
 
 A commonly used scheme for writing a test is "given/when/then":
@@ -154,7 +325,7 @@ A commonly used scheme for writing a test is "given/when/then":
 - when something happens (such as a particular input)
 - then something else should happen (such as a particular output or exception)
 
-Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").
+Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").  You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one).
 
 How do we test that the output of a function is correct given the input?  There are different answers for different situations:
 
@@ -278,7 +449,7 @@ One could write tests without the help of any specialized packages, but we gener
 
 We will start with a very simple example: a function that generates the Euclidean distance between two points.  Copilot generates the following for us based on the prompt in the comment:
 
-```
+```python
 # generate a function that calculates the distance between two points
 # where each point is defined as a tuple of two numbers
 
@@ -293,7 +464,7 @@ def distance(p1, p2):
 
 Now we would like to generate some tests for this code to make sure that it works properly. If we ask Copilot to generate some tests, it does a seeming decent job:
 
-```
+```python
 from BetterCodeBetterScience.simple_testing.distance import distance
 
 def test_distance_zero():
@@ -317,19 +488,19 @@ def test_distance_same_y():
 
 Now that we have our tests, we need to run them, using the `py.test` command:
 
-```
+```bash
 py.test src/BetterCodeBetterScience/simple_testing
 ```
 
 This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".  Running those tests intially, we get an error:
 
-```
+```bash
 E       NameError: name 'math' is not defined. Did you forget to import 'math'
 ```
 
 Running the test after adding the necessary import, we get another error:
 
-```
+```bash
 >       assert distance((1, -2), (-4, 6)) == math.sqrt(125)
 E       assert 9.433981132056603 == 11.180339887498949
 E        +  where 9.433981132056603 = distance((1, -2), (-4, 6))
@@ -340,7 +511,7 @@ E        +    where <built-in function sqrt> = math.sqrt
 
 Here we see that the value returned by our function is different from the one expected by the test; in this case, the test value generated by Copilot is incorrect.  In our research, it was not uncommon for ChatGPT to generate incorrect test values, so these must always be checked by a domain expert.  Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:
 
-```
+```bash
 python -m pytest src/codingforscience/simple_testing
 ==================== test session starts =====================
 platform darwin -- Python 3.12.0, pytest-8.3.3, pluggy-1.5.0
@@ -355,9 +526,6 @@ src/codingforscience/simple_testing/test_distance.py . [ 16%]
 ===================== 6 passed in 0.06s ======================
 
 ```
-
-**DISCUSS ESCAPE VELOCITY EXAMPLE?**
-
 
 
 ## Testing and AI-assisted coding
@@ -374,7 +542,7 @@ We start by creating `get_PubmedIDs_for_query`.  We could use the `Biopython.Ent
 
 If we are using the TDD approach, we would first want to develop a set of tests to make sure that our function is working correctly.  The following three tests specify several different outcomes that we might expect. First, we give a query that is known to give a valid result, and test whether it in fact gives such a result:
 
-```
+```python
 def test_get_PubmedIDs_for_query_check_valid():
     query = "friston-k AND 'free energy'"
     ids = get_PubmedIDs_for_query(query)
@@ -387,7 +555,7 @@ def test_get_PubmedIDs_for_query_check_valid():
 
 Second, we give a query with a known empty result, and make sure it returns an empty list:
 
-```
+```python
 def test_get_PubmedIDs_for_query_check_empty():
     query = "friston-k AND 'fizzbuzz'"
     ids = get_PubmedIDs_for_query(query)
@@ -401,7 +569,7 @@ def test_get_PubmedIDs_for_query_check_empty():
 
 We first create an empty function to ensure that the tests fail:
 
-```
+```python
 def get_PubmedIDs_for_query(query: str, 
                         retmax: int = None,
                         base_url: str = None) -> list:
@@ -410,7 +578,7 @@ def get_PubmedIDs_for_query(query: str,
 
 The test result shows that all of the tests fail:
 
-```
+```bash
 python -m pytest --cov=src/codingforscience/textmining  --cov-report term-missing -v tests/textmining
 =============================== test session starts ================================
 collected 2 items
@@ -425,7 +593,7 @@ FAILED tests/textmining/test_textmining.py::test_get_PubmedIDs_for_query_check_e
 ```
 Now we work with Copilot write the code to make the tests pass:
 
-```
+```python
 # define the eutils base URL globally
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
@@ -461,11 +629,15 @@ def get_idlist_from_response(response: requests.Response) -> list:
 
 Note that we have split parts of the functionality into separate functions in order to make the code more understandable.  Running the tests, we see that both of them pass.  Assuming that our tests cover all possible outcomes of interest, we can consider our function complete.
 
+## AI-generated tests
+
+**DISCUSS ESCAPE VELOCITY EXAMPLE?**
+
 ### Test coverage
 
 It can be useful to know if there are any portions of our code that are not being exercised by our tests, which is known as *code coverage*.  The `pytest-cov` extension for the `pytest` testing package can provide us with a report of test coverage for these tests:
 
-```
+```bash
 ---------- coverage: platform darwin, python 3.13.0-final-0 ----------
 Name                                            Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------
@@ -477,7 +649,7 @@ TOTAL                                              14      1    93%
 
 This report shows that of the 14 statements in our code, one of them is not covered by the tests.  When we look at the missing code (denoted as being on line 66), we see that the missing line is this one from `get_idlist_from_response`:
 
-```
+```python
     else:
         # raise an exception if the search didn't return a useable response
         raise ValueError("Bad request")
@@ -485,7 +657,7 @@ This report shows that of the 14 statements in our code, one of them is not cove
 
 Since none of our test cases caused a bad request to occur, this line never gets executed in the tests. We can address this by adding a test that makes sure that an exception is raised if an invalid base url is provided. To check for an exception, we need to use the `pytest.raises` context manager:
 
-```
+```python
 def test_get_PubmedIDs_for_query_check_badurl():
     query = "friston-k AND 'free energy'"
     # bad url
@@ -507,7 +679,7 @@ Sometimes we need to use a the same data for multiple tests. Rather than duplica
 
 For our example above, it's likely that we will need to reuse the list of pubmed IDs from the search to perform various tests on the subsequent functions.  We can create a single version of this list of IDs by creating a fixture. In the `pytest` framework we do this using a special Python operator called a *decorator*, which is denoted by the symbol `@` as a prefix. A decorator is an operator that changes the operator of the function that it decorates; you don't need to understand its operation in detail for this particular usage.  To refactor our tests above, we would first create the fixture by decorating the function that generates the fixture with the `@pytest.fixture` decorator:
 
-```
+```python
 @pytest.fixture
 def ids():
     query = "friston-k AND 'free energy'"
@@ -517,7 +689,7 @@ def ids():
 
 We can then refactor our tests for a valid query to use the fixture by passing it as an argument to the test function:
 
-```
+```python
 def test_get_PubmedIDs_for_query_check_valid(ids):
     assert isinstance(ids, list)
     assert len(ids) > 0
@@ -531,7 +703,7 @@ Sometimes tests require infrastructure that is outside of the control of the tes
 
 In our example, we want to create a mock response that looks sufficiently like a response from the real API to pass our tests.  We will do this using a trick called *monkeypatching*, which basically overrides the function of an object when the code runs.  We first need to create a class that can replace the `requests.get` call in `get_PubmedIDs_for_query`, replacing it with a class that outputs a fixed simulacrum of an API response via its `.json()` method.  
 
-```
+```python
 class MockPubmedResponse:
     status_code = 200
 
@@ -551,7 +723,7 @@ class MockPubmedResponse:
 
 We need to decorate the `json` method as a *static method*, which means that it can be called without actually creating an instance of the class.  We now insert this mock response for the standard `requests.get` call within the test, first creating a fixture based on the mocked response and then testing that fixture:
 
-```
+```python
 @pytest.fixture
 def ids_mocked(monkeypatch):
 
@@ -581,7 +753,7 @@ Often a function needs to accept a range of inputs that can result in different 
 
 For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. We first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
 
-```
+```python
 def get_record_from_PubmedID(pmid: str) -> dict:
     pass
 
@@ -592,7 +764,7 @@ def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
 
 Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record can be reused in a later test.
 
-```
+```python
 @pytest.fixture
 def pmid_record():
     pmid = "38691601"
@@ -612,7 +784,7 @@ def test_get_record_from_invalid_PubmedID():
 
 Armed with these tests, we now work with Copilot to develop the code for `get_record_from_PubmedID`:
 
-```
+```python
 def get_record_from_PubmedID(pmid: str, 
                              esummary_url: str = None) -> dict:
     """
@@ -639,7 +811,7 @@ def get_record_from_PubmedID(pmid: str,
 
 This passes the tests, so we can now move to writing some initial tests for `parse_year_from_Pubmed_record`:
 
-```
+```python
 
 def test_parse_year_from_Pubmed_record_empty():
     record = {
@@ -659,7 +831,7 @@ def test_parse_year_from_Pubmed_record_valid():
 
 Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years or in various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.  
 
-```
+```python
 testdata = [
     ('17773841', 1944),
     ('13148370', 1954),
@@ -673,7 +845,7 @@ testdata = [
 
 We then feed this into our test using the `@pytest.mark.parametrize` decorator on the test, which will feed in each of the values into the test:
 
-```
+```python
 @pytest.mark.parametrize("pmid, year_true", testdata)
 def test_parse_year_from_pmid_parametric(pmid, year_true):
     record = get_record_from_PubmedID(pmid)
@@ -683,7 +855,7 @@ def test_parse_year_from_pmid_parametric(pmid, year_true):
 
 Looking at the results of running the test, we will see that each parametric value is run as a separate test:
 
-```
+```bash
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[17773841-1944] PASSED       [ 62%]
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[13148370-1954] PASSED       [ 68%]
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[14208567-1964] PASSED       [ 75%]
@@ -700,7 +872,7 @@ Parameterized testing can be useful when we have specific values that we want to
 
 Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the `hypothesis` module in Python to perform property-based testing.  Let's say that we have developed a function to perform linear regression, taking in two vectors (X and y variables) and return a vector of length 2 (parameter estimates for slope and intercept).  Copilot generates some very terse code for us:
 
-```
+```python
 def linear_regression(X, y):
     X = np.c_[np.ones(X.shape[0]), X]
     return np.linalg.inv(X.T @ X) @ X.T @ y
@@ -708,7 +880,7 @@ def linear_regression(X, y):
 
 Asking Copilot to make the code more readable, we get this somewhat overly verbose version:
 
-```
+```python
 def linear_regression(X, y):
     # Add a column of ones to the input data to account for the intercept term
     X_with_intercept = np.c_[np.ones(X.shape[0]), X]
@@ -724,7 +896,7 @@ def linear_regression(X, y):
 
 Now we can use the `hypothesis` module to throw a range of data at this function and see if it fails, using the following test:
 
-```
+```python
 from hypothesis import given, strategies as st
 from hypothesis.extra.numpy import arrays
 
@@ -738,7 +910,7 @@ def test_linear_regression(X, y):
 
 The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  Note that there are no assertions; we are simply checking to see whether the function successfully executes.  Running this test, we see that the test fails, with the following output:
 
-```
+```bash
 E       numpy.linalg.LinAlgError: Singular matrix
 E       Falsifying example: test_linear_regression(
 E           X=array([[0.],
@@ -758,7 +930,7 @@ E       )
 
 The test has idenfied a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  Instead, what we can do is first test whether there is more than a single unique value in the X matrix, and then peform separate tests for when it is (which should result in an exception being raised) and when it is not (which should run normally).
 
-```
+```python
 @given(
     arrays(np.float32, (6, 1), elements=st.floats()),
     arrays(np.float32, (6, 1), elements=st.floats()),
@@ -773,7 +945,7 @@ def test_linear_regression(X, y):
 
 Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases.  If a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the `scipy` module. Initial exploration of this comparison uncovered the fact that the scipy function performs checking on the input data for various problematic conditions, such as infinite or NaN ("not a number") values.  To address this, we implemented a function to validate the input for our linear regression function:
 
-```
+```python
 def _validate_input(X, y):
     if np.isinf(X).any() or np.isinf(y).any():
         raise Exception("Input data contains infinite values")
@@ -789,7 +961,7 @@ def _validate_input(X, y):
 
 Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
 
-```
+```python
 @given(
     arrays(np.float64, (6, 1), elements=st.floats(-1e6, 1e6)),
     arrays(np.float64, (6, 1), elements=st.floats(-1e6, 1e6)),
