@@ -7,9 +7,9 @@ chapters:
 - file: introduction
 - file: essential_tools_and_techniques
 - file: software_engineering
-# - file: project_organization
+- file: testing
 # - file: AI_coding_assistants
-# - file: testing
+# - file: project_organization
 # - file: validation
 # - file: performance
 # - file: data_management
