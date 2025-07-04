@@ -427,6 +427,10 @@ document.write(`
 </li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-formatting-tools">Code formatting tools</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting-code-using-ai-agents">Formatting code using AI agents</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defensive-coding">Defensive coding</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#announcing-errors-loudly-using-exceptions">Announcing errors loudly using exceptions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#checking-assumptions-using-assertions">Checking assumptions using assertions</a></li>
@@ -836,7 +840,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <ul class="simple">
 <li><p>Read trimming and filtering</p></li>
 <li><p>Alignment to reference genome</p></li>
-<li><p>Quantification of expression</p></li>
+<li><p>Quantification of expresssion</p></li>
 <li><p>Normalization</p></li>
 <li><p>Differential expression analysis</p></li>
 </ul>
@@ -859,7 +863,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <p>I started by creating a main object, called <code class="docutils literal notranslate"><span class="pre">Narps</span></code>, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:</p>
 <ul class="simple">
 <li><p>Preprocessing the images submitted by the teams</p></li>
-<li><p>Preparing the metadata necessary for the analysis of the images</p></li>
+<li><p>Preparing the metdata necessary for the analysis of the images</p></li>
 <li><p>Performing statistical analyses of the images</p></li>
 <li><p>Performing statistical analysis on the hypothesis testing decisions reported by the teams.</p></li>
 <li><p>Performing an image-based meta-analysis to combine results across teams</p></li>
@@ -949,7 +953,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li><p>It’s very difficult to test individual operations without initializing the full class.  In addition, later functions may sometimes depend on earlier functions having been performed, which introduces temporal dependences that make testing difficult.</p></li>
 <li><p>All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code’s operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.</p></li>
 </ul>
-<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
+<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
 </section>
 <section id="global-variables">
 <h3>Global variables<a class="headerlink" href="#global-variables" title="Permalink to this heading">#</a></h3>
@@ -1032,6 +1036,83 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </div>
 <p>Using this method thus prevents the value of our constant from being inadvertently changed.</p>
 </section>
+</section>
+</section>
+<section id="code-formatting-tools">
+<h2>Code formatting tools<a class="headerlink" href="#code-formatting-tools" title="Permalink to this heading">#</a></h2>
+<p>Writing standards-compliant and well-formatted code requires a deep knowledge of the relevant standards, which in the context of Python is primarily contained in the <a class="reference external" href="https://peps.python.org/pep-0008/">Style Guide for Python Code</a>, also known as <em>PEP8</em>.
+I’d venture a guess that very few coders have actually sat down and read PEP8.
+Instead, many of us have learned Python style implicitly by looking at others’ code, but increasingly we resort to the use of automated <em>static analysis</em> tools, which can identify potential errors and reformat code without actually executing the code.
+These tools are commonly known as <em>linters</em>, after the <code class="docutils literal notranslate"><span class="pre">lint</span></code> static analysis tool used in the C language.
+There are numerous such tools for Python; for our examples we will use the <code class="docutils literal notranslate"><span class="pre">ruff</span></code> formatter, which has become popular due in part to its speed.</p>
+<p>A very useful feature of static analysis tools like <code class="docutils literal notranslate"><span class="pre">ruff</span></code> is that they can easily be integrated into most IDEs, so that they can flag problems in the code as it is written. In addition, most modern IDEs will automatically suggest changes to improve the formatting of code.</p>
+<p>Let’s start with writing some poorly formatted code, using the VSCode IDE.  Here is a screenshot after adding a couple of lines of poorly formatted or anti-pattern code:</p>
+<figure class="align-default" id="vscodeformatting-fig">
+<a class="reference internal image-reference" href="images/code_formatting.png"><img alt="Example of code formatting suggestions within IDE" src="images/code_formatting.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">IDE suggestions to fix poorly formatted or problematic code within VSCode.  The top panel shows two lines of problematic code. The squiggly underlines reflect <code class="docutils literal notranslate"><span class="pre">ruff</span></code>’s detection of problems in the code, which are detailed in the popup window as well as the <em>Problems</em> panel below.  The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.</span><a class="headerlink" href="#vscodeformatting-fig" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p>We see that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).  We can also use <code class="docutils literal notranslate"><span class="pre">ruff</span></code> from the command line to detect and fix code problems:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>src/BetterCodeBetterScience/formatting_example.py
+src/BetterCodeBetterScience/formatting_example.py:6:1:<span class="w"> </span>F403<span class="w"> </span><span class="sb">`</span>from<span class="w"> </span>numpy.random<span class="w"> </span>import<span class="w"> </span>*<span class="sb">`</span><span class="w"> </span>used<span class="p">;</span><span class="w"> </span>unable<span class="w"> </span>to<span class="w"> </span>detect<span class="w"> </span>undefined<span class="w"> </span>names
+<span class="w">  </span><span class="p">|</span>
+<span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="c1"># Poorly formatted code for linting example</span>
+<span class="m">5</span><span class="w"> </span><span class="p">|</span>
+<span class="m">6</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>from<span class="w"> </span>numpy.random<span class="w"> </span>import<span class="w"> </span>*
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>^^^^^^^^^^^^^^^^^^^^^^^^^^<span class="w"> </span>F403
+<span class="m">7</span><span class="w"> </span><span class="p">|</span>
+<span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">mynum</span><span class="o">=</span>randint<span class="o">(</span><span class="m">0</span>,100<span class="o">)</span>
+<span class="w">  </span><span class="p">|</span>
+
+src/BetterCodeBetterScience/formatting_example.py:8:7:<span class="w"> </span>F405<span class="w"> </span><span class="sb">`</span>randint<span class="sb">`</span><span class="w"> </span>may<span class="w"> </span>be<span class="w"> </span>undefined,<span class="w"> </span>or<span class="w"> </span>defined<span class="w"> </span>from<span class="w"> </span>star<span class="w"> </span>imports
+<span class="w">  </span><span class="p">|</span>
+<span class="m">6</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>from<span class="w"> </span>numpy.random<span class="w"> </span>import<span class="w"> </span>*
+<span class="m">7</span><span class="w"> </span><span class="p">|</span>
+<span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">mynum</span><span class="o">=</span>randint<span class="o">(</span><span class="m">0</span>,100<span class="o">)</span>
+<span class="w">  </span><span class="p">|</span><span class="w">       </span>^^^^^^^<span class="w"> </span>F405
+<span class="w">  </span><span class="p">|</span>
+
+Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>errors.
+</pre></div>
+</div>
+<p>Most linters can also automatically fix the issues that they detect in the code.  <code class="docutils literal notranslate"><span class="pre">ruff</span></code> modifies the file in place, so we will first create a copy (so that our original remains intact) and then run the formatter on that copy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>cp<span class="w"> </span>src/BetterCodeBetterScience/formatting_example.py<span class="w"> </span>src/BetterCodeBetterScience/formatting_example_ruff.py
+
+❯<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>src/BetterCodeBetterScience/formatting_example_ruff.py
+<span class="m">1</span><span class="w"> </span>file<span class="w"> </span>reformatted
+
+❯<span class="w"> </span>diff<span class="w"> </span>src/BetterCodeBetterScience/formatting_example.py<span class="w"> </span>src/BetterCodeBetterScience/formatting_example_ruff.py
+<span class="m">1</span>,3d0
+&lt;
+&lt;
+&lt;
+8c5
+&lt;<span class="w"> </span><span class="nv">mynum</span><span class="o">=</span>randint<span class="o">(</span><span class="m">0</span>,100<span class="o">)</span>
+<span class="se">\ </span>No<span class="w"> </span>newline<span class="w"> </span>at<span class="w"> </span>end<span class="w"> </span>of<span class="w"> </span>file
+---
+&gt;<span class="w"> </span><span class="nv">mynum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>randint<span class="o">(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">diff</span></code> result shows that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> reformatted the code on line 8 (to add spaces in compliance with PEP8) and also removed some empty lines in the file. It did not, however, change the import statement; that’s a level of modification that is beyond the power of a static analysis tool.</p>
+<section id="formatting-code-using-ai-agents">
+<h3>Formatting code using AI agents<a class="headerlink" href="#formatting-code-using-ai-agents" title="Permalink to this heading">#</a></h3>
+<p>Unsurprisingly, AI coding agents are also quite good at fixing formatting and styling issues in code.  Here is a simple example where we prompt the GitHub Copilot chat within VSCode to fix the formatting in the example code from above:</p>
+<figure class="align-default" id="aiformatting-fig">
+<a class="reference internal image-reference" href="images/code_formatting_ai.png"><img alt="Example of code formatting using AI." src="images/code_formatting_ai.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The GitHub Copilot chat within VSCode was used to prompt the model (Claude Sonnet 4) to fix issues with the code. The model generated new code and also outlined its improvements.</span><a class="headerlink" href="#aiformatting-fig" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The agent both addressed the formatting issues as well as fixing the wildcard import, improving the variable naming, and updating the comment.  Here is the new code generated by the model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Well-formatted code following PEP8 and best practices</span>
+
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">np_random</span>
+
+<span class="n">my_num</span> <span class="o">=</span> <span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The model could certainly be prompted to make more extensive changes on more complex code (such as improving variable names) with a more detailed prompt.</p>
 </section>
 </section>
 <section id="defensive-coding">
@@ -1178,7 +1259,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </pre></div>
 </div>
 <p>Even if you don’t plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.</p>
-<p>A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab’s Amazon Web Services account into a piece of code, which was kept in a private GitHub repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.</p>
+<p>A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab’s Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.</p>
 <p><em>Never</em> place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.</p>
 <section id="environment-variables">
 <h3>Environment variables<a class="headerlink" href="#environment-variables" title="Permalink to this heading">#</a></h3>
@@ -1217,7 +1298,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="configuration-files">
 <h3>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">#</a></h3>
-<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alternative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
+<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="c1"># Project Configuration</span>
 <span class="nt">project</span><span class="p">:</span>
@@ -1279,7 +1360,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="managing-technical-debt">
 <h2>Managing technical debt<a class="headerlink" href="#managing-technical-debt" title="Permalink to this heading">#</a></h2>
-<p>The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on GitHub that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.</p>
+<p>The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.</p>
 <p>The concept of <em>technical debt</em> refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:</p>
 <ul class="simple">
 <li><p>become dysfunctional with newer Python releases</p></li>
@@ -1293,7 +1374,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li><p>A well-maintained package is likely to be well-tested</p></li>
 <li><p>Using a well-maintained package can save a great deal of time compared to writing one’s own implementation</p></li>
 </ul>
-<p>While we don’t want to suggest that one shouldn’t use any old package from PyPI that happens to solve an important problem, we think it’s important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the GitHub repository for the <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">Scikit-learn project</a>.  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:</p>
+<p>While we don’t want to suggest that one shouldn’t use any old package from PyPI that happens to solve an important problem, we think it’s important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">Scikit-learn project</a>.  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:</p>
 <ul class="simple">
 <li><p>Multiple active contributors (not just a single developer)</p></li>
 <li><p>Automated testing with a high degree of code coverage</p></li>
@@ -1418,6 +1499,10 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-immutable-variables">Creating immutable variables</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-formatting-tools">Code formatting tools</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting-code-using-ai-agents">Formatting code using AI agents</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defensive-coding">Defensive coding</a><ul class="nav section-nav flex-column">
