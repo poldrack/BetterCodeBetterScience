@@ -840,7 +840,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <ul class="simple">
 <li><p>Read trimming and filtering</p></li>
 <li><p>Alignment to reference genome</p></li>
-<li><p>Quantification of expresssion</p></li>
+<li><p>Quantification of expression</p></li>
 <li><p>Normalization</p></li>
 <li><p>Differential expression analysis</p></li>
 </ul>
@@ -863,7 +863,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <p>I started by creating a main object, called <code class="docutils literal notranslate"><span class="pre">Narps</span></code>, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:</p>
 <ul class="simple">
 <li><p>Preprocessing the images submitted by the teams</p></li>
-<li><p>Preparing the metdata necessary for the analysis of the images</p></li>
+<li><p>Preparing the metadata necessary for the analysis of the images</p></li>
 <li><p>Performing statistical analyses of the images</p></li>
 <li><p>Performing statistical analysis on the hypothesis testing decisions reported by the teams.</p></li>
 <li><p>Performing an image-based meta-analysis to combine results across teams</p></li>
@@ -953,7 +953,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li><p>It’s very difficult to test individual operations without initializing the full class.  In addition, later functions may sometimes depend on earlier functions having been performed, which introduces temporal dependences that make testing difficult.</p></li>
 <li><p>All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code’s operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.</p></li>
 </ul>
-<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
+<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
 </section>
 <section id="global-variables">
 <h3>Global variables<a class="headerlink" href="#global-variables" title="Permalink to this heading">#</a></h3>
@@ -1298,7 +1298,7 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="configuration-files">
 <h3>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">#</a></h3>
-<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
+<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alternative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="c1"># Project Configuration</span>
 <span class="nt">project</span><span class="p">:</span>
