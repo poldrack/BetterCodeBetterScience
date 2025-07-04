@@ -437,7 +437,7 @@ A common expression of the idea of modularity in software development is the *Si
 
 - Read trimming and filtering
 - Alignment to reference genome
-- Quantification of expression
+- Quantification of expresssion
 - Normalization
 - Differential expression analysis
 
@@ -465,7 +465,7 @@ In 2019, I started developing data processing and analysis code for large projec
 I started by creating a main object, called `Narps`, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:
 
 - Preprocessing the images submitted by the teams
-- Preparing the metadata necessary for the analysis of the images
+- Preparing the metdata necessary for the analysis of the images
 - Performing statistical analyses of the images
 - Performing statistical analysis on the hypothesis testing decisions reported by the teams.
 - Performing an image-based meta-analysis to combine results across teams
@@ -561,7 +561,7 @@ More generally, there are a couple of problems with the use of a single large cl
 - All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code's operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.
 
 
-Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python *data classes* to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.   
+Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python *data classes* to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsiblities, and makes it easier to test the functions individually without requiring initialization of a large class.   
 
 
 ### Global variables
@@ -658,6 +658,93 @@ AttributeError: Constants cannot be modified
 ```
 
 Using this method thus prevents the value of our constant from being inadvertently changed.
+
+
+## Code formatting tools
+
+Writing standards-compliant and well-formatted code requires a deep knowledge of the relevant standards, which in the context of Python is primarily contained in the [Style Guide for Python Code](https://peps.python.org/pep-0008/), also known as *PEP8*.  I'd venture a guess that very few coders have actually sat down and read PEP8.  Instead, many of us have learned Python style implicitly by looking at others' code, but increasingly we resort to the use of automated *static analysis* tools, which can identify potential errors and reformat code without actually executing the code.  These tools are commonly known as *linters*, after the `lint` static analysis tool used in the C language.  There are numerous such tools for Python; for our examples we will use the `ruff` formatter, which has become popular due in part to its speed.  
+
+A very useful feature of static analysis tools like `ruff` is that they can easily be integrated into most IDEs, so that they can flag problems in the code as it is written. In addition, most modern IDEs will automatically suggest changes to improve the formatting of code.  
+
+Let's start with writing some poorly formatted code, using the VSCode IDE.  Here is a screenshot after adding a couple of lines of poorly formatted or anti-pattern code:
+
+:::{figure-md} VSCodeFormatting-fig
+<img src="images/code_formatting.png" alt="Example of code formatting suggestions within IDE" width="600px">
+
+IDE suggestions to fix poorly formatted or problematic code within VSCode.  The top panel shows tw lines of problematic code. The squiggly underlines reflect `ruff`'s detection of problems in the code, which are detailed in the popup window as well as the *Problems* panel below.  The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.
+:::
+
+We see that Ruff detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).  We can also use `ruff` from the command line to detect and fix code problems:
+
+```bash
+❯ ruff check src/BetterCodeBetterScience/formatting_example.py
+src/BetterCodeBetterScience/formatting_example.py:6:1: F403 `from numpy.random import *` used; unable to detect undefined names
+  |
+4 | # Poorly formatted code for linting example
+5 |
+6 | from numpy.random import *
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^ F403
+7 |
+8 | mynum=randint(0,100)
+  |
+
+src/BetterCodeBetterScience/formatting_example.py:8:7: F405 `randint` may be undefined, or defined from star imports
+  |
+6 | from numpy.random import *
+7 |
+8 | mynum=randint(0,100)
+  |       ^^^^^^^ F405
+  |
+
+Found 2 errors.
+```
+
+Most linters can also automatically fix the issues that they detect in the code.  `ruff` modifies the file in place, so we will first create a copy (so that our original remains intact) and then run the formatter on that copy:
+
+```bash
+❯ cp src/BetterCodeBetterScience/formatting_example.py src/BetterCodeBetterScience/formatting_example_ruff.py
+
+❯ ruff format src/BetterCodeBetterScience/formatting_example_ruff.py
+1 file reformatted
+
+❯ diff src/BetterCodeBetterScience/formatting_example.py src/BetterCodeBetterScience/formatting_example_ruff.py
+1,3d0
+<
+<
+<
+8c5
+< mynum=randint(0,100)
+\ No newline at end of file
+---
+> mynum = randint(0, 100)
+
+```
+
+The `diff` result shows that `ruff` reformatted the code on line 8 (to add spaces in compliance with PEP8) and also removed some empty lines in the file. It did not, however, change the import statement; that's a level of modification that is beyond the power of a static analysis tool. 
+
+
+### Formatting code using AI agents
+
+Unsurprisingly, AI coding agents are also quite good at fixing formatting and styling issues in code.  Here is a simple example where we prompt the GitHub Copilot chat within VSCode to fix the formatting in the example code from above:
+
+
+:::{figure-md} AIFormatting-fig
+<img src="images/code_formatting_ai.png" alt="Example of code formatting using AI." width="600px">
+
+The GitHub Copilot chat within VSCode was used to prompt the model (Claude Sonnet 4) to fix issues with the code. The model generated new code and also outlined its improvements.
+:::
+
+The agent both addressed the formatting issues as well as fixing the wildcard import, improving the variable naming, and updating the comment.  Here is the new code generated by the model:
+
+```python
+# Well-formatted code following PEP8 and best practices
+
+import numpy.random as np_random
+
+my_num = np_random.randint(0, 100)
+```
+
+The model could certainly be prompted to make more extensive changes on more complex code (such as improving variable names) with a more detailed prompt.
 
 
 ## Defensive coding
@@ -825,7 +912,7 @@ fmripath = '/home/jb07/joe_python/fmri_analysis/'
 
 Even if you don't plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.  
 
-A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private GitHub repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
+A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab's Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.
 
 *Never* place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.
 
@@ -873,7 +960,7 @@ Out[5]: '934kjdflk5k5ks592kskx'
 
 ### Configuration files
 
-In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alternative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
+In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alterative is to use *configuration files*, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the [YAML](https://yaml.org/) file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:
 
 ```yaml
 ---
@@ -937,7 +1024,7 @@ It is important to ensure that configuration files do not get checked into versi
 
 ## Managing technical debt
 
-The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on GitHub that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
+The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.  
 
 The concept of *technical debt* refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:
 
@@ -952,7 +1039,7 @@ At the same time, there are very good reasons for using well-maintained packages
 - A well-maintained package is likely to be well-tested
 - Using a well-maintained package can save a great deal of time compared to writing one's own implementation
 
-While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the GitHub repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
+While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:
 
 - Multiple active contributors (not just a single developer)
 - Automated testing with a high degree of code coverage
@@ -960,4 +1047,3 @@ While we don't want to suggest that one shouldn't use any old package from PyPI 
 - An active issues page, with developers responding to issues relatively quickly
 
 You may well decide that the code from a project that doesn't meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.
-
