@@ -662,7 +662,11 @@ Using this method thus prevents the value of our constant from being inadvertent
 
 ## Code formatting tools
 
-Writing standards-compliant and well-formatted code requires a deep knowledge of the relevant standards, which in the context of Python is primarily contained in the [Style Guide for Python Code](https://peps.python.org/pep-0008/), also known as *PEP8*.  I'd venture a guess that very few coders have actually sat down and read PEP8.  Instead, many of us have learned Python style implicitly by looking at others' code, but increasingly we resort to the use of automated *static analysis* tools, which can identify potential errors and reformat code without actually executing the code.  These tools are commonly known as *linters*, after the `lint` static analysis tool used in the C language.  There are numerous such tools for Python; for our examples we will use the `ruff` formatter, which has become popular due in part to its speed.  
+Writing standards-compliant and well-formatted code requires a deep knowledge of the relevant standards, which in the context of Python is primarily contained in the [Style Guide for Python Code](https://peps.python.org/pep-0008/), also known as *PEP8*.
+I'd venture a guess that very few coders have actually sat down and read PEP8.
+Instead, many of us have learned Python style implicitly by looking at others' code, but increasingly we resort to the use of automated *static analysis* tools, which can identify potential errors and reformat code without actually executing the code.
+These tools are commonly known as *linters*, after the `lint` static analysis tool used in the C language.
+There are numerous such tools for Python; for our examples we will use the `ruff` formatter, which has become popular due in part to its speed.  
 
 A very useful feature of static analysis tools like `ruff` is that they can easily be integrated into most IDEs, so that they can flag problems in the code as it is written. In addition, most modern IDEs will automatically suggest changes to improve the formatting of code.  
 
@@ -671,10 +675,10 @@ Let's start with writing some poorly formatted code, using the VSCode IDE.  Here
 :::{figure-md} VSCodeFormatting-fig
 <img src="images/code_formatting.png" alt="Example of code formatting suggestions within IDE" width="600px">
 
-IDE suggestions to fix poorly formatted or problematic code within VSCode.  The top panel shows tw lines of problematic code. The squiggly underlines reflect `ruff`'s detection of problems in the code, which are detailed in the popup window as well as the *Problems* panel below.  The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.
+IDE suggestions to fix poorly formatted or problematic code within VSCode.  The top panel shows two lines of problematic code. The squiggly underlines reflect `ruff`'s detection of problems in the code, which are detailed in the popup window as well as the *Problems* panel below.  The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.
 :::
 
-We see that Ruff detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).  We can also use `ruff` from the command line to detect and fix code problems:
+We see that `ruff` detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).  We can also use `ruff` from the command line to detect and fix code problems:
 
 ```bash
 ❯ ruff check src/BetterCodeBetterScience/formatting_example.py
