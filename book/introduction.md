@@ -37,17 +37,12 @@ In early 2023 the frenzy about AI reached the boiling point with the introductio
 We believe that AI coding assistants have the potential to greatly improve the experience of coding and to help new coders learn how to code effectively.  However, our experiences with AI-assisted coding have also led us to the conclusion that software engineering skills will remain *at least* as important in the future as they are now.  First, and most importantly, the hardest problem in programming is not the generation of code; rather, it is the decomposition of the problem into a set of steps that can be used to generate code. It is no accident that the section of SWEBOK on "Computing Foundations" starts with the following:
 
 
-1. Problem Solving Techniques  
-
-    1.1. Definition of Problem Solving  
-
-    1.2. Formulating the Real Problem  
-
-    1.3. Analyze the Problem  
-
-    1.4  Design a Solution Search Strategy  
-
-    1.5. Problem Solving Using Programs  
+- Problem Solving Techniques  
+  - Definition of Problem Solving  
+  - Formulating the Real Problem  
+  - Analyze the Problem  
+  - Design a Solution Search Strategy  
+  - Problem Solving Using Programs  
 
 The motivation for why coding will remain as an essential skill even if code is no longer being written by humans was expressed by Robert Martin in 2009, well before the current AI tools were even imaginable:
 
