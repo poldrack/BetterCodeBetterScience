@@ -227,7 +227,7 @@ requires-dist = [
     { name = "jupyter-book", specifier = ">=1.0.2" },
     { name = "jupytext", specifier = ">=1.16.4" },
     { name = "matplotlib", specifier = ">=3.9.2" },
-    { name = "mdnewline", specifier = ">=0.1.2" },
+    { name = "mdnewline", specifier = ">=0.1.3" },
     { name = "numba", specifier = ">=0.61.0" },
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "openai", specifier = ">=1.51.2" },
@@ -1330,14 +1330,14 @@ wheels = [
 
 [[package]]
 name = "mdnewline"
-version = "0.1.2"
+version = "0.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5a/fa/23aae25aac6c5c45581dca0bd913278d0854d13f3b8ab50759e6cfa7d8fb/mdnewline-0.1.2.tar.gz", hash = "sha256:c90f94da1ba6014e75f695db6c450c15a917f890997b97471d793bec8faa610c", size = 5907 }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/11/9d8f633cdf42316cccdbe7ab84bbd00698a75449edc2e4cbeaf7ce24eae7/mdnewline-0.1.3.tar.gz", hash = "sha256:697b02828813f44dcf1584b67314267aad26ca297ff958135b46602694c0a85a", size = 6009 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/39/80c8ecec7cd02f32b871352a05a3881bfc8ef6daba61f665cb583613cc6d/mdnewline-0.1.2-py3-none-any.whl", hash = "sha256:cdf86a08df891d44133d3ac11d19965edf1cda22aeda128c340808b98d56728e", size = 5497 },
+    { url = "https://files.pythonhosted.org/packages/3e/e5/c81d24fe7b8d19c41a198fe5ffade6543c2bb657ae6419d7ef62ba15e57e/mdnewline-0.1.3-py3-none-any.whl", hash = "sha256:d3251d1298705fff5822aa9d7ff350f08eeeeb29118e05ea51049f961d9b8118", size = 5527 },
 ]
 
 [[package]]
