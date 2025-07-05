@@ -193,6 +193,7 @@ dependencies = [
     { name = "jupyter-book" },
     { name = "jupytext" },
     { name = "matplotlib" },
+    { name = "mdnewline" },
     { name = "numba" },
     { name = "numpy" },
     { name = "openai" },
@@ -226,6 +227,7 @@ requires-dist = [
     { name = "jupyter-book", specifier = ">=1.0.2" },
     { name = "jupytext", specifier = ">=1.16.4" },
     { name = "matplotlib", specifier = ">=3.9.2" },
+    { name = "mdnewline", specifier = ">=0.1.2" },
     { name = "numba", specifier = ">=0.61.0" },
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "openai", specifier = ">=1.51.2" },
@@ -1324,6 +1326,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/49/e7/cc2720da8a32724b36d04c6dba5644154cdf883a1482b3bbb81959a642ed/mdit-py-plugins-0.3.5.tar.gz", hash = "sha256:eee0adc7195e5827e17e02d2a258a2ba159944a0748f59c5099a4a27f78fcf6a", size = 39871 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/4c/a9b222f045f98775034d243198212cbea36d3524c3ee1e8ab8c0346d6953/mdit_py_plugins-0.3.5-py3-none-any.whl", hash = "sha256:ca9a0714ea59a24b2b044a1831f48d817dd0c817e84339f20e7889f392d77c4e", size = 52087 },
+]
+
+[[package]]
+name = "mdnewline"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5a/fa/23aae25aac6c5c45581dca0bd913278d0854d13f3b8ab50759e6cfa7d8fb/mdnewline-0.1.2.tar.gz", hash = "sha256:c90f94da1ba6014e75f695db6c450c15a917f890997b97471d793bec8faa610c", size = 5907 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9c/39/80c8ecec7cd02f32b871352a05a3881bfc8ef6daba61f665cb583613cc6d/mdnewline-0.1.2-py3-none-any.whl", hash = "sha256:cdf86a08df891d44133d3ac11d19965edf1cda22aeda128c340808b98d56728e", size = 5497 },
 ]
 
 [[package]]
