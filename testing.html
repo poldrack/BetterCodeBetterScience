@@ -1,0 +1,796 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Software testing &#8212; Better Code, Better Science</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'testing';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="frontmatter.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Better Code, Better Science</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="frontmatter.html">
+                    Better Code, Better Science
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="essential_tools_and_techniques.html">Essential tools and techniques</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_engineering.html">Principles of software engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Ftesting.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/testing.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Software testing</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-use-software-tests">Why use software tests?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-tests">Types of tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-tests">Unit tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-tests">Integration tests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-anatomy-of-a-test">The anatomy of a test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-write-tests">When to write tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">Bug-driven testing: Any time you encounter a bug, write a test</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="software-testing">
+<h1>Software testing<a class="headerlink" href="#software-testing" title="Permalink to this heading">#</a></h1>
+<p>Tests define the expected behavior of code, and detect when the code doesn’t match that expected behavior.</p>
+<p>One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a <em>control</em> line; if this line didn’t show up, then that meant that the test was not functioning as expected.  This is known as a <em>positive control</em> because it assesses the test’s ability to identify a positive response.  Other tests also include <em>negative controls</em>, which ensure that the test returns a negative result when it should.</p>
+<p>By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.  A positive test assesses whether, given a particular valid input, the component returns the correct output.  A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.</p>
+<section id="why-use-software-tests">
+<h2>Why use software tests?<a class="headerlink" href="#why-use-software-tests" title="Permalink to this heading">#</a></h2>
+<p>The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.  This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming <em>more important</em> than code generation as a skill for generating good scientific code.  But creating correct code is far from the only reason for writing tests.</p>
+<p>A second reason for testing was highlighted in our earlier discussion of test-driven development.  Tests can provide the coder with a measure of task completion; when the tests pass, the job is done, other than refactoring the code to make it cleaner and more robust.  Writing tests make one think harder about what exactly they want/need the code to do, and to specify those goals in as clear a way as possible.  Focusing on tests can help keep the coder’s “eyes on the MVP prize” and prevent generating too much extraneous code (“gold plating”).</p>
+<p>A third reason to write tests is that they can help drive modularity in the code.  It’s much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.  Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored. In this way, writing tests can give us useful insights into the structure of the code.</p>
+<p>A final reason to write tests is that they make it much easier to make changes to the code.  Without a robust test suite, one is always left worried that changing some aspect of the code will have unexpected effects on its former behavior (known as a “regression”).  Tests can provide you with the comfort you need to make changes, knowing that you will detect any untoward effects your changes might have.  This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.</p>
+</section>
+<section id="types-of-tests">
+<h2>Types of tests<a class="headerlink" href="#types-of-tests" title="Permalink to this heading">#</a></h2>
+<section id="unit-tests">
+<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading">#</a></h3>
+<p>Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing “garbage in, garbage out” behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as <em>NaN</em>, or “not a number”).</p>
+</section>
+<section id="integration-tests">
+<h3>Integration tests<a class="headerlink" href="#integration-tests" title="Permalink to this heading">#</a></h3>
+<p>As the name suggests, an integration test assesses whether the entire application works as it should, integrating all of the components that were tested via unit testing.</p>
+<p>One simple type of integration test is a “smoke test”.  This name <a class="reference external" href="https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)">apparently</a> derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.  In coding, a smoke test is a simple sanity check meant to ensure that the entire application runs without crashing.  This is usually accomplished by running a top-level function that exercises the entire application.  Smoke tests are useful for quickly identifying major problems, but they don’t actually test whether the application performs its function correctly.  They can be especially useful for large applications, where the full test suite may take hours to run. An initial smoke test can determine whether something is broken downstream, saving lots of wasted testing time.</p>
+<p>Full integration tests assess the function of the entire application; one can think of them as unit tests where the unit is the entire application. Just as with unit tests, we want integration tests that both confirm proper operation under intended conditions, as well as confirming proper behavior (such as exiting with an error message) under improper conditions.</p>
+</section>
+</section>
+<section id="the-anatomy-of-a-test">
+<h2>The anatomy of a test<a class="headerlink" href="#the-anatomy-of-a-test" title="Permalink to this heading">#</a></h2>
+<p>A test is generally structured as a function that executes without raising an exception as long as the code behaves in an expected way.  Let’s say that we want to generate a function that returns the escape velocity of a planet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">escape_velocity</span><span class="p">(</span><span class="n">mass</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="mf">6.67430e-11</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the escape velocity from a celestial body, given its mass and radius.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    mass (float): Mass of the celestial body in kg.</span>
+<span class="sd">    radius (float): Radius of the celestial body in meters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    float: Escape velocity in m/s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">G</span> <span class="o">*</span> <span class="n">mass</span> <span class="o">/</span> <span class="n">radius</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can then generate a test to determine whether the value returned by our function matches the known value for a given planet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_escape_velocity</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test the escape_velocity function with known values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mass_earth</span> <span class="o">=</span> <span class="mf">5.972e24</span>  <span class="c1"># Earth mass in kg</span>
+    <span class="n">radius_earth</span> <span class="o">=</span> <span class="mf">6.371e6</span>  <span class="c1"># Earth radius in meters</span>
+    <span class="n">ev_expected</span> <span class="o">=</span> <span class="mf">11186.0</span>  <span class="c1"># Expected escape velocity for Earth in m/s</span>
+    <span class="n">ev_computed</span> <span class="o">=</span> <span class="n">escape_velocity</span><span class="p">(</span><span class="n">mass_earth</span><span class="p">,</span> <span class="n">radius_earth</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ev_expected</span><span class="p">,</span> <span class="n">ev_computed</span><span class="p">),</span> <span class="s2">&quot;Test failed!&quot;</span>
+</pre></div>
+</div>
+<p>We can run this using <code class="docutils literal notranslate"><span class="pre">pytest</span></code> (more about this later), which tells us that the test passes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>pytest<span class="w"> </span>src/BetterCodeBetterScience/escape_velocity.py
+<span class="o">======================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">======================</span>
+
+src/BetterCodeBetterScience/escape_velocity.py<span class="w"> </span>..<span class="w">          </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">=======================</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.10s<span class="w"> </span><span class="o">=======================</span>
+</pre></div>
+</div>
+<p>If the returned value didn’t match the known value (within a given level of tolerance, which is handled by <code class="docutils literal notranslate"><span class="pre">np.allclose()</span></code>), then the assertion will fail and raise an exception, causing the test to fail.  For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>pytest<span class="w"> </span>src/BetterCodeBetterScience/escape_velocity.py
+<span class="o">======================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">======================</span>
+
+src/BetterCodeBetterScience/escape_velocity.py<span class="w"> </span>F<span class="w">          </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">===========================</span><span class="w"> </span><span class="nv">FAILURES</span><span class="w"> </span><span class="o">===========================</span>
+_____________________<span class="w"> </span>test_escape_velocity<span class="w"> </span>_____________________
+
+<span class="w">    </span>def<span class="w"> </span>test_escape_velocity<span class="o">()</span>:
+<span class="w">        </span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        Test the escape_velocity function with known values.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="nv">mass_earth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span>.972e24<span class="w">  </span><span class="c1"># Earth mass in kg</span>
+<span class="w">        </span><span class="nv">radius_earth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span>.371e6<span class="w">  </span><span class="c1"># Earth radius in meters</span>
+<span class="w">        </span><span class="nv">ev_expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1186</span>.0<span class="w"> </span><span class="c1"># 11186.0  # Expected escape velocity for Earth in m/s</span>
+<span class="w">        </span><span class="nv">ev_computed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>escape_velocity<span class="o">(</span>mass_earth,<span class="w"> </span>radius_earth<span class="o">)</span>
+&gt;<span class="w">       </span>assert<span class="w"> </span>np.allclose<span class="o">(</span>ev_expected,<span class="w"> </span>ev_computed<span class="o">)</span>,<span class="w"> </span><span class="s2">&quot;Test failed!&quot;</span>
+E<span class="w">       </span>AssertionError:<span class="w"> </span>Test<span class="w"> </span>failed!
+E<span class="w">       </span>assert<span class="w"> </span>False
+E<span class="w">        </span>+<span class="w">  </span>where<span class="w"> </span><span class="nv">False</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;<span class="k">function</span><span class="w"> </span>allclose<span class="w"> </span>at<span class="w"> </span>0x101403370&gt;<span class="o">(</span><span class="m">1186</span>.0,<span class="w"> </span><span class="m">11185</span>.97789184991<span class="o">)</span>
+E<span class="w">        </span>+<span class="w">    </span>where<span class="w"> </span>&lt;<span class="k">function</span><span class="w"> </span>allclose<span class="w"> </span>at<span class="w"> </span>0x101403370&gt;<span class="w"> </span><span class="o">=</span><span class="w"> </span>np.allclose
+
+src/BetterCodeBetterScience/escape_velocity.py:26:<span class="w"> </span><span class="nv">AssertionError</span>
+<span class="o">=====================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">=====================</span>
+FAILED<span class="w"> </span>src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity<span class="w"> </span>-<span class="w"> </span>AssertionError:<span class="w"> </span>Test<span class="w"> </span>failed!
+<span class="o">========================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>failed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.11s<span class="w"> </span><span class="o">========================</span>
+</pre></div>
+</div>
+<p>It’s also important to make sure that an exception is raised whenever it should be.  For example, the version of the <code class="docutils literal notranslate"><span class="pre">escape_velocity()</span></code> function above did not check to make sure that the mass and radius arguments had positive values, which means that it would give nonsensical results when passed a negative mass or radius value.  To address this we should add code to the function that causes it to raise an exception if either of the arguments is negative:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">escape_velocity</span><span class="p">(</span><span class="n">mass</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="mf">6.67430e-11</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the escape velocity from a celestial body, given its mass and radius.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    mass (float): Mass of the celestial body in kg.</span>
+<span class="sd">    radius (float): Radius of the celestial body in meters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    float: Escape velocity in m/s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mass</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">radius</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mass and radius must be positive values.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">G</span> <span class="o">*</span> <span class="n">mass</span> <span class="o">/</span> <span class="n">radius</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>We can then specify a test that checks whether the function properly raises an exception when passed a negative value. To do this we can use a feature of the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> package (<code class="docutils literal notranslate"><span class="pre">pytest.raises</span></code>) that passes only if the specified exception is raised:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_escape_velocity_negative</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make sure the function raises ValueError for negative mass or radius.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">escape_velocity</span><span class="p">(</span><span class="o">-</span><span class="mf">5.972e24</span><span class="p">,</span> <span class="mf">6.371e6</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="when-to-write-tests">
+<h2>When to write tests<a class="headerlink" href="#when-to-write-tests" title="Permalink to this heading">#</a></h2>
+<p>Too often researchers decide to write tests after they have written an entire codebase.  Having any tests is certainly better than having no tests, but integrating testing into ones development workflow from the start can help improve the development experience and ultimately lead to better and more maintainable software.  In Chapter 1 we mentioned the idea of <em>test-driven development</em>, which we outline in more detail below, but we first discuss a simple approach to introducing testing into the development process.</p>
+<section id="bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">
+<h3>Bug-driven testing: Any time you encounter a bug, write a test<a class="headerlink" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test" title="Permalink to this heading">#</a></h3>
+<p>An easy way to introduce testing into the development process is to write a new test any time one encounters a bug, which we refer to as <em>bug-driven testing</em>.  This makes it easy to then work on fixing the bug, since the test will determine when the bug has been fixed. In addition, the test will detect if future changes reintroduce the bug.</p>
+<p>As an example, take the following function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find outliers in a dataset using z-score method.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : List[float]</span>
+<span class="sd">        List of numerical values.</span>
+<span class="sd">    threshold : float, default=2.0</span>
+<span class="sd">        Number of standard deviations from the mean to consider a value as an outlier.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[int]</span>
+<span class="sd">        List of indices of outliers in the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">mean</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">variance</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">variance</span> <span class="o">**</span> <span class="mf">0.5</span>
+    
+    <span class="c1"># Bug: division by zero when std is 0 (all values are identical)</span>
+    <span class="c1"># This only happens when all data points are the same</span>
+    <span class="n">outliers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">z_score</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span> 
+        <span class="k">if</span> <span class="n">z_score</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="n">outliers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">outliers</span>
+</pre></div>
+</div>
+<p>This code works to properly identify outliers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">:</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>However, it fails due to a division by zero if all of the values are equal:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">:</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">ZeroDivisionError</span>                         <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">26</span><span class="p">,</span> <span class="ow">in</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+     <span class="mi">24</span> <span class="n">outliers</span> <span class="o">=</span> <span class="p">[]</span>
+     <span class="mi">25</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="o">---&gt;</span> <span class="mi">26</span>     <span class="n">z_score</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span> 
+     <span class="mi">27</span>     <span class="k">if</span> <span class="n">z_score</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+     <span class="mi">28</span>         <span class="n">outliers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<span class="ne">ZeroDivisionError</span><span class="p">:</span> <span class="nb">float</span> <span class="n">division</span> <span class="n">by</span> <span class="n">zero</span>
+
+</pre></div>
+</div>
+<p>Our intended behavior if all of the values are equal is to return an empty list, since there are by definition no outliers.  But before we do this, let’s create a couple of tests to check for the intended behavior and provide useful error messages if the test fails:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_find_outliers_normal_case</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>  <span class="c1"># 100 is clearly an outlier</span>
+    <span class="n">outliers</span> <span class="o">=</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    
+    <span class="c1"># Should find the outlier at index 5</span>
+    <span class="k">assert</span> <span class="mi">5</span> <span class="ow">in</span> <span class="n">outliers</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Failed to detect outlier: </span><span class="si">{</span><span class="n">outliers</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Expected exactly one outlier, got: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">test_find_outliers_identical_values</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>  <span class="c1"># All identical values</span>
+    
+    <span class="n">outliers</span> <span class="o">=</span> <span class="n">find_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">outliers</span> <span class="o">==</span> <span class="p">[],</span> <span class="sa">f</span><span class="s2">&quot;Expected no outliers for identical values, got </span><span class="si">{</span><span class="n">outliers</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Running this with the original function definition, we see that it fails:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+=========================== test session starts ===========================
+collected 2 items
+
+src/BetterCodeBetterScience/bug_driven_testing.py .F                [100%]
+
+================================ FAILURES =================================
+___________________ test_find_outliers_identical_values ___________________
+
+    def test_find_outliers_identical_values():
+        data = [5, 5, 5, 5, 5]  # All identical values
+
+&gt;       outliers = find_outliers(data, threshold=2.0)
+
+src/BetterCodeBetterScience/bug_driven_testing.py:50:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = [5, 5, 5, 5, 5], threshold = 2.0
+
+    def find_outliers(data: List[float], threshold: float = 2.0) -&gt; List[int]:
+        &quot;&quot;&quot;
+        Find outliers in a dataset using z-score method.
+
+        Parameters
+        ----------
+        data : List[float]
+            List of numerical values.
+        threshold : float, default=2.0
+            Number of standard deviations from the mean to consider a value as an outlier.
+
+        Returns
+        -------
+        List[int]
+            List of indices of outliers in the data.
+        &quot;&quot;&quot;
+
+        mean = sum(data) / len(data)
+        variance = sum((x - mean) ** 2 for x in data) / len(data)
+        std = variance ** 0.5
+
+        # Bug: division by zero when std is 0 (all values are identical)
+        # This only happens when all data points are the same
+        outliers = []
+        for i, value in enumerate(data):
+&gt;           z_score = abs(value - mean) / std  # Bug: std can be 0!
+E           ZeroDivisionError: float division by zero
+
+src/BetterCodeBetterScience/bug_driven_testing.py:31: ZeroDivisionError
+========================= short test summary info =========================
+FAILED src/BetterCodeBetterScience/bug_driven_testing.py::test_find_outliers_identical_values
+ - ZeroDivisionError: float division by zero
+======================= 1 failed, 1 passed in 0.10s =======================
+</pre></div>
+</div>
+<p>We can now fix the code by returning an empty list if zero standard deviation is detected:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="o">...</span>
+    <span class="k">if</span> <span class="n">std</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># If standard deviation is zero, all values are identical, so no outliers</span>
+        <span class="k">return</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<p>Here we add a comment to explain the logic of the test. Running the tests now will show that the problem is fixed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+=========================== test session starts ===========================
+collected 2 items
+
+src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
+
+============================ 2 passed in 0.08s ============================
+
+</pre></div>
+</div>
+<p>Now we can continue coding with confidence that if we happen to accidentally reintroduce the bug, it will be caught.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-use-software-tests">Why use software tests?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-tests">Types of tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-tests">Unit tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-tests">Integration tests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-anatomy-of-a-test">The anatomy of a test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-write-tests">When to write tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">Bug-driven testing: Any time you encounter a bug, write a test</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Russell Poldrack et al.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
