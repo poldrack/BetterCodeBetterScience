@@ -462,6 +462,8 @@ def distance(p1, p2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 ```
 
+### Generating tests using AI
+
 Now we would like to generate some tests for this code to make sure that it works properly. If we ask Copilot to generate some tests, it does a seeming decent job:
 
 ```python
@@ -492,7 +494,7 @@ Now that we have our tests, we need to run them, using the `py.test` command:
 py.test src/BetterCodeBetterScience/simple_testing
 ```
 
-This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".  Running those tests intially, we get an error:
+This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".  Running those tests initially, we get an error:
 
 ```bash
 E       NameError: name 'math' is not defined. Did you forget to import 'math'
@@ -527,6 +529,9 @@ src/codingforscience/simple_testing/test_distance.py . [ 16%]
 
 ```
 
+### Potential problems with AI-generated tests
+
+If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.  One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong. 
 
 ## Testing and AI-assisted coding
 
@@ -623,7 +628,7 @@ def get_idlist_from_response(response: requests.Response) -> list:
         ids = response.json()["esearchresult"]["idlist"]
         return ids
     else:
-        # raise an exception if the search didn't return a useable response
+        # raise an exception if the search didn't return a usable response
         raise ValueError("Bad request")
 ```
 
@@ -651,7 +656,7 @@ This report shows that of the 14 statements in our code, one of them is not cove
 
 ```python
     else:
-        # raise an exception if the search didn't return a useable response
+        # raise an exception if the search didn't return a usable response
         raise ValueError("Bad request")
 ```
 
@@ -749,7 +754,7 @@ Note that while mocking can be useful for testing specific components by saving 
 
 ## Parametrized tests
 
-Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to acheive this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
+Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to achieve this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
 
 For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. We first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
 
@@ -928,7 +933,7 @@ E                  [0.]], dtype=float32),  # or any other generated value
 E       )
 ```
 
-The test has idenfied a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  Instead, what we can do is first test whether there is more than a single unique value in the X matrix, and then peform separate tests for when it is (which should result in an exception being raised) and when it is not (which should run normally).
+The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  Instead, what we can do is first test whether there is more than a single unique value in the X matrix, and then perform separate tests for when it is (which should result in an exception being raised) and when it is not (which should run normally).
 
 ```python
 @given(
