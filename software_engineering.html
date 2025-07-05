@@ -456,24 +456,53 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="principles-of-software-engineering">
 <h1>Principles of software engineering<a class="headerlink" href="#principles-of-software-engineering" title="Permalink to this heading">#</a></h1>
-<p>Just as mechanical engineering is the science of building physical things like airports or engines, software engineering is the science of building software.  Its goal is to identify the principles and practices that allow building of software that is robust, efficient, and maintainable.  Just as a person can build a table at home without any formal knowledge of mechanical engineering, one can build software without knowing any of the principles of software engineering. However, this software is likely to suffer from exactly the same kinds of instability and poor functionality as the average homemade table.  Knowing a few basic ideas from software engineering can help scientists build software more effectively and generate outputs that will be more robust and maintainable over time.</p>
-<p>We have already talked about some of the basic tools of software engineering, such as version control. In this chapter we will focus on some of the “big ideas” from software engineering, highlighting how their adoption can improve the life of nearly anyone who develops software.</p>
+<p>Just as mechanical engineering is the science of building physical things like airports or engines, software engineering is the science of building software.
+Its goal is to identify the principles and practices that allow building of software that is robust, efficient, and maintainable.
+Just as a person can build a table at home without any formal knowledge of mechanical engineering, one can build software without knowing any of the principles of software engineering.
+However, this software is likely to suffer from exactly the same kinds of instability and poor functionality as the average homemade table.
+Knowing a few basic ideas from software engineering can help scientists build software more effectively and generate outputs that will be more robust and maintainable over time.</p>
+<p>We have already talked about some of the basic tools of software engineering, such as version control.
+In this chapter we will focus on some of the “big ideas” from software engineering, highlighting how their adoption can improve the life of nearly anyone who develops software.</p>
 <section id="why-software-engineering-matters-in-the-age-of-ai-assisted-coding">
 <h2>Why software engineering matters in the age of AI-assisted coding<a class="headerlink" href="#why-software-engineering-matters-in-the-age-of-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
-<p>One might ask why we are spending an entire chapter talking about software engineering; when it’s likely that AI tools going to write much of the code in our projects going forward.  First, think back to the point we made in Chapter 1: Programming is not equivalent to writing code.  Even if the AI system can write computer code (e.g. in Python), a human needs to describe the problem(s) that the software is meant to solve, and to iterate with the code to debug any failures to solve the problem.  This requires that a human write the specification that tells the computer how to solve the problem: we may have traded Python for English as the programming language of choice, but nonetheless the human needs to precisely specify the goals of the software.  Thus, an understanding of the software development process will remain essential even as AI assistants write an increasing amount of code.</p>
-<p>Software development processes may be less important for small one-off projects written by a single developer, but they become essential once a project becomes large and involves multiple developers.  Coordination costs can quickly eat into the added benefit of more developers on a project, particularly if there is not a strong development process in place.  And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineering codebase can just be too large.  Similarly, poorly written code can result in a high “bus factor” (i.e., what happens if your lead developer gets hit by a bus?), which can be major risk for groups that rely heavily upon a particular software project for their work.</p>
+<p>One might ask why we are spending an entire chapter talking about software engineering; when it’s likely that AI tools going to write much of the code in our projects going forward.
+First, think back to the point we made in Chapter 1: Programming is not equivalent to writing code.
+Even if the AI system can write computer code (e.g. in Python), a human needs to describe the problem(s) that the software is meant to solve, and to iterate with the code to debug any failures to solve the problem.
+This requires that a human write the specification that tells the computer how to solve the problem: we may have traded Python for English as the programming language of choice, but nonetheless the human needs to precisely specify the goals of the software.
+Thus, an understanding of the software development process will remain essential even as AI assistants write an increasing amount of code.</p>
+<p>Software development processes may be less important for small one-off projects written by a single developer, but they become essential once a project becomes large and involves multiple developers.
+Coordination costs can quickly eat into the added benefit of more developers on a project, particularly if there is not a strong development process in place.
+And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineering codebase can just be too large.
+Similarly, poorly written code can result in a high “bus factor” (i.e., what happens if your lead developer gets hit by a bus?), which can be major risk for groups that rely heavily upon a particular software project for their work.</p>
 </section>
 <section id="agile-development-processes">
 <h2>Agile development processes<a class="headerlink" href="#agile-development-processes" title="Permalink to this heading">#</a></h2>
-<p>When I was in graduate school, I spent countless hours developing a tool for analyzing data that was general enough to process not just the data that I needed to analyze for his project, but also nearly any other kind of data that one might envision from similar experiments.  How many of those other kinds of data did I ever actually analyze?  You guessed it: Zilch.  There is an admirable tendency amongst some scientists to want to solve a problem in a maximally general way, but this problem is not limited to scientists. In fact, it has a name within software circles: “gold plating”.  Unfortunately, humans are generally bad at predicting what is actually needed to solve a problem, and the extra work spent adding gold plating might be fun for the developer but rarely pays off in the longer term.  Software engineers love acronyms, and a commonly used acronym that targets this kind of overengineering is YAGNI: “You Aren’t Gonna Need It”.</p>
-<p>Within commercial software engineering, it was once common to develop a detailed requirements document before one ever started writing code, and then move on to code writing using those fixed requirements.  This is known as the “waterfall” method for project management; it can work well in some domains (like physical construction, where the plans can’t change halfway through building, and the materials need to be on hand before construction starts), but in software development it often led to long delays that occurred once the initial plan ran into challenges at the coding phase.  Instead, most software development projects now use methods generally referred to as <em>Agile</em>, in which there are much faster cycles between planning and development. One of the most important <a class="reference external" href="https://agilemanifesto.org/principles.html">principles</a> of the Agile movement is that “Working software is the primary measure of progress.”.  It’s worth noting that a lot of dogma has grown up around Agile and related software development methodologies (such as <em>Scrum</em> and <em>Kanban</em>), most of which is overkill for scientists producing code for research.  But there are nonetheless some very useful concepts and processes that we can take from these methodologies to help us build scientific software better and faster.</p>
-<p>In our laboratory, we focus heavily on the idea of the “minimum viable product” (MVP) that grows out of the Agile philosophy.  We shoot for code that solves the scientific or technical problem at hand: no more, and no less.  We try to write that code as cleanly as possible (as described in the next section), but we realize that the code will never be perfect, and that’s ok.  If it’s code that will be reused in the future, then we will likely spend some additional time refactoring it to improve its clarity and robustness and providing additional documentation.  This philosophy is the rationale for the “test-driven development” approach that we outline later in this chapter.</p>
+<p>When I was in graduate school, I spent countless hours developing a tool for analyzing data that was general enough to process not just the data that I needed to analyze for his project, but also nearly any other kind of data that one might envision from similar experiments.
+How many of those other kinds of data did I ever actually analyze? You guessed it: Zilch.
+There is an admirable tendency amongst some scientists to want to solve a problem in a maximally general way, but this problem is not limited to scientists.
+In fact, it has a name within software circles: “gold plating”.
+Unfortunately, humans are generally bad at predicting what is actually needed to solve a problem, and the extra work spent adding gold plating might be fun for the developer but rarely pays off in the longer term.
+Software engineers love acronyms, and a commonly used acronym that targets this kind of overengineering is YAGNI: “You Aren’t Gonna Need It”.</p>
+<p>Within commercial software engineering, it was once common to develop a detailed requirements document before one ever started writing code, and then move on to code writing using those fixed requirements.
+This is known as the “waterfall” method for project management; it can work well in some domains (like physical construction, where the plans can’t change halfway through building, and the materials need to be on hand before construction starts), but in software development it often led to long delays that occurred once the initial plan ran into challenges at the coding phase.
+Instead, most software development projects now use methods generally referred to as <em>Agile</em>, in which there are much faster cycles between planning and development.
+One of the most important <a class="reference external" href="https://agilemanifesto.org/principles.html">principles</a> of the Agile movement is that “Working software is the primary measure of progress.”.
+It’s worth noting that a lot of dogma has grown up around Agile and related software development methodologies (such as <em>Scrum</em> and <em>Kanban</em>), most of which is overkill for scientists producing code for research.
+But there are nonetheless some very useful concepts and processes that we can take from these methodologies to help us build scientific software better and faster.</p>
+<p>In our laboratory, we focus heavily on the idea of the “minimum viable product” (MVP) that grows out of the Agile philosophy.
+We shoot for code that solves the scientific or technical problem at hand: no more, and no less.
+We try to write that code as cleanly as possible (as described in the next section), but we realize that the code will never be perfect, and that’s ok.
+If it’s code that will be reused in the future, then we will likely spend some additional time refactoring it to improve its clarity and robustness and providing additional documentation.
+This philosophy is the rationale for the “test-driven development” approach that we outline later in this chapter.</p>
 </section>
 <section id="designing-software-through-user-stories">
 <h2>Designing software through user stories<a class="headerlink" href="#designing-software-through-user-stories" title="Permalink to this heading">#</a></h2>
-<p>It’s important to think through the ways that a piece of software will be used, and one useful way to address this is through <em>user stories</em>.  Understanding specific use cases for the software from the standpoint of users can be very useful in helping to ensure that the software is actually solving real problems, rather than solving problems that might theoretically exist but that no user will ever engage with.  We often see this with the development of visualization tools, where the developer thinks that a visualization feature would be “cool” but it doesn’t actually solve a real scientific problem for a user of the software.</p>
+<p>It’s important to think through the ways that a piece of software will be used, and one useful way to address this is through <em>user stories</em>.
+Understanding specific use cases for the software from the standpoint of users can be very useful in helping to ensure that the software is actually solving real problems, rather than solving problems that might theoretically exist but that no user will ever engage with.
+We often see this with the development of visualization tools, where the developer thinks that a visualization feature would be “cool” but it doesn’t actually solve a real scientific problem for a user of the software.</p>
 <p>A user story is often framed in the following way: “As a [type of user], I want [a particular functionality] so that [what problem the functionality will solve]”.
-As an example, say that a researcher wanted to develop a tool to convert between different genomic data formats. A couple of potential user stories for this software could be:</p>
+As an example, say that a researcher wanted to develop a tool to convert between different genomic data formats.
+A couple of potential user stories for this software could be:</p>
 <ul class="simple">
 <li><p>“As a user of the ABC123 sequencer, I want to convert my raw data to the current version of the SuperMegaFormat, so that I can submit my data to the OmniData Repository.”</p></li>
 <li><p>“As a user of software that that requires my data to be in a specific version of the SuperMegaFormat, I want to validate that my data have been properly converted to comply with that version of the format so that I can ensure that my data can be analyzed.”</p></li>
@@ -484,22 +513,43 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li><p>The code needs to be able to read data from the ABC123 sequencer.</p></li>
 <li><p>The code needs to be able to validate that a dataset meets any particular version of the SuperMegaFormat.</p></li>
 </ul>
-<p>User stories are also useful for thinking through the potential impact of new features that are envisioned by the coder.  Perhaps the most common example of violations of YAGNI comes about in the development of visualization tools.  In this example, the developer might decide to create an visualizer to show how the original dataset is being converted into the new format, with interactive features that would allow the user to view features of individual files.  The question that you should always ask yourself is: What user stories would this feature address?  If it’s difficult to come up with stories that make clear how the feature would help solve particular problems for users, then the feature is probably not needed. “If you build it, they will come” might work in baseball, but it rarely works in scientific software. This is the reason that one of us (RP) regularly tells his trainees to post a note in their workspace with one simple mantra: “MVP”.</p>
+<p>User stories are also useful for thinking through the potential impact of new features that are envisioned by the coder.
+Perhaps the most common example of violations of YAGNI comes about in the development of visualization tools.
+In this example, the developer might decide to create an visualizer to show how the original dataset is being converted into the new format, with interactive features that would allow the user to view features of individual files.
+The question that you should always ask yourself is: What user stories would this feature address? If it’s difficult to come up with stories that make clear how the feature would help solve particular problems for users, then the feature is probably not needed. “If you build it, they will come” might work in baseball, but it rarely works in scientific software.
+This is the reason that one of us (RP) regularly tells his trainees to post a note in their workspace with one simple mantra: “MVP”.</p>
 </section>
 <section id="refactoring-code">
 <h2>Refactoring code<a class="headerlink" href="#refactoring-code" title="Permalink to this heading">#</a></h2>
-<p>Throughout our discussion we will regularly mention the concept of <em>refactoring</em> (as we just did in the previous section), so we should introduce it here.  When we refactor a piece of code, we modify it in a way that doesn’t change its external behavior. The idea long existed in software development but was made prominent by Martin Fowler in his book <em>Refactoring: Improving the Design of Existing Code</em>.  As the title suggests, the goal of refactoring is to improve existing code rather than adding features or fixing bugs - but why would we spend time modifying code once it’s working, unless our goal is to add something new or fix something that is broken?</p>
-<p>In fact, the idea of refactoring is closely aligned with the Agile development philosophy mentioned above.  Rather than designing a software product in detail before coding, we can instead design as we go, understanding that this is just a first pass.  As Fowler says:</p>
+<p>Throughout our discussion we will regularly mention the concept of <em>refactoring</em> (as we just did in the previous section), so we should introduce it here.
+When we refactor a piece of code, we modify it in a way that doesn’t change its external behavior.
+The idea long existed in software development but was made prominent by Martin Fowler in his book <em>Refactoring: Improving the Design of Existing Code</em>.
+As the title suggests, the goal of refactoring is to improve existing code rather than adding features or fixing bugs - but why would we spend time modifying code once it’s working, unless our goal is to add something new or fix something that is broken?</p>
+<p>In fact, the idea of refactoring is closely aligned with the Agile development philosophy mentioned above.
+Rather than designing a software product in detail before coding, we can instead design as we go, understanding that this is just a first pass.
+As Fowler says:</p>
 <blockquote>
-<div><p>“With refactoring, we can take a bad, even chaotic, design and rework it into well-structured code. Each step is simple — even simplistic. I move a field from one class to another, pull some code out of a method to make it into its own method, or push some code up or down a hierarchy. Yet the cumulative effect of these small changes can radically improve the design.” - Fowler (p. xiv)</p>
+<div><p>“With refactoring, we can take a bad, even chaotic, design and rework it into well-structured code.
+Each step is simple — even simplistic.
+I move a field from one class to another, pull some code out of a method to make it into its own method, or push some code up or down a hierarchy.
+Yet the cumulative effect of these small changes can radically improve the design.” - Fowler (p. xiv)</p>
 </div></blockquote>
-<p>There are several reasons why we might want to refactor existing code.  Most importantly, we may want to make the code <em>easier to maintain</em>.  This in turn often implies making it easier to read and understand, as we discuss further below in the context of <em>clean coding</em>.  For example, we might want to break a large function out into several smaller functions so that the logical structure of the code is clearer from the code itself. Making code easier to understand and maintain also helps make it easier to add features to in the future. There are many other ways in which one can improve code, which are the focus of Fowler’s book; we will outline more of them below when we turn later to the problem of “code smells”.</p>
-<p>It is increasingly possible to use AI tools to refactor code. As long as one has a solid testing program in place, this can help save time and also help learn how to refactor code more effectively. This suggests that testing needs to be a central part of our coding process, which is why we will devote an entire chapter to it later in the book.</p>
+<p>There are several reasons why we might want to refactor existing code.
+Most importantly, we may want to make the code <em>easier to maintain</em>.
+This in turn often implies making it easier to read and understand, as we discuss further below in the context of <em>clean coding</em>.
+For example, we might want to break a large function out into several smaller functions so that the logical structure of the code is clearer from the code itself.
+Making code easier to understand and maintain also helps make it easier to add features to in the future.
+There are many other ways in which one can improve code, which are the focus of Fowler’s book; we will outline more of them below when we turn later to the problem of “code smells”.</p>
+<p>It is increasingly possible to use AI tools to refactor code.
+As long as one has a solid testing program in place, this can help save time and also help learn how to refactor code more effectively.
+This suggests that testing needs to be a central part of our coding process, which is why we will devote an entire chapter to it later in the book.</p>
 </section>
 <section id="test-driven-development">
 <h2>Test-driven development<a class="headerlink" href="#test-driven-development" title="Permalink to this heading">#</a></h2>
-<p>Let’s say that you have a software project you want to undertake, and you have in mind what the Minimum Viable Product would be: A script that takes in a dataset and transforms the data into a standardized format that can be uploaded to a particular data repository.  How would you get started?  And how would you know when you are done?</p>
-<p>After decomposing the problem into its components, many coders would simply start writing code to implement each of the components.  For example, one might start by creating a script with comments that describe each of the needed components:</p>
+<p>Let’s say that you have a software project you want to undertake, and you have in mind what the Minimum Viable Product would be: A script that takes in a dataset and transforms the data into a standardized format that can be uploaded to a particular data repository.
+How would you get started? And how would you know when you are done?</p>
+<p>After decomposing the problem into its components, many coders would simply start writing code to implement each of the components.
+For example, one might start by creating a script with comments that describe each of the needed components:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 1: index the data files</span>
 
 <span class="c1"># Step 2: load the files</span>
@@ -511,83 +561,124 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <span class="c1"># Step 5: save the data to the required format</span>
 </pre></div>
 </div>
-<p>A sensible way to get started would be march through the steps and write a function to accomplish each one, and then test the entire package once all of the functions are created.  However, this approach has a couple of drawbacks.  First, since you can’t run the application until all of the code is written, you can’t know whether each component is working properly until the entire package is built.  Second, it’s easy to end up writing code that will end up not needing, since you haven’t specified exactly what the inputs and outputs are for each component.  Finally, once you start integrating all of the components, you won’t have a way to know if you have introduced a bug.</p>
-<p>One answer to these problems is to start the process by creating a set of <em>tests</em>, which tell us whether the code has solved our intended problems.  The process of writing tests before writing code to solve the problem is known as <em>test-driven development</em> (TDD), and we think that it is a very useful framework to use when writing scientific code, especially if one plans to use LLMs for code generation.  Test-driven development is somewhat controversial within the software engineering field, in part because many people take it too far and become obsessive with testing, such that the tests come to be the tail that wags the dog; in particular we would caution against using the amount of test coverage as a metric for success. But we think that when it is used in a thoughtful way, TDD can be a powerful way to increase the effectiveness and accuracy of one’s code.</p>
-<p>We will dive deeply into testing in a later chapter; here we will simply outline a simple test-driven development workflow for the data transformation problem described above.  The TDD workflow can be summarized in a cycle involving three steps:</p>
+<p>A sensible way to get started would be march through the steps and write a function to accomplish each one, and then test the entire package once all of the functions are created.
+However, this approach has a couple of drawbacks.
+First, since you can’t run the application until all of the code is written, you can’t know whether each component is working properly until the entire package is built.
+Second, it’s easy to end up writing code that will end up not needing, since you haven’t specified exactly what the inputs and outputs are for each component.
+Finally, once you start integrating all of the components, you won’t have a way to know if you have introduced a bug.</p>
+<p>One answer to these problems is to start the process by creating a set of <em>tests</em>, which tell us whether the code has solved our intended problems.
+The process of writing tests before writing code to solve the problem is known as <em>test-driven development</em> (TDD), and we think that it is a very useful framework to use when writing scientific code, especially if one plans to use LLMs for code generation.
+Test-driven development is somewhat controversial within the software engineering field, in part because many people take it too far and become obsessive with testing, such that the tests come to be the tail that wags the dog; in particular we would caution against using the amount of test coverage as a metric for success.
+But we think that when it is used in a thoughtful way, TDD can be a powerful way to increase the effectiveness and accuracy of one’s code.</p>
+<p>We will dive deeply into testing in a later chapter; here we will simply outline a simple test-driven development workflow for the data transformation problem described above.
+The TDD workflow can be summarized in a cycle involving three steps:</p>
 <ul class="simple">
 <li><p><em>Red</em>: Create a test that initially fails for the intended function.</p></li>
 <li><p><em>Green</em>: Create a function that passes the test.</p></li>
 <li><p><em>Refactor</em>: Modify the code to make it more maintainable, readable, and robust</p></li>
 </ul>
-<p>These processes are then repeated until the software solves the intended problem. This process helps prevent the developer from writing code to solve problems that don’t exist yet, since the only aim is to create code that passes the specific test in question.</p>
+<p>These processes are then repeated until the software solves the intended problem.
+This process helps prevent the developer from writing code to solve problems that don’t exist yet, since the only aim is to create code that passes the specific test in question.</p>
 </section>
 <section id="clean-coding">
 <h2>Clean coding<a class="headerlink" href="#clean-coding" title="Permalink to this heading">#</a></h2>
 <blockquote>
-<div><p>“Any fool can write code that a computer can understand. Good programmers write code that humans can understand.”  Fowler (p. 10)</p>
+<div><p>“Any fool can write code that a computer can understand.
+Good programmers write code that humans can understand.” Fowler (p. 10)</p>
 </div></blockquote>
-<p>Another idea that has emerged from the Agile community is <em>clean coding</em>, which is the idea that code should be simple, readable, and easily maintainable.  This idea was codified in the book titled <em>Clean Code: A Handbook of Agile Software Craftsmanship</em>, published in 2008 by Robert C. Martin (known in the community as “Uncle Bob”). One of the best ways to describe clean code is that it is <em>simple</em>.  Kent Beck, another Agile founder who developed the idea of “Extreme Programming”, laid out a set of rules for simple code:</p>
+<p>Another idea that has emerged from the Agile community is <em>clean coding</em>, which is the idea that code should be simple, readable, and easily maintainable.
+This idea was codified in the book titled <em>Clean Code: A Handbook of Agile Software Craftsmanship</em>, published in 2008 by Robert C.
+Martin (known in the community as “Uncle Bob”).
+One of the best ways to describe clean code is that it is <em>simple</em>.
+Kent Beck, another Agile founder who developed the idea of “Extreme Programming”, laid out a set of rules for simple code:</p>
 <ol class="arabic simple">
 <li><p>The code has tests and all of the tests run.</p></li>
 <li><p>The code contains no duplication.</p></li>
 <li><p>The code makes the design of the system clear</p></li>
 <li><p>The code minimizes the number of entities (such as functions or classes).</p></li>
 </ol>
-<p>Another way to think about clean code is that it makes it as easy as possible for another programmer to come in later and change it.  And it’s essential to remember that this “other programmer” is mostly like to refer to future you!  When we look back at code that we wrote more than a few months ago, we are likely to remember very little of it, meaning that we need to rediscover the design and structure of the code.</p>
-<p>There are many different interpretations of the concept of clean code. Here we will lay out the principles that we think are most important for the creation of code in the context of scientific research (as opposed to commercial software development).  Fortunately, the code generated by AI coding assistants is often quite clean, as we found in our analyses of code generated by GPT-4 <span id="id1">[<a class="reference internal" href="bibliography.html#id17" title="Russell A Poldrack, Thomas Lu, and Gašper Beguš. Ai-assisted coding: experiments with gpt-4. 2023. URL: https://arxiv.org/abs/2304.13187, arXiv:2304.13187.">Poldrack <em>et al.</em>, 2023</a>]</span>.  But as we work alongside these assistants, it’s important to develop a mindset of continuous improvement, always seeking to make the code cleaner and simpler whenever we can.</p>
+<p>Another way to think about clean code is that it makes it as easy as possible for another programmer to come in later and change it.
+And it’s essential to remember that this “other programmer” is mostly like to refer to future you! When we look back at code that we wrote more than a few months ago, we are likely to remember very little of it, meaning that we need to rediscover the design and structure of the code.</p>
+<p>There are many different interpretations of the concept of clean code.
+Here we will lay out the principles that we think are most important for the creation of code in the context of scientific research (as opposed to commercial software development).
+Fortunately, the code generated by AI coding assistants is often quite clean, as we found in our analyses of code generated by GPT-4 <span id="id1">[<a class="reference internal" href="bibliography.html#id17" title="Russell A Poldrack, Thomas Lu, and Gašper Beguš. Ai-assisted coding: experiments with gpt-4. 2023. URL: https://arxiv.org/abs/2304.13187, arXiv:2304.13187.">Poldrack <em>et al.</em>, 2023</a>]</span>.
+But as we work alongside these assistants, it’s important to develop a mindset of continuous improvement, always seeking to make the code cleaner and simpler whenever we can.</p>
 <section id="readability">
 <h3>Readability<a class="headerlink" href="#readability" title="Permalink to this heading">#</a></h3>
-<p>An excellent test for whether code is clean is whether it is <em>readable</em>.  In fact, one of the 19 guiding principles of the Python language, enshrined in <a class="reference external" href="https://peps.python.org/pep-0020/">The Zen of Python</a>, is “Readability counts”, reflecting the judgment by Python founder Guido van Rossum that <a class="reference external" href="https://peps.python.org/pep-0008/">“code is read much more often than it is written”</a>.</p>
+<p>An excellent test for whether code is clean is whether it is <em>readable</em>.
+In fact, one of the 19 guiding principles of the Python language, enshrined in <a class="reference external" href="https://peps.python.org/pep-0020/">The Zen of Python</a>, is “Readability counts”, reflecting the judgment by Python founder Guido van Rossum that <a class="reference external" href="https://peps.python.org/pep-0008/">“code is read much more often than it is written”</a>.</p>
 <section id="naming-things-well">
 <h4>Naming things well<a class="headerlink" href="#naming-things-well" title="Permalink to this heading">#</a></h4>
-<p>The book <a class="reference external" href="https://leanpub.com/naming-things">“Naming Things”</a> by Tom Benner is subtitled “The Hardest Problem in Software Engineering”, which might sound hyperbolic but really can turn out to be true once you start trying to come up with good names as you program. Benner provides a summary on his blog of what he calls <a class="reference external" href="https://www.namingthings.co/naming-things-principles">“The 7 principles of naming”</a>, a subset of which we detail here. However, we highly recommend the book for much more detail on how to follow each of the principles.  It’s particularly important to point out that these different principles may sometimes clash with one another, requiring the judgment of the developer to determine the best name to use.</p>
+<p>The book <a class="reference external" href="https://leanpub.com/naming-things">“Naming Things”</a> by Tom Benner is subtitled “The Hardest Problem in Software Engineering”, which might sound hyperbolic but really can turn out to be true once you start trying to come up with good names as you program.
+Benner provides a summary on his blog of what he calls <a class="reference external" href="https://www.namingthings.co/naming-things-principles">“The 7 principles of naming”</a>, a subset of which we detail here.
+However, we highly recommend the book for much more detail on how to follow each of the principles.
+It’s particularly important to point out that these different principles may sometimes clash with one another, requiring the judgment of the developer to determine the best name to use.</p>
 <section id="consistency">
 <h5>Consistency<a class="headerlink" href="#consistency" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“Each concept should be represented by a single, unique name.”</p>
 </div></blockquote>
-<p>The use of different names for the same concept can lead the reader to assume that there are two different concepts at play, often known as a “<a class="reference external" href="https://en.wikipedia.org/wiki/Jingle-jangle_fallacies">jangle fallacy</a>”.  This might occur when a similar concept appears across multiple functions, but is named differently; for example, a variable referring to a specific model is called <code class="docutils literal notranslate"><span class="pre">modelname</span></code> in one function and <code class="docutils literal notranslate"><span class="pre">llm_label</span></code> in another.</p>
-<p>Conversely, using the same name to represent two different concepts can lead the reader to think that they are referring to the same thing, which is called a “jingle fallacy.” For example, if one were to use the variable name <code class="docutils literal notranslate"><span class="pre">model</span></code> to refer to a model class within one function but to a string containing the model name in another function.  This fallacy is particularly likely to occur when one uses names that are too simple (see below).</p>
+<p>The use of different names for the same concept can lead the reader to assume that there are two different concepts at play, often known as a “<a class="reference external" href="https://en.wikipedia.org/wiki/Jingle-jangle_fallacies">jangle fallacy</a>”.
+This might occur when a similar concept appears across multiple functions, but is named differently; for example, a variable referring to a specific model is called <code class="docutils literal notranslate"><span class="pre">modelname</span></code> in one function and <code class="docutils literal notranslate"><span class="pre">llm_label</span></code> in another.</p>
+<p>Conversely, using the same name to represent two different concepts can lead the reader to think that they are referring to the same thing, which is called a “jingle fallacy.” For example, if one were to use the variable name <code class="docutils literal notranslate"><span class="pre">model</span></code> to refer to a model class within one function but to a string containing the model name in another function.
+This fallacy is particularly likely to occur when one uses names that are too simple (see below).</p>
 </section>
 <section id="understandability">
 <h5>Understandability<a class="headerlink" href="#understandability" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“A name should describe the concept it represents.”</p>
 </div></blockquote>
-<p>The reader should be able to accurately infer from the name what is being represented.  This implies the common proscription against single-letter variable names, except in cases where the context makes very clear what its function is (e.g. as a counter in a compact loop).  More generally, when creating a variable name it’s worth thinking about what kind of confusion might occur, and also who the intended audiences are. For example, it can be particularly useful to select terms that are common within the relevant scientific domain when available.  Other important guidelines for understandability are using the right pluralization (e.g. a variable with a pluralized name should contain more than one thing, and vice versa for variables with a single name) and the right part of speech (for example, functions should generally use verbs while variables and classes should generally use nouns).</p>
+<p>The reader should be able to accurately infer from the name what is being represented.
+This implies the common proscription against single-letter variable names, except in cases where the context makes very clear what its function is (e.g. as a counter in a compact loop).
+More generally, when creating a variable name it’s worth thinking about what kind of confusion might occur, and also who the intended audiences are.
+For example, it can be particularly useful to select terms that are common within the relevant scientific domain when available.
+Other important guidelines for understandability are using the right pluralization (e.g. a variable with a pluralized name should contain more than one thing, and vice versa for variables with a single name) and the right part of speech (for example, functions should generally use verbs while variables and classes should generally use nouns).</p>
 </section>
 <section id="specificity">
 <h5>Specificity<a class="headerlink" href="#specificity" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“A name shouldn’t be overly vague or overly specific.”</p>
 </div></blockquote>
-<p>One should avoid very generic names such as “object” or “request”.  In addition, the name of a function should highlight its intended use, rather than details about the implementation.  For example, say that we develop a function that uses a fast Fourier transform to perform bandpass filtering a timeseries.  A name like <code class="docutils literal notranslate"><span class="pre">filter_timeseries_bandpass</span></code> focuses on the intended use, whereas a name like <code class="docutils literal notranslate"><span class="pre">fft_timeseries</span></code> would highlight the implementation details without specifying what the function is meant to do.</p>
+<p>One should avoid very generic names such as “object” or “request”.
+In addition, the name of a function should highlight its intended use, rather than details about the implementation.
+For example, say that we develop a function that uses a fast Fourier transform to perform bandpass filtering a timeseries.
+A name like <code class="docutils literal notranslate"><span class="pre">filter_timeseries_bandpass</span></code> focuses on the intended use, whereas a name like <code class="docutils literal notranslate"><span class="pre">fft_timeseries</span></code> would highlight the implementation details without specifying what the function is meant to do.</p>
 </section>
 <section id="brevity">
 <h5>Brevity<a class="headerlink" href="#brevity" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“A name should be neither overly short nor overly long.”</p>
 </div></blockquote>
-<p>Most coders tend to err on the side of variables names that are too short, with single-letter names being epitome of this.  One useful concept from Martin’s <em>Clean Code</em> is that the length of a variable name should be related to the scope of the variable.  When a single-letter variable name is used in the context of a very compact loop, its meaning will be immediately obvious.  However, as a variable is used across a broader scope, using a more detailed name will allow the reader to understand the variable without having to look back at where it was previously used to understand its meaning. We would generally suggest to err on the side of using names that are too long versus too short, since the cost to typing longer names is reduced by the autocompletion features present in modern IDEs.</p>
+<p>Most coders tend to err on the side of variables names that are too short, with single-letter names being epitome of this.
+One useful concept from Martin’s <em>Clean Code</em> is that the length of a variable name should be related to the scope of the variable.
+When a single-letter variable name is used in the context of a very compact loop, its meaning will be immediately obvious.
+However, as a variable is used across a broader scope, using a more detailed name will allow the reader to understand the variable without having to look back at where it was previously used to understand its meaning.
+We would generally suggest to err on the side of using names that are too long versus too short, since the cost to typing longer names is reduced by the autocompletion features present in modern IDEs.</p>
 </section>
 <section id="pronounceability">
 <h5>Pronounceability<a class="headerlink" href="#pronounceability" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“A name should be easy to use in common speech.”</p>
 </div></blockquote>
-<p>Pronounceability is primarily important for cognitive reasons: We are much more likely to remember things that are meaningful to us compared to things that don’t have obvious meaning.  In addition, an unpronounceable name makes communicating about the object with others (e.g. in a code review) very difficult.  So while <code class="docutils literal notranslate"><span class="pre">bfufftots</span></code> might seem like a clever acronym for “bandpass filter using FFT on time series”, <code class="docutils literal notranslate"><span class="pre">filter_timeseries_bandpass</span></code> is probably more effective and will certainly be clearer to readers.</p>
+<p>Pronounceability is primarily important for cognitive reasons: We are much more likely to remember things that are meaningful to us compared to things that don’t have obvious meaning.
+In addition, an unpronounceable name makes communicating about the object with others (e.g. in a code review) very difficult.
+So while <code class="docutils literal notranslate"><span class="pre">bfufftots</span></code> might seem like a clever acronym for “bandpass filter using FFT on time series”, <code class="docutils literal notranslate"><span class="pre">filter_timeseries_bandpass</span></code> is probably more effective and will certainly be clearer to readers.</p>
 </section>
 <section id="austerity">
 <h5>Austerity<a class="headerlink" href="#austerity" title="Permalink to this heading">#</a></h5>
 <blockquote>
 <div><p>“A name should not be clever or rely on temporary concepts.”</p>
 </div></blockquote>
-<p>Programmers often like to use humorous or clever object names.  For example, a function that marks a directory for later deletion might be called <code class="docutils literal notranslate"><span class="pre">terminator()</span></code> (riffing on Schwarzenegger’s “I’ll be back”.)  As clever as this might seem, it’s not useful for anyone who doesn’t have the same cultural context.  Object names should be boring and matter-of-fact to ensure that they are as widely understandable as possible.</p>
+<p>Programmers often like to use humorous or clever object names.
+For example, a function that marks a directory for later deletion might be called <code class="docutils literal notranslate"><span class="pre">terminator()</span></code> (riffing on Schwarzenegger’s “I’ll be back”.) As clever as this might seem, it’s not useful for anyone who doesn’t have the same cultural context.
+Object names should be boring and matter-of-fact to ensure that they are as widely understandable as possible.</p>
 </section>
 </section>
 <section id="using-empty-space-properly">
 <h4>Using empty space properly<a class="headerlink" href="#using-empty-space-properly" title="Permalink to this heading">#</a></h4>
-<p>Another important aspect of readability is the judicious use of empty space.  While users of other languages sometimes revolt at the fact that empty space plays a syntactic role in Python, we actually view this is a very useful feature of the language, because it enhances the readability of code.  For example, the following code is perfectly legitimate in R, but inferring its structure from a quick glance is difficult:</p>
+<p>Another important aspect of readability is the judicious use of empty space.
+While users of other languages sometimes revolt at the fact that empty space plays a syntactic role in Python, we actually view this is a very useful feature of the language, because it enhances the readability of code.
+For example, the following code is perfectly legitimate in R, but inferring its structure from a quick glance is difficult:</p>
 <div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">trans_levels</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">();</span><span class="w"> </span><span class="nf">for </span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">genes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="n">snps</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">get_snps</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span><span class="w"> </span>
 <span class="w">  </span><span class="n">.</span><span class="m">001</span><span class="p">)</span>
 <span class="w">  </span><span class="n">trans_levels</span><span class="p">[[</span><span class="n">gene</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span>
@@ -602,18 +693,23 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <span class="n">phenotype</span> <span class="o">&lt;-</span> <span class="n">get_phen</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="n">trans_levels</span><span class="p">[</span><span class="n">gene</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>It is also important to use vertical empty space to separate conceptually distinct sections of code.  In this case, this helps make more visually apparent the fact that there is likely an error in the code, with the <code class="docutils literal notranslate"><span class="pre">gene</span></code> variable that indexes the loop being used outside of the loop.</p>
-<p>Vertical empty space also plays a role in readability, by helping to distinguish conceptually or logically related section of code. At the same time, it’s important to not overuse vertical white space; our ability to understand code that we can see at once is much better than understanding code that spreads across multiple screen pages (which requires holding information in working memory), so it’s important to use vertical empty space judiciously.</p>
+<p>It is also important to use vertical empty space to separate conceptually distinct sections of code.
+In this case, this helps make more visually apparent the fact that there is likely an error in the code, with the <code class="docutils literal notranslate"><span class="pre">gene</span></code> variable that indexes the loop being used outside of the loop.</p>
+<p>Vertical empty space also plays a role in readability, by helping to distinguish conceptually or logically related section of code.
+At the same time, it’s important to not overuse vertical white space; our ability to understand code that we can see at once is much better than understanding code that spreads across multiple screen pages (which requires holding information in working memory), so it’s important to use vertical empty space judiciously.</p>
 </section>
 <section id="commenting-code">
 <h4>Commenting code<a class="headerlink" href="#commenting-code" title="Permalink to this heading">#</a></h4>
-<p>There are few topics where the common understanding differs so much from expert consensus as in the use of comments within code.  For many programmers, the term “documentation” is largely synonymous with code comments, and it is common to hear novice programmers complaining about the need to add comments to their code before releasing it.  On the other hand, one of the most consistent messages from the software engineering literature is that comments are far too often used as a “magic balm” over bad code:</p>
+<p>There are few topics where the common understanding differs so much from expert consensus as in the use of comments within code.
+For many programmers, the term “documentation” is largely synonymous with code comments, and it is common to hear novice programmers complaining about the need to add comments to their code before releasing it.
+On the other hand, one of the most consistent messages from the software engineering literature is that comments are far too often used as a “magic balm” over bad code:</p>
 <ul class="simple">
 <li><p>“Don’t comment bad code — rewrite it” (Kernighan &amp; Plaugher)</p></li>
 <li><p>“Clear and expressive code with few comments is far superior to cluttered and complex code with lots of comments””” (Robert Martin, Clean Code)</p></li>
 <li><p>“comments aren’t a bad smell; indeed they are a sweet smell. The reason we mention comments here is that comments are often used as a deodorant. It’s surprising how often you look at thickly commented code and notice that the comments are there because the code is bad.” (Fowler, Refactoring)</p></li>
 </ul>
-<p>The overall goal of code comments should be to help the reader know as much as the writer knows about the code.  We will start by outlining the kinds of things that do <em>not</em> warrant comments, and then turn to the legitimate uses of comments.</p>
+<p>The overall goal of code comments should be to help the reader know as much as the writer knows about the code.
+We will start by outlining the kinds of things that do <em>not</em> warrant comments, and then turn to the legitimate uses of comments.</p>
 <section id="what-not-to-comment">
 <h5>What not to comment<a class="headerlink" href="#what-not-to-comment" title="Permalink to this heading">#</a></h5>
 <section id="ugly-or-indecipherable-code">
@@ -636,11 +732,13 @@ As an example, say that a researcher wanted to develop a tool to convert between
     <span class="k">return</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">stddev</span> <span class="o">*</span> <span class="n">box_mueller_z0</span>
 </pre></div>
 </div>
-<p>In this case, we don’t need a comment to explain the function because its name and the names of its arguments make clear what its function is and how to use it.  By using the variable name <code class="docutils literal notranslate"><span class="pre">box_mueller_z0</span></code> we also make clear what algorithm this computation reflects (the Box-Mueller transform).</p>
+<p>In this case, we don’t need a comment to explain the function because its name and the names of its arguments make clear what its function is and how to use it.
+By using the variable name <code class="docutils literal notranslate"><span class="pre">box_mueller_z0</span></code> we also make clear what algorithm this computation reflects (the Box-Mueller transform).</p>
 </section>
 <section id="the-obvious">
 <h6>The obvious<a class="headerlink" href="#the-obvious" title="Permalink to this heading">#</a></h6>
-<p>Anything that is clear from the structure of the code or the names of the variables doesn’t need to be commented.  Here are some examples of unnecessary comments:</p>
+<p>Anything that is clear from the structure of the code or the names of the variables doesn’t need to be commented.
+Here are some examples of unnecessary comments:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># looping over states</span>
 <span class="k">for</span> <span class="n">state_index</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">states</span><span class="p">):</span>
     <span class="o">...</span>
@@ -650,7 +748,8 @@ As an example, say that a researcher wanted to develop a tool to convert between
     <span class="o">...</span>
 </pre></div>
 </div>
-<p>In general one should assume that the reader of code has a good understanding of the language, such that they could understand that first example involves a loop over states.  An exception to this rule is when one is writing code for educational purposes; in that case, one might want to include comments that are more didactic even though they would cause clutter for an experienced programmer.</p>
+<p>In general one should assume that the reader of code has a good understanding of the language, such that they could understand that first example involves a loop over states.
+An exception to this rule is when one is writing code for educational purposes; in that case, one might want to include comments that are more didactic even though they would cause clutter for an experienced programmer.</p>
 </section>
 <section id="historical-information">
 <h6>Historical information<a class="headerlink" href="#historical-information" title="Permalink to this heading">#</a></h6>
@@ -682,7 +781,8 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <h5>What to comment<a class="headerlink" href="#what-to-comment" title="Permalink to this heading">#</a></h5>
 <section id="intention-aka-director-s-commentary">
 <h6>Intention (aka “Director’s Commentary”)<a class="headerlink" href="#intention-aka-director-s-commentary" title="Permalink to this heading">#</a></h6>
-<p>Comments should help the reader understand important design choices that would not be evident from simply reading the code.  For example:</p>
+<p>Comments should help the reader understand important design choices that would not be evident from simply reading the code.
+For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># using a numpy array here rather than</span>
 <span class="c1"># a pandas DataFrame for performance reasons</span>
 </pre></div>
@@ -691,7 +791,9 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="known-flaws-or-todo-items">
 <h6>Known flaws or TODO items<a class="headerlink" href="#known-flaws-or-todo-items" title="Permalink to this heading">#</a></h6>
-<p>It’s often the case that there are remaining known issues with code that the developer has not yet had the time to address.  These should be noted with a consistent heading (e.g. “TODO”) so that they can be easily searched for.  For example:</p>
+<p>It’s often the case that there are remaining known issues with code that the developer has not yet had the time to address.
+These should be noted with a consistent heading (e.g. “TODO”) so that they can be easily searched for.
+For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: Current algorithm is very inefficient</span>
 <span class="c1"># - should parallelize to improve performance</span>
 </pre></div>
@@ -711,11 +813,16 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="avoiding-code-smells-and-anti-patterns">
 <h3>Avoiding “code smells” and “anti-patterns”<a class="headerlink" href="#avoiding-code-smells-and-anti-patterns" title="Permalink to this heading">#</a></h3>
-<p>There are two related concepts that are used to describe the appearance of potentially problematic code  The “anti-pattern” is a riff on the concept of a <em>design pattern</em>, which is a recommended solution (i.e. a “best practice”) for a common programming problem <span id="id2">[<a class="reference internal" href="bibliography.html#id4" title="Erich Gamma. Design patterns: elements of reusable object-oriented software. Addison-Wesley, Reading, Mass., 1995. ISBN 0201633612 (acid-free paper).">Gamma, 1995</a>]</span>.  An anti-pattern is conversely a commonly used but bad solution (i.e. a “worst practice”) for a common programming problem. In the Python world these are well known from the <a class="reference external" href="https://docs.quantifiedcode.com/python-anti-patterns/">The Little Book of Python Anti-Patterns</a>, which lays out many different anti-patterns common in Python coding.  The second idea, that of the “code smell”, has been popularized by Martin Fowler in his well-known book <em>Refactoring: Improving The Design of Existing Code</em><span id="id3">[<a class="reference internal" href="bibliography.html#id15" title="Martin Fowler and Kent Beck. Refactoring: improving the design of existing code. Addison-Wesley, Reading, MA, 1999. ISBN 0201485672.">Fowler and Beck, 1999</a>]</span>. Just as a bad smell from food can give us an intuitive sense that the good might be spoiled, code smells are intuitive reactions to code that suggest that there might be a problem that could be a target for refactoring.</p>
+<p>There are two related concepts that are used to describe the appearance of potentially problematic code The “anti-pattern” is a riff on the concept of a <em>design pattern</em>, which is a recommended solution (i.e. a “best practice”) for a common programming problem <span id="id2">[<a class="reference internal" href="bibliography.html#id4" title="Erich Gamma. Design patterns: elements of reusable object-oriented software. Addison-Wesley, Reading, Mass., 1995. ISBN 0201633612 (acid-free paper).">Gamma, 1995</a>]</span>.
+An anti-pattern is conversely a commonly used but bad solution (i.e. a “worst practice”) for a common programming problem.
+In the Python world these are well known from the <a class="reference external" href="https://docs.quantifiedcode.com/python-anti-patterns/">The Little Book of Python Anti-Patterns</a>, which lays out many different anti-patterns common in Python coding.
+The second idea, that of the “code smell”, has been popularized by Martin Fowler in his well-known book <em>Refactoring: Improving The Design of Existing Code</em><span id="id3">[<a class="reference internal" href="bibliography.html#id15" title="Martin Fowler and Kent Beck. Refactoring: improving the design of existing code. Addison-Wesley, Reading, MA, 1999. ISBN 0201485672.">Fowler and Beck, 1999</a>]</span>.
+Just as a bad smell from food can give us an intuitive sense that the good might be spoiled, code smells are intuitive reactions to code that suggest that there might be a problem that could be a target for refactoring.</p>
 <p>Here we outline several bad smells and anti-patterns commonly found in our experience with scientific code.</p>
 <section id="duplicated-code">
 <h4>Duplicated code<a class="headerlink" href="#duplicated-code" title="Permalink to this heading">#</a></h4>
-<p>One of the most common smells in scientific code is the use of repeated blocks of duplicated code with only minor changes.  For example:</p>
+<p>One of the most common smells in scientific code is the use of repeated blocks of duplicated code with only minor changes.
+For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute mean response time separately for each test (bad practice)</span>
 <span class="n">mean_rt_1</span> <span class="o">=</span> <span class="n">stroop_data</span><span class="p">[</span><span class="s1">&#39;ResponseTime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">mean_rt_2</span> <span class="o">=</span> <span class="n">flanker_data</span><span class="p">[</span><span class="s1">&#39;RT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -723,7 +830,12 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <span class="n">grand_mean_rt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">mean_rt_1</span><span class="p">,</span> <span class="n">mean_rt_2</span><span class="p">,</span> <span class="n">mean_rt_3</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>This code might work, but it violates the commonly stated principle of “Don’t Repeat Yourself” (DRY), and is problematic for several reasons.  First, any changes to the intended operation (in this case computing the mean of the ‘ResponseTime’ variable in the data frame) would require making changes on multiple lines. In this example the lines are close to one another so it would be easy to see that they all need to be changed, but if they were separated by many other others then one would need to be sure to make the change in each place.  Second, imagine that we wanted to include an additional task in the dataset; we would need to add a new line to compute the mean for the added condition, and also would need to remember to add it to the computation of the grand mean.  Third, an especially strong code smell is the use of numbers as part of variable names, rather than using a data structure such as a dictionary or data frame that inherently represents the data within a single iterable object.  Let’s say that we decided to remove the flanker task from our dataset; we would then need to remember to remove <code class="docutils literal notranslate"><span class="pre">mean_rt_2</span></code> from the grand mean computation, which would require working memory if those two lines were to become separated by other code.</p>
+<p>This code might work, but it violates the commonly stated principle of “Don’t Repeat Yourself” (DRY), and is problematic for several reasons.
+First, any changes to the intended operation (in this case computing the mean of the ‘ResponseTime’ variable in the data frame) would require making changes on multiple lines.
+In this example the lines are close to one another so it would be easy to see that they all need to be changed, but if they were separated by many other others then one would need to be sure to make the change in each place.
+Second, imagine that we wanted to include an additional task in the dataset; we would need to add a new line to compute the mean for the added condition, and also would need to remember to add it to the computation of the grand mean.
+Third, an especially strong code smell is the use of numbers as part of variable names, rather than using a data structure such as a dictionary or data frame that inherently represents the data within a single iterable object.
+Let’s say that we decided to remove the flanker task from our dataset; we would then need to remember to remove <code class="docutils literal notranslate"><span class="pre">mean_rt_2</span></code> from the grand mean computation, which would require working memory if those two lines were to become separated by other code.</p>
 <p>Here is a refactored version of the code that:</p>
 <ul class="simple">
 <li><p>extracts the task names and associated data frame column names for the response time variable for each into a dictionary</p></li>
@@ -749,16 +861,20 @@ As an example, say that a researcher wanted to develop a tool to convert between
     <span class="n">grand_mean_rt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mean_rt</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 </pre></div>
 </div>
-<p>This refactoring has more lines of code than the original, but it will be much easier to understand, to maintain, and to modify.  Also note the use of vertical empty space to highlight the distinct logical components of the code.</p>
+<p>This refactoring has more lines of code than the original, but it will be much easier to understand, to maintain, and to modify.
+Also note the use of vertical empty space to highlight the distinct logical components of the code.</p>
 </section>
 <section id="magic-numbers">
 <h4>Magic numbers<a class="headerlink" href="#magic-numbers" title="Permalink to this heading">#</a></h4>
-<p>A <em>magic number</em> is a number that is included in code directly rather than via assignment to a variable  For example:</p>
+<p>A <em>magic number</em> is a number that is included in code directly rather than via assignment to a variable For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">proportion_significant</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="mf">3.09</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>What does “3.09” refer to? A statistically literate reader might infer that this was meant to refer to the 99.9th percentile of the standard normal (Z) distribution, but couldn’t be certain without talking to the developer. Another particular problem with floating point magic numbers is that they often are rounded (i.e. 3.09 rather than 3.090232306167813), which could lead to imprecision in the results in some contexts.   An additional problem with this particular function is that the value can’t be changed by the user of the function.  It would be better compute the value formally based on an explicit input of the probability, and then assign it to a named variable that makes clear what it means:</p>
+<p>What does “3.09” refer to? A statistically literate reader might infer that this was meant to refer to the 99.9th percentile of the standard normal (Z) distribution, but couldn’t be certain without talking to the developer.
+Another particular problem with floating point magic numbers is that they often are rounded (i.e. 3.09 rather than 3.090232306167813), which could lead to imprecision in the results in some contexts.
+An additional problem with this particular function is that the value can’t be changed by the user of the function.
+It would be better compute the value formally based on an explicit input of the probability, and then assign it to a named variable that makes clear what it means:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">proportion_exceeding_threshold</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p_threshold</span><span class="o">=</span><span class="mf">.001</span><span class="p">):</span>
     <span class="n">z_cutoff</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_threshold</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">z_cutoff</span><span class="p">)</span>
@@ -767,7 +883,9 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="long-parameter-lists">
 <h4>Long parameter lists<a class="headerlink" href="#long-parameter-lists" title="Permalink to this heading">#</a></h4>
-<p>A long list of parameters in a function definition can be confusing for users. One way that Python coders sometimes get around specifying long parameter lists is the use of the <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> argument, which allows the specification of arbitrary keyword arguments to a function, placing them within a dictionary.  For example:</p>
+<p>A long list of parameters in a function definition can be confusing for users.
+One way that Python coders sometimes get around specifying long parameter lists is the use of the <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> argument, which allows the specification of arbitrary keyword arguments to a function, placing them within a dictionary.
+For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">36</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -776,7 +894,9 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </pre></div>
 </div>
 <p>This can be useful in specific cases, but in general should be avoided if possible, as it makes the code less clear and allows for potential type errors.</p>
-<p>A useful solution when one needs to pass a large number of named parameters is to create a <em>configuration object</em> that contains all of these parameters. This can be easily accomplished using <em>dataclasses</em> within Python, which are specialized classes meant to easily store data.  Here is an example of a function call with a number of parameters:</p>
+<p>A useful solution when one needs to pass a large number of named parameters is to create a <em>configuration object</em> that contains all of these parameters.
+This can be easily accomplished using <em>dataclasses</em> within Python, which are specialized classes meant to easily store data.
+Here is an example of a function call with a number of parameters:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
 <span class="k">def</span> <span class="nf">run_llm_prompt</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;gpt4&#39;</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -786,7 +906,7 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </pre></div>
 </div>
 <p>We could instead first create a configuration class that allows us to define all of the optional parameters:</p>
-<p><em>TODO</em>: DO WE ACTUALLY WANT TO USE TYPE HINTS THROUGHOUT?  IF SO, WE PROBABLY NEED TO INTRODUCE THEM EARLIER</p>
+<p><em>TODO</em>: DO WE ACTUALLY WANT TO USE TYPE HINTS THROUGHOUT? IF SO, WE PROBABLY NEED TO INTRODUCE THEM EARLIER</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
@@ -821,7 +941,9 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <span class="n">random_sample</span> <span class="o">=</span> <span class="n">vonmises</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this example we have no idea where the vonmises() function is being specified.  In fact, both numpy.random and scipy.stats have an object named vonmises,  so function that is called will depend on the order in which the two import functions are run.  It’s much better to explicitly import functions that are used:</p>
+<p>In this example we have no idea where the vonmises() function is being specified.
+In fact, both numpy.random and scipy.stats have an object named vonmises, so function that is called will depend on the order in which the two import functions are run.
+It’s much better to explicitly import functions that are used:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">vonmises</span>
 
@@ -835,8 +957,14 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </section>
 <section id="modularity">
 <h2>Modularity<a class="headerlink" href="#modularity" title="Permalink to this heading">#</a></h2>
-<p>Another key to making a system understandable is to make it <em>modular</em>, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.  Complex modular systems are also usually <em>hierarchical</em>, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.  In a 1962 paper entitled <em>The Architecture of Complexity</em><span id="id4">[<a class="reference internal" href="bibliography.html#id9" title="Herbert A. Simon. The architecture of complexity. Proceedings of the American Philosophical Society, 106(6):467-482, 1962.">Simon, 1962</a>]</span>, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the <em>near-decomposability</em> that arises in systems where the different modules are insulated from each other except through specific interfaces.  The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas <span id="id5">[<a class="reference internal" href="bibliography.html#id8" title="D. L. Parnas. On the criteria to be used in decomposing systems into modules. Commun. ACM, 15(12):1053–1058, December 1972. URL: https://doi.org/10.1145/361598.361623, doi:10.1145/361598.361623.">Parnas, 1972</a>]</span>, who pointed out that decomposing code based on the concept of “information hiding” can make code much easier to modify than a decomposition based on the logical “flowchart” of the problem being solved.</p>
-<p>A common expression of the idea of modularity in software development is the <em>Single Responsibility Principle</em>, which states that a function or class should only have one reason to change. This principle is often summarized as saying that a function or class should only “do one thing”, but that’s too vague; a clearer way to state this is that a function or class should have a clear and cohesive purpose at the appropriate level of abstraction. Let’s look at an example to help make this clearer.  Say that we are developing an analysis workflow for RNA-sequencing data, involving the following steps:</p>
+<p>Another key to making a system understandable is to make it <em>modular</em>, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.
+Complex modular systems are also usually <em>hierarchical</em>, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.
+In a 1962 paper entitled <em>The Architecture of Complexity</em><span id="id4">[<a class="reference internal" href="bibliography.html#id9" title="Herbert A. Simon. The architecture of complexity. Proceedings of the American Philosophical Society, 106(6):467-482, 1962.">Simon, 1962</a>]</span>, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the <em>near-decomposability</em> that arises in systems where the different modules are insulated from each other except through specific interfaces.
+The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas <span id="id5">[<a class="reference internal" href="bibliography.html#id8" title="D. L. Parnas. On the criteria to be used in decomposing systems into modules. Commun. ACM, 15(12):1053–1058, December 1972. URL: https://doi.org/10.1145/361598.361623, doi:10.1145/361598.361623.">Parnas, 1972</a>]</span>, who pointed out that decomposing code based on the concept of “information hiding” can make code much easier to modify than a decomposition based on the logical “flowchart” of the problem being solved.</p>
+<p>A common expression of the idea of modularity in software development is the <em>Single Responsibility Principle</em>, which states that a function or class should only have one reason to change.
+This principle is often summarized as saying that a function or class should only “do one thing”, but that’s too vague; a clearer way to state this is that a function or class should have a clear and cohesive purpose at the appropriate level of abstraction.
+Let’s look at an example to help make this clearer.
+Say that we are developing an analysis workflow for RNA-sequencing data, involving the following steps:</p>
 <ul class="simple">
 <li><p>Read trimming and filtering</p></li>
 <li><p>Alignment to reference genome</p></li>
@@ -855,12 +983,21 @@ As an example, say that a researcher wanted to develop a tool to convert between
     <span class="k">return</span> <span class="n">data</span>
 </pre></div>
 </div>
-<p>This function clearly performs several operations, but viewed from the appropriate level of abstraction, it does one thing: it executes the workflow.  Importantly, the only thing that would cause this function to change is if the workflow changed; any changes within the components of the workflow would not require changes to this function. In this way, the high level workflow manager is <em>insulated</em> from the details of each of the components, interacting with them only through their outputs.  Each of the different workflow components can also be insulated from the other components, as long as they rely only upon the arguments provided to the function.</p>
+<p>This function clearly performs several operations, but viewed from the appropriate level of abstraction, it does one thing: it executes the workflow.
+Importantly, the only thing that would cause this function to change is if the workflow changed; any changes within the components of the workflow would not require changes to this function.
+In this way, the high level workflow manager is <em>insulated</em> from the details of each of the components, interacting with them only through their outputs.
+Each of the different workflow components can also be insulated from the other components, as long as they rely only upon the arguments provided to the function.</p>
 <section id="the-god-object">
 <h3>The “God object”<a class="headerlink" href="#the-god-object" title="Permalink to this heading">#</a></h3>
-<p>There is often a temptation when using object-oriented programming approaches to generate a single very large object that contains all relevant data and code for a particular problem.  These kinds of objects are sometimes referred to as “God objects” since they are meant to have a God’s-eye view of an entire project.</p>
-<p>In 2019, I started developing data processing and analysis code for large project called the Neuroimaging Analysis Replication and Prediction Study (NARPS).  We won’t go into the details here; if you are interested, you can find more detail in a paper that we published in 2020 <span id="id6">[<a class="reference internal" href="bibliography.html#id7" title="Rotem Botvinik-Nezer, Felix Holzmeister, Colin F Camerer, Anna Dreber, Juergen Huber, Magnus Johannesson, Michael Kirchler, Roni Iwanir, Jeanette A Mumford, R Alison Adcock, Paolo Avesani, Blazej M Baczkowski, Aahana Bajracharya, Leah Bakst, Sheryl Ball, Marco Barilari, Nadège Bault, Derek Beaton, Julia Beitner, Roland G Benoit, Ruud M W J Berkers, Jamil P Bhanji, Bharat B Biswal, Sebastian Bobadilla-Suarez, Tiago Bortolini, Katherine L Bottenhorn, Alexander Bowring, Senne Braem, Hayley R Brooks, Emily G Brudner, Cristian B Calderon, Julia A Camilleri, Jaime J Castrellon, Luca Cecchetti, Edna C Cieslik, Zachary J Cole, Olivier Collignon, Robert W Cox, William A Cunningham, Stefan Czoschke, Kamalaker Dadi, Charles P Davis, Alberto De Luca, Mauricio R Delgado, Lysia Demetriou, Jeffrey B Dennison, Xin Di, Erin W Dickie, Ekaterina Dobryakova, Claire L Donnat, Juergen Dukart, Niall W Duncan, Joke Durnez, Amr Eed, Simon B Eickhoff, Andrew Erhart, Laura Fontanesi, G Matthew Fricke, Shiguang Fu, Adriana Galván, Remi Gau, Sarah Genon, Tristan Glatard, Enrico Glerean, Jelle J Goeman, Sergej A E Golowin, Carlos González-García, Krzysztof J Gorgolewski, Cheryl L Grady, Mikella A Green, João F Guassi Moreira, Olivia Guest, Shabnam Hakimi, J Paul Hamilton, Roeland Hancock, Giacomo Handjaras, Bronson B Harry, Colin Hawco, Peer Herholz, Gabrielle Herman, Stephan Heunis, Felix Hoffstaedter, Jeremy Hogeveen, Susan Holmes, Chuan-Peng Hu, Scott A Huettel, Matthew E Hughes, Vittorio Iacovella, Alexandru D Iordan, Peder M Isager, Ayse I Isik, Andrew Jahn, Matthew R Johnson, Tom Johnstone, Michael J E Joseph, Anthony C Juliano, Joseph W Kable, Michalis Kassinopoulos, Cemal Koba, Xiang-Zhen Kong, Timothy R Koscik, Nuri Erkut Kucukboyaci, Brice A Kuhl, Sebastian Kupek, Angela R Laird, Claus Lamm, Robert Langner, Nina Lauharatanahirun, Hongmi Lee, Sangil Lee, Alexander Leemans, Andrea Leo, Elise Lesage, Flora Li, Monica Y C Li, Phui Cheng Lim, Evan N Lintz, Schuyler W Liphardt, Annabel B Losecaat Vermeer, Bradley C Love, Michael L Mack, Norberto Malpica, Theo Marins, Camille Maumet, Kelsey McDonald, Joseph T McGuire, Helena Melero, Adriana S Méndez Leal, Benjamin Meyer, Kristin N Meyer, Glad Mihai, Georgios D Mitsis, Jorge Moll, Dylan M Nielson, Gustav Nilsonne, Michael P Notter, Emanuele Olivetti, Adrian I Onicas, Paolo Papale, Kaustubh R Patil, Jonathan E Peelle, Alexandre Pérez, Doris Pischedda, Jean-Baptiste Poline, Yanina Prystauka, Shruti Ray, Patricia A Reuter-Lorenz, Richard C Reynolds, Emiliano Ricciardi, Jenny R Rieck, Anais M Rodriguez-Thompson, Anthony Romyn, Taylor Salo, Gregory R Samanez-Larkin, Emilio Sanz-Morales, Margaret L Schlichting, Douglas H Schultz, Qiang Shen, Margaret A Sheridan, Jennifer A Silvers, Kenny Skagerlund, Alec Smith, David V Smith, Peter Sokol-Hessner, Simon R Steinkamp, Sarah M Tashjian, Bertrand Thirion, John N Thorp, Gustav Tinghög, Loreen Tisdall, Steven H Tompson, Claudio Toro-Serey, Juan Jesus Torre Tresols, Leonardo Tozzi, Vuong Truong, Luca Turella, Anna E van 't Veer, Tom Verguts, Jean M Vettel, Sagana Vijayarajah, Khoi Vo, Matthew B Wall, Wouter D Weeda, Susanne Weis, David J White, David Wisniewski, Alba Xifra-Porxas, Emily A Yearling, Sangsuk Yoon, Rui Yuan, Kenneth S L Yuen, Lei Zhang, Xu Zhang, Joshua E Zosky, Thomas E Nichols, Russell A Poldrack, and Tom Schonberg. Variability in the analysis of a single neuroimaging dataset by many teams. Nature, 582(7810):84-88, Jun 2020. doi:10.1038/s41586-020-2314-9.">Botvinik-Nezer <em>et al.</em>, 2020</a>]</span>, and the codebase is available at <a class="github reference external" href="https://github.com/poldrack/narps">poldrack/narps</a>. The brief description is that 70 research groups were given the same raw brain imaging dataset and asked to analyze it and submit their results; it was these results that I was analyzing in order to determine how different analysis methods might lead to different results.  It had been a while since I had developed a project of scope, and I decided to use an object-oriented approach to developing the code.  This project ended up being one of the main reasons I became more interested in software engineering practices, but at this point I had not yet dived into the literature on good coding practices.</p>
-<p>I started by creating a main object, called <code class="docutils literal notranslate"><span class="pre">Narps</span></code>, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.  This object was then called by each of a set of scripts that performed all of the main operations:</p>
+<p>There is often a temptation when using object-oriented programming approaches to generate a single very large object that contains all relevant data and code for a particular problem.
+These kinds of objects are sometimes referred to as “God objects” since they are meant to have a God’s-eye view of an entire project.</p>
+<p>In 2019, I started developing data processing and analysis code for large project called the Neuroimaging Analysis Replication and Prediction Study (NARPS).
+We won’t go into the details here; if you are interested, you can find more detail in a paper that we published in 2020 <span id="id6">[<a class="reference internal" href="bibliography.html#id7" title="Rotem Botvinik-Nezer, Felix Holzmeister, Colin F Camerer, Anna Dreber, Juergen Huber, Magnus Johannesson, Michael Kirchler, Roni Iwanir, Jeanette A Mumford, R Alison Adcock, Paolo Avesani, Blazej M Baczkowski, Aahana Bajracharya, Leah Bakst, Sheryl Ball, Marco Barilari, Nadège Bault, Derek Beaton, Julia Beitner, Roland G Benoit, Ruud M W J Berkers, Jamil P Bhanji, Bharat B Biswal, Sebastian Bobadilla-Suarez, Tiago Bortolini, Katherine L Bottenhorn, Alexander Bowring, Senne Braem, Hayley R Brooks, Emily G Brudner, Cristian B Calderon, Julia A Camilleri, Jaime J Castrellon, Luca Cecchetti, Edna C Cieslik, Zachary J Cole, Olivier Collignon, Robert W Cox, William A Cunningham, Stefan Czoschke, Kamalaker Dadi, Charles P Davis, Alberto De Luca, Mauricio R Delgado, Lysia Demetriou, Jeffrey B Dennison, Xin Di, Erin W Dickie, Ekaterina Dobryakova, Claire L Donnat, Juergen Dukart, Niall W Duncan, Joke Durnez, Amr Eed, Simon B Eickhoff, Andrew Erhart, Laura Fontanesi, G Matthew Fricke, Shiguang Fu, Adriana Galván, Remi Gau, Sarah Genon, Tristan Glatard, Enrico Glerean, Jelle J Goeman, Sergej A E Golowin, Carlos González-García, Krzysztof J Gorgolewski, Cheryl L Grady, Mikella A Green, João F Guassi Moreira, Olivia Guest, Shabnam Hakimi, J Paul Hamilton, Roeland Hancock, Giacomo Handjaras, Bronson B Harry, Colin Hawco, Peer Herholz, Gabrielle Herman, Stephan Heunis, Felix Hoffstaedter, Jeremy Hogeveen, Susan Holmes, Chuan-Peng Hu, Scott A Huettel, Matthew E Hughes, Vittorio Iacovella, Alexandru D Iordan, Peder M Isager, Ayse I Isik, Andrew Jahn, Matthew R Johnson, Tom Johnstone, Michael J E Joseph, Anthony C Juliano, Joseph W Kable, Michalis Kassinopoulos, Cemal Koba, Xiang-Zhen Kong, Timothy R Koscik, Nuri Erkut Kucukboyaci, Brice A Kuhl, Sebastian Kupek, Angela R Laird, Claus Lamm, Robert Langner, Nina Lauharatanahirun, Hongmi Lee, Sangil Lee, Alexander Leemans, Andrea Leo, Elise Lesage, Flora Li, Monica Y C Li, Phui Cheng Lim, Evan N Lintz, Schuyler W Liphardt, Annabel B Losecaat Vermeer, Bradley C Love, Michael L Mack, Norberto Malpica, Theo Marins, Camille Maumet, Kelsey McDonald, Joseph T McGuire, Helena Melero, Adriana S Méndez Leal, Benjamin Meyer, Kristin N Meyer, Glad Mihai, Georgios D Mitsis, Jorge Moll, Dylan M Nielson, Gustav Nilsonne, Michael P Notter, Emanuele Olivetti, Adrian I Onicas, Paolo Papale, Kaustubh R Patil, Jonathan E Peelle, Alexandre Pérez, Doris Pischedda, Jean-Baptiste Poline, Yanina Prystauka, Shruti Ray, Patricia A Reuter-Lorenz, Richard C Reynolds, Emiliano Ricciardi, Jenny R Rieck, Anais M Rodriguez-Thompson, Anthony Romyn, Taylor Salo, Gregory R Samanez-Larkin, Emilio Sanz-Morales, Margaret L Schlichting, Douglas H Schultz, Qiang Shen, Margaret A Sheridan, Jennifer A Silvers, Kenny Skagerlund, Alec Smith, David V Smith, Peter Sokol-Hessner, Simon R Steinkamp, Sarah M Tashjian, Bertrand Thirion, John N Thorp, Gustav Tinghög, Loreen Tisdall, Steven H Tompson, Claudio Toro-Serey, Juan Jesus Torre Tresols, Leonardo Tozzi, Vuong Truong, Luca Turella, Anna E van 't Veer, Tom Verguts, Jean M Vettel, Sagana Vijayarajah, Khoi Vo, Matthew B Wall, Wouter D Weeda, Susanne Weis, David J White, David Wisniewski, Alba Xifra-Porxas, Emily A Yearling, Sangsuk Yoon, Rui Yuan, Kenneth S L Yuen, Lei Zhang, Xu Zhang, Joshua E Zosky, Thomas E Nichols, Russell A Poldrack, and Tom Schonberg. Variability in the analysis of a single neuroimaging dataset by many teams. Nature, 582(7810):84-88, Jun 2020. doi:10.1038/s41586-020-2314-9.">Botvinik-Nezer <em>et al.</em>, 2020</a>]</span>, and the codebase is available at <a class="github reference external" href="https://github.com/poldrack/narps">poldrack/narps</a>.
+The brief description is that 70 research groups were given the same raw brain imaging dataset and asked to analyze it and submit their results; it was these results that I was analyzing in order to determine how different analysis methods might lead to different results.
+It had been a while since I had developed a project of scope, and I decided to use an object-oriented approach to developing the code.
+This project ended up being one of the main reasons I became more interested in software engineering practices, but at this point I had not yet dived into the literature on good coding practices.</p>
+<p>I started by creating a main object, called <code class="docutils literal notranslate"><span class="pre">Narps</span></code>, which was meant to take in all of the information about the project and contain methods to perform all of the main analysis procedures.
+This object was then called by each of a set of scripts that performed all of the main operations:</p>
 <ul class="simple">
 <li><p>Preprocessing the images submitted by the teams</p></li>
 <li><p>Preparing the metadata necessary for the analysis of the images</p></li>
@@ -887,7 +1024,8 @@ As an example, say that a researcher wanted to develop a tool to convert between
   <span class="o">-</span> <span class="n">write_data</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>This falls clearly within “God object” territory.  Let’s have a closer look at the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> constructor method for the <code class="docutils literal notranslate"><span class="pre">Narps</span></code> object, which sets up the object:</p>
+<p>This falls clearly within “God object” territory.
+Let’s have a closer look at the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> constructor method for the <code class="docutils literal notranslate"><span class="pre">Narps</span></code> object, which sets up the object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Narps</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    main class for NARPS analysis</span>
@@ -953,14 +1091,21 @@ As an example, say that a researcher wanted to develop a tool to convert between
 <li><p>It’s very difficult to test individual operations without initializing the full class.  In addition, later functions may sometimes depend on earlier functions having been performed, which introduces temporal dependences that make testing difficult.</p></li>
 <li><p>All of the processing operations are coupled to the state of the class (such as whether a particular method has been called or not).  This makes it difficult to cleanly decompose the code’s operations (making both understanding and testing difficult) and also difficult to reuse individual components since they are so tightly coupled.</p></li>
 </ul>
-<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow.  (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately. I would then create a separate class to manage the execution of the full analysis workflow.  The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
+<p>Perhaps unsurprisingly, working with this code base became increasingly unwieldy as the project went on, with many hours spent debugging problems that arose from the deep coupling of different parts of the workflow. (Remember that this was before we had AI tools to help us debug and refactor our code!) If I were going to rewrite this code today, I would instead use a set of Python <em>data classes</em> to store configuration and data separately, and move the processing operations into functions defined separately.
+I would then create a separate class to manage the execution of the full analysis workflow.
+The use of separate functions (rather than methods) to perform the processing operations helps to separate responsibilities, and makes it easier to test the functions individually without requiring initialization of a large class.</p>
 </section>
 <section id="global-variables">
 <h3>Global variables<a class="headerlink" href="#global-variables" title="Permalink to this heading">#</a></h3>
 <blockquote>
-<div><p>Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it. And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)</p>
+<div><p>Since our earliest days of writing software, we were warned of the perils of global data — how it was invented by demons from the fourth plane of hell, which is the resting place of any programmer who dares to use it.
+And, although we are somewhat skeptical about fire and brimstone, it’s still one of the most pungent odors we are likely to run into. (Fowler,p. 74)</p>
 </div></blockquote>
-<p>In Python, the accessibility (or <em>scope</em>) of a variable is determined by where it is defined. A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has <em>global scope</em>, which means that it can be accessed from within any other functions that are defined within that same file. The problem with global variables is that they break the insulation that is usually provided by functions.  Global variables can in theory be modified anywhere they appear within the code, and thus can change in ways that can be very difficult to understand.  In this example, we use the <code class="docutils literal notranslate"><span class="pre">ic</span></code> function from the <code class="docutils literal notranslate"><span class="pre">icecream</span></code> library to report the value of the global variable before and after executing the function that modifies it:</p>
+<p>In Python, the accessibility (or <em>scope</em>) of a variable is determined by where it is defined.
+A variable defined at the top level of a script, notebook, or module (that is, not inside any other function) has <em>global scope</em>, which means that it can be accessed from within any other functions that are defined within that same file.
+The problem with global variables is that they break the insulation that is usually provided by functions.
+Global variables can in theory be modified anywhere they appear within the code, and thus can change in ways that can be very difficult to understand.
+In this example, we use the <code class="docutils literal notranslate"><span class="pre">ic</span></code> function from the <code class="docutils literal notranslate"><span class="pre">icecream</span></code> library to report the value of the global variable before and after executing the function that modifies it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">icecream</span> <span class="kn">import</span> <span class="n">ic</span>
 <span class="n">GLOBALVAR</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -974,12 +1119,16 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </pre></div>
 </div>
 <p>If we were to use the global variable elsewhere, we couldn’t know what its value would be without knowing how many times <code class="docutils literal notranslate"><span class="pre">myfunc()</span></code> had been executed.</p>
-<p>In general, we want to restrict the scope of a variable to be as limited as possible, akin to a “need to know basis”.  In particular, one should never use global variables to share information into and/or out of a function.  Instead, one should pass the relevant information into the function as an argument, and return the modified variable as an output.  This helps make testing of functions easier by preventing <em>side effects</em> - that is, effects on the state of the system that are not mediated by the return values of the function.</p>
+<p>In general, we want to restrict the scope of a variable to be as limited as possible, akin to a “need to know basis”.
+In particular, one should never use global variables to share information into and/or out of a function.
+Instead, one should pass the relevant information into the function as an argument, and return the modified variable as an output.
+This helps make testing of functions easier by preventing <em>side effects</em> - that is, effects on the state of the system that are not mediated by the return values of the function.</p>
 </section>
 <section id="defining-constants">
 <h3>Defining constants<a class="headerlink" href="#defining-constants" title="Permalink to this heading">#</a></h3>
 <p>Global variables are most often used to define <em>constants</em> - that is, variables that are meant to take a single value that doesn’t change, such as <em>pi</em> or <em>e</em> in mathematics and <em>c</em> (speed of light) or <em>h</em> (the Planck constant) in physics.</p>
-<p>A simple way to define a constant is to define it within a module and import it.  For example, we could create a module file called <code class="docutils literal notranslate"><span class="pre">constants.py</span></code> and within it define a constant for the speed of light, using the common convention of defining constants using uppercase letters:</p>
+<p>A simple way to define a constant is to define it within a module and import it.
+For example, we could create a module file called <code class="docutils literal notranslate"><span class="pre">constants.py</span></code> and within it define a constant for the speed of light, using the common convention of defining constants using uppercase letters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># project constants</span>
 
 <span class="c1"># speed of light in a vacuum</span>
@@ -995,14 +1144,16 @@ As an example, say that a researcher wanted to develop a tool to convert between
 </div>
 <section id="creating-immutable-variables">
 <h4>Creating immutable variables<a class="headerlink" href="#creating-immutable-variables" title="Permalink to this heading">#</a></h4>
-<p>We would generally like to define constants in such a way that their value is <em>immutable</em>, i.e. it is not allowed to be modified.  Unfortunately, importing a variable from a module doesn’t prevent it from being modified:</p>
+<p>We would generally like to define constants in such a way that their value is <em>immutable</em>, i.e. it is not allowed to be modified.
+Unfortunately, importing a variable from a module doesn’t prevent it from being modified:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span><span class="p">:</span> <span class="n">C</span> <span class="o">=</span> <span class="mi">43</span>
 
 <span class="n">In</span><span class="p">:</span> <span class="n">C</span>
 <span class="n">Out</span><span class="p">:</span> <span class="mi">43</span>
 </pre></div>
 </div>
-<p>Unlike some other languages, Python doesn’t offer a simple way to define a variable as a constant in a way that prevents it from being modified, but there are several tricks we can play to create an immutable constant. Here we demonstrate one simple way, in which we create a class but override its <code class="docutils literal notranslate"><span class="pre">__setattr__</span></code> method to prevent the value from being changed:</p>
+<p>Unlike some other languages, Python doesn’t offer a simple way to define a variable as a constant in a way that prevents it from being modified, but there are several tricks we can play to create an immutable constant.
+Here we demonstrate one simple way, in which we create a class but override its <code class="docutils literal notranslate"><span class="pre">__setattr__</span></code> method to prevent the value from being changed:</p>
 <p>We first add the class definition to our <code class="docutils literal notranslate"><span class="pre">constants.py</span></code> file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
 <span class="k">class</span> <span class="nc">Constants</span><span class="p">:</span>
@@ -1045,15 +1196,21 @@ I’d venture a guess that very few coders have actually sat down and read PEP8.
 Instead, many of us have learned Python style implicitly by looking at others’ code, but increasingly we resort to the use of automated <em>static analysis</em> tools, which can identify potential errors and reformat code without actually executing the code.
 These tools are commonly known as <em>linters</em>, after the <code class="docutils literal notranslate"><span class="pre">lint</span></code> static analysis tool used in the C language.
 There are numerous such tools for Python; for our examples we will use the <code class="docutils literal notranslate"><span class="pre">ruff</span></code> formatter, which has become popular due in part to its speed.</p>
-<p>A very useful feature of static analysis tools like <code class="docutils literal notranslate"><span class="pre">ruff</span></code> is that they can easily be integrated into most IDEs, so that they can flag problems in the code as it is written. In addition, most modern IDEs will automatically suggest changes to improve the formatting of code.</p>
-<p>Let’s start with writing some poorly formatted code, using the VSCode IDE.  Here is a screenshot after adding a couple of lines of poorly formatted or anti-pattern code:</p>
+<p>A very useful feature of static analysis tools like <code class="docutils literal notranslate"><span class="pre">ruff</span></code> is that they can easily be integrated into most IDEs, so that they can flag problems in the code as it is written.
+In addition, most modern IDEs will automatically suggest changes to improve the formatting of code.</p>
+<p>Let’s start with writing some poorly formatted code, using the VSCode IDE.
+Here is a screenshot after adding a couple of lines of poorly formatted or anti-pattern code:</p>
 <figure class="align-default" id="vscodeformatting-fig">
 <a class="reference internal image-reference" href="_images/code_formatting.png"><img alt="Example of code formatting suggestions within IDE" src="_images/code_formatting.png" style="width: 600px;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 6 </span><span class="caption-text">IDE suggestions to fix poorly formatted or problematic code within VSCode.  The top panel shows two lines of problematic code. The squiggly underlines reflect <code class="docutils literal notranslate"><span class="pre">ruff</span></code>’s detection of problems in the code, which are detailed in the popup window as well as the <em>Problems</em> panel below.  The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.</span><a class="headerlink" href="#vscodeformatting-fig" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">IDE suggestions to fix poorly formatted or problematic code within VSCode.
+The top panel shows two lines of problematic code.
+The squiggly underlines reflect <code class="docutils literal notranslate"><span class="pre">ruff</span></code>’s detection of problems in the code, which are detailed in the popup window as well as the <em>Problems</em> panel below.
+The IDE is also auto-suggesting a fix to the poorly formatted code on line 8.</span><a class="headerlink" href="#vscodeformatting-fig" title="Permalink to this image">#</a></p>
 </figcaption>
 </figure>
-<p>We see that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).  We can also use <code class="docutils literal notranslate"><span class="pre">ruff</span></code> from the command line to detect and fix code problems:</p>
+<p>We see that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> detects both formatting problems (such as the lack of spaces in the code) as well as problematic code patterns (such as the use of star-imports).
+We can also use <code class="docutils literal notranslate"><span class="pre">ruff</span></code> from the command line to detect and fix code problems:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>src/BetterCodeBetterScience/formatting_example.py
 src/BetterCodeBetterScience/formatting_example.py:6:1:<span class="w"> </span>F403<span class="w"> </span><span class="sb">`</span>from<span class="w"> </span>numpy.random<span class="w"> </span>import<span class="w"> </span>*<span class="sb">`</span><span class="w"> </span>used<span class="p">;</span><span class="w"> </span>unable<span class="w"> </span>to<span class="w"> </span>detect<span class="w"> </span>undefined<span class="w"> </span>names
 <span class="w">  </span><span class="p">|</span>
@@ -1076,7 +1233,7 @@ src/BetterCodeBetterScience/formatting_example.py:8:7:<span class="w"> </span>F4
 Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>errors.
 </pre></div>
 </div>
-<p>Most linters can also automatically fix the issues that they detect in the code.  <code class="docutils literal notranslate"><span class="pre">ruff</span></code> modifies the file in place, so we will first create a copy (so that our original remains intact) and then run the formatter on that copy:</p>
+<p>Most linters can also automatically fix the issues that they detect in the code. <code class="docutils literal notranslate"><span class="pre">ruff</span></code> modifies the file in place, so we will first create a copy (so that our original remains intact) and then run the formatter on that copy:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>cp<span class="w"> </span>src/BetterCodeBetterScience/formatting_example.py<span class="w"> </span>src/BetterCodeBetterScience/formatting_example_ruff.py
 
 ❯<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>src/BetterCodeBetterScience/formatting_example_ruff.py
@@ -1094,17 +1251,21 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 &gt;<span class="w"> </span><span class="nv">mynum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>randint<span class="o">(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">diff</span></code> result shows that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> reformatted the code on line 8 (to add spaces in compliance with PEP8) and also removed some empty lines in the file. It did not, however, change the import statement; that’s a level of modification that is beyond the power of a static analysis tool.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">diff</span></code> result shows that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> reformatted the code on line 8 (to add spaces in compliance with PEP8) and also removed some empty lines in the file.
+It did not, however, change the import statement; that’s a level of modification that is beyond the power of a static analysis tool.</p>
 <section id="formatting-code-using-ai-agents">
 <h3>Formatting code using AI agents<a class="headerlink" href="#formatting-code-using-ai-agents" title="Permalink to this heading">#</a></h3>
-<p>Unsurprisingly, AI coding agents are also quite good at fixing formatting and styling issues in code.  Here is a simple example where we prompt the GitHub Copilot chat within VSCode to fix the formatting in the example code from above:</p>
+<p>Unsurprisingly, AI coding agents are also quite good at fixing formatting and styling issues in code.
+Here is a simple example where we prompt the GitHub Copilot chat within VSCode to fix the formatting in the example code from above:</p>
 <figure class="align-default" id="aiformatting-fig">
 <a class="reference internal image-reference" href="_images/code_formatting_ai.png"><img alt="Example of code formatting using AI." src="_images/code_formatting_ai.png" style="width: 600px;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The GitHub Copilot chat within VSCode was used to prompt the model (Claude Sonnet 4) to fix issues with the code. The model generated new code and also outlined its improvements.</span><a class="headerlink" href="#aiformatting-fig" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The GitHub Copilot chat within VSCode was used to prompt the model (Claude Sonnet 4) to fix issues with the code.
+The model generated new code and also outlined its improvements.</span><a class="headerlink" href="#aiformatting-fig" title="Permalink to this image">#</a></p>
 </figcaption>
 </figure>
-<p>The agent both addressed the formatting issues as well as fixing the wildcard import, improving the variable naming, and updating the comment.  Here is the new code generated by the model:</p>
+<p>The agent both addressed the formatting issues as well as fixing the wildcard import, improving the variable naming, and updating the comment.
+Here is the new code generated by the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Well-formatted code following PEP8 and best practices</span>
 
 <span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">np_random</span>
@@ -1117,8 +1278,11 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="defensive-coding">
 <h2>Defensive coding<a class="headerlink" href="#defensive-coding" title="Permalink to this heading">#</a></h2>
-<p>Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too.  <em>Defensive coding</em> means writing code in a way that tries to protect against errors.  One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in a later chapter.  Here we focus on robustness to <em>runtime errors</em>; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the logic of the code or errors or invalid assumptions about the data that are being used by code.</p>
-<p>A central aspect of defensive coding is to detect errors and announce them in a loud way.  For example, in a recent code review, a researcher showed the following code:</p>
+<p>Given that even professional programmers make errors on a regular basis, it seems almost certain that researchers writing code for their scientific projects will make their fair share of errors too. <em>Defensive coding</em> means writing code in a way that tries to protect against errors.
+One essential aspect of defensive coding is a thorough suite of tests for all important functions; we will dive much more deeply into this in a later chapter.
+Here we focus on robustness to <em>runtime errors</em>; that is, errors that are not necessarily due to errors in the code per se, but rather due to errors in the logic of the code or errors or invalid assumptions about the data that are being used by code.</p>
+<p>A central aspect of defensive coding is to detect errors and announce them in a loud way.
+For example, in a recent code review, a researcher showed the following code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the subject label from a given file path.</span>
@@ -1140,10 +1304,15 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
         <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 </div>
-<p>When one of us asked the question “Should there ever be a file path that doesn’t include a subject label?”, the answer was “No”, meaning that this code allows what amounts to an error to occur without announcing its presence. When we looked at the place where this function was used in the code, there was no check for whether the output was <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that such an error would go unnoticed until it caused an error later when <code class="docutils literal notranslate"><span class="pre">subject_label</span></code> was assumed to be a string.  Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, but no message is actually printed.  In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.</p>
+<p>When one of us asked the question “Should there ever be a file path that doesn’t include a subject label?”, the answer was “No”, meaning that this code allows what amounts to an error to occur without announcing its presence.
+When we looked at the place where this function was used in the code, there was no check for whether the output was <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that such an error would go unnoticed until it caused an error later when <code class="docutils literal notranslate"><span class="pre">subject_label</span></code> was assumed to be a string.
+Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, but no message is actually printed.
+In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.</p>
 <section id="announcing-errors-loudly-using-exceptions">
 <h3>Announcing errors loudly using exceptions<a class="headerlink" href="#announcing-errors-loudly-using-exceptions" title="Permalink to this heading">#</a></h3>
-<p>A better practice here would be to raise an <em>exception</em>. Unlike passing <code class="docutils literal notranslate"><span class="pre">None</span></code>, raising an exception will cause the program to stop unless the exception is handled.  In the previous example, we could do the following (removing the docstring for brevity):</p>
+<p>A better practice here would be to raise an <em>exception</em>.
+Unlike passing <code class="docutils literal notranslate"><span class="pre">None</span></code>, raising an exception will cause the program to stop unless the exception is handled.
+In the previous example, we could do the following (removing the docstring for brevity):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/sub-(s\d</span><span class="si">{3}</span><span class="s1">)/&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1171,7 +1340,8 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 <span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">&#39;NoneType&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">&#39;group&#39;</span>
 </pre></div>
 </div>
-<p>In other cases we might want to handle the exception without halting the program, in which case we can embed the function call in a <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement that tries to run the function and then handles any exceptions that might occur.  Let’s say that we simply want to skip over any files for which there is no subject label:</p>
+<p>In other cases we might want to handle the exception without halting the program, in which case we can embed the function call in a <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement that tries to run the function and then handles any exceptions that might occur.
+Let’s say that we simply want to skip over any files for which there is no subject label:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">subject_label</span> <span class="o">=</span> <span class="n">get_subject_label</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -1183,7 +1353,9 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 
 </pre></div>
 </div>
-<p>In most cases our <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement should catch specific errors.  In this case, we know that the function will return an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> its input is a string that doesn’t contain a subject label. But what if the input is <code class="docutils literal notranslate"><span class="pre">None</span></code>?</p>
+<p>In most cases our <code class="docutils literal notranslate"><span class="pre">try/catch</span></code> statement should catch specific errors.
+In this case, we know that the function will return an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> its input is a string that doesn’t contain a subject label.
+But what if the input is <code class="docutils literal notranslate"><span class="pre">None</span></code>?</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
 <span class="n">In</span> <span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1211,8 +1383,12 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="checking-assumptions-using-assertions">
 <h3>Checking assumptions using assertions<a class="headerlink" href="#checking-assumptions-using-assertions" title="Permalink to this heading">#</a></h3>
-<p>In 2013, a group of researchers published a paper in the journal <em>PLOS One</em> reporting a relationship between belief in conspiracy theories and rejection of science <span id="id7">[<a class="reference internal" href="bibliography.html#id6" title="Stephan Lewandowsky, Gilles E Gignac, and Klaus Oberauer. The role of conspiracist ideation and worldviews in predicting rejection of science. PLoS One, 8(10):e75637, 2013. doi:10.1371/journal.pone.0075637.">Lewandowsky <em>et al.</em>, 2013</a>]</span>.  This result was based on a panel of participants (presumably adults) who completed a survey regarding a number of topics along with reporting their age and gender.  In order to rule out the potential for age to confound the relationships that they identified, they reported that “Age turned out not to correlate with any of the indicator variables”.  They were later forced to issue a correction to the paper after a reader examined the dataset (which had been shared along with the paper, as required by the journal) and found the following: “The dataset included two notable age outliers (reported ages 5 and 32757).”</p>
-<p>No one wants to publish research that requires later correction, and in this case this correction could have been avoided by including a single line of code.  Assuming that the age values are stored in a column called ‘age’ within a data frame, and the range of legitimate ages is 18 to 80:</p>
+<p>In 2013, a group of researchers published a paper in the journal <em>PLOS One</em> reporting a relationship between belief in conspiracy theories and rejection of science <span id="id7">[<a class="reference internal" href="bibliography.html#id6" title="Stephan Lewandowsky, Gilles E Gignac, and Klaus Oberauer. The role of conspiracist ideation and worldviews in predicting rejection of science. PLoS One, 8(10):e75637, 2013. doi:10.1371/journal.pone.0075637.">Lewandowsky <em>et al.</em>, 2013</a>]</span>.
+This result was based on a panel of participants (presumably adults) who completed a survey regarding a number of topics along with reporting their age and gender.
+In order to rule out the potential for age to confound the relationships that they identified, they reported that “Age turned out not to correlate with any of the indicator variables”.
+They were later forced to issue a correction to the paper after a reader examined the dataset (which had been shared along with the paper, as required by the journal) and found the following: “The dataset included two notable age outliers (reported ages 5 and 32757).”</p>
+<p>No one wants to publish research that requires later correction, and in this case this correction could have been avoided by including a single line of code.
+Assuming that the age values are stored in a column called ‘age’ within a data frame, and the range of legitimate ages is 18 to 80:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;Error: ages out of bound&quot;</span>
 </pre></div>
 </div>
@@ -1228,7 +1404,8 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 
 </pre></div>
 </div>
-<p>Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea. Examples of such variables include:</p>
+<p>Any time one is working with variables that have bounded limits on acceptable values, an assertion is a good idea.
+Examples of such variables include:</p>
 <ul class="simple">
 <li><p>Counts (&gt;= 0; in some cases an upper limit may also be plausible, such as a count of the number of planets in the solar system)</p></li>
 <li><p>Elapsed time (&gt; 0)</p></li>
@@ -1251,7 +1428,9 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="coding-portably">
 <h2>Coding portably<a class="headerlink" href="#coding-portably" title="Permalink to this heading">#</a></h2>
-<p>If you have ever tried to run other people’s research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.  A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinated. Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:</p>
+<p>If you have ever tried to run other people’s research code on your own machine, you have almost certainly run into errors due to the hard-coding of machine-dependent details into the code.
+A good piece of evidence for this is the frequency with which AI coding assistants will insert paths into code that appear to be leaked from their training data or hallucinated.
+Here are a few examples where a prompt for a path was completed with what appears to be a leaked or hallucinated file path from the GPT-4o training set:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;/home/brain/workingdir/data/dwi/hcp/preprocessed/response_dhollander/100206/T1w/Diffusion/100206_WM_FOD_norm.mif&#39;</span>
 <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;/data/pt_02101/fmri_data/&#39;</span>
 <span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/kevinsitek/Downloads/pt_02101/&#39;</span>
@@ -1259,23 +1438,30 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </pre></div>
 </div>
 <p>Even if you don’t plan to share your code with anyone else, writing portably is a good idea because you never know when your system configuration may change.</p>
-<p>A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.  Several years ago one member of our lab had embedded credentials for the lab’s Amazon Web Services account into a piece of code, which was kept in a private Github repository.  At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.  Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.</p>
-<p><em>Never</em> place any system-specific or user-specific information within code.  Instead, that information should be specified outside of the code, for which there are two common methods.</p>
+<p>A particularly dangerous practice is the direct coding of credentials (such as login credentials or API keys) into code files.
+Several years ago one member of our lab had embedded credentials for the lab’s Amazon Web Services account into a piece of code, which was kept in a private Github repository.
+At some point this repository was made public (forgetting that it contained those credentials), and cybercriminals were able to use the credentials to spend more than $8000 on the account within a couple of days before a spending alarm alerted us to the compromise.
+Fortunately the money was refunded, but the episode highlights just how dangerous the leakage of credentials can be.</p>
+<p><em>Never</em> place any system-specific or user-specific information within code.
+Instead, that information should be specified outside of the code, for which there are two common methods.</p>
 <section id="environment-variables">
 <h3>Environment variables<a class="headerlink" href="#environment-variables" title="Permalink to this heading">#</a></h3>
-<p>Environment variables are variables that exist in the environment and are readable from within the code; here we use examples from the UNIX shell.  Environment variables can be set from the command line using the <code class="docutils literal notranslate"><span class="pre">export</span></code> command:</p>
+<p>Environment variables are variables that exist in the environment and are readable from within the code; here we use examples from the UNIX shell.
+Environment variables can be set from the command line using the <code class="docutils literal notranslate"><span class="pre">export</span></code> command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">MY_API_KEY</span><span class="o">=</span><span class="s1">&#39;5lkjdlvkni5lkj5sklc&#39;</span>
 ❯<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$MY_API_KEY</span>
 5lkjdlvkni5lkj5sklc
 </pre></div>
 </div>
-<p>In addition, these environment variables can be made persistent by adding them to shell startup files (such as .bashrc for the <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell), in which case they are loaded whenever a new shell is opened.  The values of these environment variables can then be obtained within Python using the <code class="docutils literal notranslate"><span class="pre">os.environ</span></code> object:</p>
+<p>In addition, these environment variables can be made persistent by adding them to shell startup files (such as .bashrc for the <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell), in which case they are loaded whenever a new shell is opened.
+The values of these environment variables can then be obtained within Python using the <code class="docutils literal notranslate"><span class="pre">os.environ</span></code> object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">os</span>
 <span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MY_API_KEY&#39;</span><span class="p">]</span>
 <span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="s1">&#39;5lkjdlvkni5lkj5sklc&#39;</span>
 </pre></div>
 </div>
-<p>Often we may have environment variables that are project-specific, such that we only want them loaded when working on that project.  A good solution for this problem is to create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file within the project and include those settings within this file.</p>
+<p>Often we may have environment variables that are project-specific, such that we only want them loaded when working on that project.
+A good solution for this problem is to create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file within the project and include those settings within this file.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;PROJECT_KEY=934kjdflk5k5ks592kskx&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>.env
 
 ❯<span class="w"> </span>cat<span class="w"> </span>.env
@@ -1298,7 +1484,10 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="configuration-files">
 <h3>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">#</a></h3>
-<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.  In this case, another alternative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.  There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.  Here is an example of what a YAML configuration file might look like:</p>
+<p>In some cases one may want more flexibility in the specification of configuration settings than provided by environment variables.
+In this case, another alternative is to use <em>configuration files</em>, which are text files that allow a more structured and flexible organization of configuration variables.
+There are many different file formats that can be used to specify configuration files; here we will focus on the <a class="reference external" href="https://yaml.org/">YAML</a> file format, which is highly readable and provides substantial flexibility for configuration data structures.
+Here is an example of what a YAML configuration file might look like:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="c1"># Project Configuration</span>
 <span class="nt">project</span><span class="p">:</span>
@@ -1355,13 +1544,17 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 </section>
 <section id="protecting-private-credentials">
 <h3>Protecting private credentials<a class="headerlink" href="#protecting-private-credentials" title="Permalink to this heading">#</a></h3>
-<p>It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.  For this reason, one should always add any configuration files to the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file, which will prevent them from being checked into the repository by accident.</p>
+<p>It is important to ensure that configuration files do not get checked into version control, since this could expose them to the world if the project is shared.
+For this reason, one should always add any configuration files to the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file, which will prevent them from being checked into the repository by accident.</p>
 </section>
 </section>
 <section id="managing-technical-debt">
 <h2>Managing technical debt<a class="headerlink" href="#managing-technical-debt" title="Permalink to this heading">#</a></h2>
-<p>The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.  Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.</p>
-<p>The concept of <em>technical debt</em> refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).  The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.  A package that is not actively maintained can:</p>
+<p>The Python package ecosystem provides a cornucopia of tools, such that for nearly any problem one can find a package on PyPI or code on Github that can solve the problem.
+Most coders never think twice about installing a package that solves their problem; how could it be a bad thing? While we also love the richness of the Python package ecosystem, there are reasons to think twice about relying on arbitrary packages that one finds.</p>
+<p>The concept of <em>technical debt</em> refers to work that is deferred in the short term in exchange for higher costs in the future (such as maintenance or changes).
+The use of an existing package counts as technical debt because there is uncertainty about how well any package will be maintained in the long term.
+A package that is not actively maintained can:</p>
 <ul class="simple">
 <li><p>become dysfunctional with newer Python releases</p></li>
 <li><p>come in conflict with newer versions of other packages, e.g. relying upon a function in another package that becomes deprecated</p></li>
@@ -1374,7 +1567,11 @@ Found<span class="w"> </span><span class="m">2</span><span class="w"> </span>err
 <li><p>A well-maintained package is likely to be well-tested</p></li>
 <li><p>Using a well-maintained package can save a great deal of time compared to writing one’s own implementation</p></li>
 </ul>
-<p>While we don’t want to suggest that one shouldn’t use any old package from PyPI that happens to solve an important problem, we think it’s important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.  The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.  To see what an example of a well-maintained package look like, visit the Github repository for the <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">Scikit-learn project</a>.  This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.  Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:</p>
+<p>While we don’t want to suggest that one shouldn’t use any old package from PyPI that happens to solve an important problem, we think it’s important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.
+The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.
+To see what an example of a well-maintained package look like, visit the Github repository for the <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">Scikit-learn project</a>.
+This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.
+Most projects will never reach this level of maturity, but we can use this as a template for what to look for in a well-maintained project:</p>
 <ul class="simple">
 <li><p>Multiple active contributors (not just a single developer)</p></li>
 <li><p>Automated testing with a high degree of code coverage</p></li>
