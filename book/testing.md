@@ -2,7 +2,7 @@
 
 Tests define the expected behavior of code, and detect when the code doesn't match that expected behavior.
 
-One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.  This is known as a *positive control* because it assesses the test's ability to identify a positive response.  Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
+One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.  This is known as a *positive control* because it assesses the test's ability to identify a positive response[^1].  Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
 
 By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.  A positive test assesses whether, given a particular valid input, the component returns the correct output.  A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.  
 
@@ -21,7 +21,7 @@ A final reason to write tests is that they make it much easier to make changes t
 
 ### Unit tests
 
-Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").  
+Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").  That is, we want to aim for "garbage in, exception out" behavior.
 
 ### Integration tests
 
@@ -76,7 +76,7 @@ We can run this using `pytest` (more about this later), which tells us that the 
 
 src/BetterCodeBetterScience/escape_velocity.py ..          [100%]
 
-======================= 2 passed in 0.10s =======================
+======================= 1 passed in 0.10s =======================
 ```
 
 
@@ -302,7 +302,7 @@ We can now fix the code by returning an empty list if zero standard deviation is
         return []
 ```
 
-Here we add a comment to explain the logic of the test. Running the tests now will show that the problem is fixed:
+Here we add a comment to explain the intention of the statement. Running the tests now will show that the problem is fixed:
 
 ```python
 ❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
@@ -325,7 +325,7 @@ A commonly used scheme for writing a test is "given/when/then":
 - when something happens (such as a particular input)
 - then something else should happen (such as a particular output or exception)
 
-Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").  You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one).
+Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").  You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one) that together define the condition that we are interested in testing for.
 
 How do we test that the output of a function is correct given the input?  There are different answers for different situations:
 
@@ -386,7 +386,7 @@ def test_simple_scaler_internals():
 
 ```
 
-Both of these tests pass against the class definition shown above. However, if we were to change the way that the transformation is performed (for example, we decide to use the `StandardScaler` function from `scikit-learn` instead of writing our own), then the tests are likely to fail unless the sample internal variable names are used.  In general we should only interact with a function or class via its explicit interfaces.
+Both of these tests pass against the class definition shown above. However, if we were to change the way that the transformation is performed (for example, we decide to use the `StandardScaler` function from `scikit-learn` instead of writing our own), then the implementation-aware tests are likely to fail unless the sample internal variable names are used.  In general we should only interact with a function or class via its explicit interfaces.
 
 ### Tests should be independent
 
@@ -419,7 +419,7 @@ def test_get_initials():
     assert people_df['initials'].tolist() == ['AS', 'BH', 'CA']
 ```
 
-These tests run correctly, but the same tests fail if we change their order such that `test_get_intials()` runs first, because the necessary columns (`initials`) has not yet been created.  
+These tests run correctly, but the same tests fail if we change their order such that `test_get_intials()` runs first, because the necessary columns (`firstname` and `lastname`) have not yet been created.  
 
 One simple way to deal with this is to set up all of the necessary structure locally within each test:
 
@@ -505,13 +505,8 @@ E        +    where <built-in function sqrt> = math.sqrt
 Here we see that the value returned by our function is different from the one expected by the test; in this case, the test value generated by Copilot is incorrect.  In our research, it was not uncommon for ChatGPT to generate incorrect test values, so these must always be checked by a domain expert.  Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:
 
 ```bash
-python -m pytest src/codingforscience/simple_testing
-==================== test session starts =====================
-platform darwin -- Python 3.12.0, pytest-8.3.3, pluggy-1.5.0
-rootdir: /Users/poldrack/Dropbox/code/coding_for_science
-configfile: pyproject.toml
-plugins: cov-5.0.0, hypothesis-6.115.3, mock-3.14.0, anyio-4.6.2.post1
-collected 6 items                                            
+python -m pytest pytest src/BetterCodeBetterScience/distance_testing
+==================== test session starts =====================                                     
 
 src/codingforscience/simple_testing/test_distance.py . [ 16%]
 .....                                                  [100%]
@@ -590,7 +585,7 @@ FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4
 ===================================== 1 failed in 0.12s =====================================
 ```
  
-It seems that the first two assertions pass but the third one, for Mars, fails.  This failure took a bit of digging to fully understand.  In this case, the code and test value are both correct, depending on where you stand on Jupiter! The problem is that planets are *oblate*, meaning that they are slightly flattened such that the radius around the equator is higher than at other points.  NASA’s [Jupiter fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html) claims an escape velocity of 59.5 km/s, which seems to be the source of the test value.  This is correct when computed using the equatorial radius of 71492 km.  However, the radius given for Jupiter in GPT-4's test (69911 km) is the volumetric mean radius rather than the equatorial radius, and the value generated by the code (60.2 km/s) is correct when computed using the volumetric mean radius.  Thus, the test failed not due to any problems with the code itself, but due to a mismatch in assumptions regarding the combination of test values.  This example highlights the importance of understanding and checking the tests that are generated by AI coding tools.
+It seems that the first two assertions pass but the third one, for Jupiter, fails.  This failure took a bit of digging to fully understand.  In this case, the code and test value are both correct, depending on where you stand on Jupiter! The problem is that planets are *oblate*, meaning that they are slightly flattened such that the radius around the equator is higher than at other points.  NASA’s [Jupiter fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html) claims an escape velocity of 59.5 km/s, which seems to be the source of the test value.  This is correct when computed using the equatorial radius of 71492 km.  However, the radius given for Jupiter in GPT-4's test (69911 km) is the volumetric mean radius rather than the equatorial radius, and the value generated by the code (60.2 km/s) is correct when computed using the volumetric mean radius.  Thus, the test failed not due to any problems with the code itself, but due to a mismatch in assumptions regarding the combination of test values.  This example highlights the importance of understanding and checking the tests that are generated by AI coding tools.
 
 ## Testing and AI-assisted coding
 
@@ -1066,3 +1061,5 @@ If the tests for a project take too long to run, they are not going to be run re
 ## Possible TODOs:
 
 - Fuzzing for web-facing applications: The idea of *fuzzing* (also sometimes called *monkey testing* involves throwing random inputs at an application to look for potential crashes or security problems.  Fuzzing is particularly important when one is developing a web facing application such as a web API.  
+
+[^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
