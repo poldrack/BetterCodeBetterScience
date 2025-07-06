@@ -62,6 +62,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'testing';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Bibliography" href="bibliography.html" />
+    <link rel="prev" title="Principles of software engineering" href="software_engineering.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -124,8 +126,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -175,10 +175,11 @@
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="essential_tools_and_techniques.html">Essential tools and techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="software_engineering.html">Principles of software engineering</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Software testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
 </ul>
 
@@ -386,6 +387,19 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">Bug-driven testing: Any time you encounter a bug, write a test</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-structure-of-a-good-test">The structure of a good test</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-against-the-interface-not-the-implementation">Test against the interface, not the implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-should-be-independent">Tests should be independent</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-frameworks">Testing frameworks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#potential-problems-with-ai-generated-tests">Potential problems with AI-generated tests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-driven-development-and-ai-assisted-coding">Test-driven development and AI-assisted coding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-coverage">Test coverage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-fixtures">Test fixtures</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking">Mocking</a></li>
 </ul>
             </nav>
         </div>
@@ -400,7 +414,7 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="software-testing">
 <h1>Software testing<a class="headerlink" href="#software-testing" title="Permalink to this heading">#</a></h1>
 <p>Tests define the expected behavior of code, and detect when the code doesn’t match that expected behavior.</p>
-<p>One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a <em>control</em> line; if this line didn’t show up, then that meant that the test was not functioning as expected.  This is known as a <em>positive control</em> because it assesses the test’s ability to identify a positive response.  Other tests also include <em>negative controls</em>, which ensure that the test returns a negative result when it should.</p>
+<p>One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a <em>control</em> line; if this line didn’t show up, then that meant that the test was not functioning as expected.  This is known as a <em>positive control</em> because it assesses the test’s ability to identify a positive response<a class="footnote-reference brackets" href="#id3" id="id1">1</a>.  Other tests also include <em>negative controls</em>, which ensure that the test returns a negative result when it should.</p>
 <p>By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.  A positive test assesses whether, given a particular valid input, the component returns the correct output.  A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.</p>
 <section id="why-use-software-tests">
 <h2>Why use software tests?<a class="headerlink" href="#why-use-software-tests" title="Permalink to this heading">#</a></h2>
@@ -413,7 +427,7 @@ document.write(`
 <h2>Types of tests<a class="headerlink" href="#types-of-tests" title="Permalink to this heading">#</a></h2>
 <section id="unit-tests">
 <h3>Unit tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading">#</a></h3>
-<p>Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing “garbage in, garbage out” behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as <em>NaN</em>, or “not a number”).</p>
+<p>Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing “garbage in, garbage out” behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as <em>NaN</em>, or “not a number”).  That is, we want to aim for “garbage in, exception out” behavior.</p>
 </section>
 <section id="integration-tests">
 <h3>Integration tests<a class="headerlink" href="#integration-tests" title="Permalink to this heading">#</a></h3>
@@ -461,7 +475,7 @@ document.write(`
 
 src/BetterCodeBetterScience/escape_velocity.py<span class="w"> </span>..<span class="w">          </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
 
-<span class="o">=======================</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.10s<span class="w"> </span><span class="o">=======================</span>
+<span class="o">=======================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.10s<span class="w"> </span><span class="o">=======================</span>
 </pre></div>
 </div>
 <p>If the returned value didn’t match the known value (within a given level of tolerance, which is handled by <code class="docutils literal notranslate"><span class="pre">np.allclose()</span></code>), then the assertion will fail and raise an exception, causing the test to fail.  For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:</p>
@@ -666,7 +680,7 @@ FAILED src/BetterCodeBetterScience/bug_driven_testing.py::test_find_outliers_ide
         <span class="k">return</span> <span class="p">[]</span>
 </pre></div>
 </div>
-<p>Here we add a comment to explain the logic of the test. Running the tests now will show that the problem is fixed:</p>
+<p>Here we add a comment to explain the intention of the statement. Running the tests now will show that the problem is fixed:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
 =========================== test session starts ===========================
 collected 2 items
@@ -679,6 +693,497 @@ src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
 </div>
 <p>Now we can continue coding with confidence that if we happen to accidentally reintroduce the bug, it will be caught.</p>
 </section>
+</section>
+<section id="the-structure-of-a-good-test">
+<h2>The structure of a good test<a class="headerlink" href="#the-structure-of-a-good-test" title="Permalink to this heading">#</a></h2>
+<p>A commonly used scheme for writing a test is “given/when/then”:</p>
+<ul class="simple">
+<li><p>given some particular situation as background</p></li>
+<li><p>when something happens (such as a particular input)</p></li>
+<li><p>then something else should happen (such as a particular output or exception)</p></li>
+</ul>
+<p>Importantly, a test should only test one thing at a time.  This doesn’t mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation (“given/when”), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly (“then”).  You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one) that together define the condition that we are interested in testing for.</p>
+<p>How do we test that the output of a function is correct given the input?  There are different answers for different situations:</p>
+<ul class="simple">
+<li><p><em>commonly known answer</em>: Sometimes we possess inputs where the output is known.  For example, if we were creating a function that computes the circumference of a circle, then we know that the output for an input radius of 1 should be 2 * pi.  This is generally only the case for very simple functions.</p></li>
+<li><p><em>reference implementation</em>: In other cases we may have a standard implementation of an algorithm that we can compare against.  While in general it’s not a good idea to reimplement code that already exists in a standard library, in come cases we may want to extend existing code but also check that the basic version still works as planned.</p></li>
+<li><p><em>parallel implementation</em>: Some times we don’t have a reference implementation, but we can code up another parallel implementation to compare our code to.  It’s important that this isn’t just a copy of the code used in the function; in that case, it’s really not a test at all!</p></li>
+<li><p><em>behavioral test</em>: Sometimes the best we can do is to run the code repeatedly and ensure that it behaves as expected on average.  For example, if a function outputs a numerical value and we know the expected distribution of that value given a particular input, we can ensure that the result matches that distribution with a high probability.  Such <em>probabilistic tests</em> are not optimal in the sense that they can occasionally fail even when the code is correct, but they are sometimes the best we can do.</p></li>
+</ul>
+<section id="test-against-the-interface-not-the-implementation">
+<h3>Test against the interface, not the implementation<a class="headerlink" href="#test-against-the-interface-not-the-implementation" title="Permalink to this heading">#</a></h3>
+<p>A good test shouldn’t know about the internal implementation details of the function that it is testing, and changes in the internal code that do not modify the input-output relationship should not affect the test.  That is, from the standpoint of the test, a function should be a “black box”.</p>
+<p>The most common way in which a test can violate this principle is by accessing the internal variables of a class that it is testing.  For example, we might generate a class that performs a scaling operation on a numpy matrix:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SimpleScaler</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformed_</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">std_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformed_</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_</span>
+
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We could write a test that checks the values returned by the <code class="docutils literal notranslate"><span class="pre">fit_transform()</span></code> method, treating the the class as a black box:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_simple_scaler_interface</span><span class="p">():</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+    <span class="n">scaler</span> <span class="o">=</span> <span class="n">SimpleScaler</span><span class="p">()</span>
+    
+    <span class="c1"># Test the interface without accessing internals</span>
+    <span class="n">transformed_X</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">transformed_X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">transformed_X</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Alternatively one might use knowledge of the internals of the class to test the transformed value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_simple_scaler_internals</span><span class="p">():</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+    <span class="n">scaler</span> <span class="o">=</span> <span class="n">SimpleScaler</span><span class="p">()</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    
+    <span class="c1"># Test that the transformed data is correct using the internal</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">scaler</span><span class="o">.</span><span class="n">transformed_</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">scaler</span><span class="o">.</span><span class="n">transformed_</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+
+</pre></div>
+</div>
+<p>Both of these tests pass against the class definition shown above. However, if we were to change the way that the transformation is performed (for example, we decide to use the <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> function from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> instead of writing our own), then the implementation-aware tests are likely to fail unless the sample internal variable names are used.  In general we should only interact with a function or class via its explicit interfaces.</p>
+</section>
+<section id="tests-should-be-independent">
+<h3>Tests should be independent<a class="headerlink" href="#tests-should-be-independent" title="Permalink to this heading">#</a></h3>
+<p>In scientific computing it’s common to compose many different operations into a workflow.  If we want to test the workflow, then the tests of later steps in the workflow must necessarily rely upon earlier steps.  We could in theory write a set of tests that operate on a shared object, but the tests would fail if executed in an incorrect order, even if the code was correct.  Similarly, a failure on an early test would cause cascading failures in later tests, even if their code was correct.  The use of ordered tests also prevents the parallel execution of tests, which may slow down testing for complex projects.  For these reasons, we should always aim to create tests that can be executed independently.</p>
+<p>Here is an example where coupling between tests could cause failures.  First we generate two functions that make changes in place to a data frame:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">split_names</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;firstname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;lastname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">get_initials</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;initials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;firstname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;lastname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+</pre></div>
+</div>
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">get_initials()</span></code> function relies upon the <code class="docutils literal notranslate"><span class="pre">split_names()</span></code> function having been run, since otherwise the necessary columns won’t exist in the data frame. We can then create tests for each of these, and a data frame that they can both use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">people_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Alice Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob Howard&#39;</span><span class="p">,</span> <span class="s1">&#39;Charlie Ashe&#39;</span><span class="p">]})</span> 
+
+<span class="k">def</span> <span class="nf">test_split_names</span><span class="p">():</span>
+    <span class="n">split_names</span><span class="p">(</span><span class="n">people_df</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">people_df</span><span class="p">[</span><span class="s1">&#39;firstname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;Charlie&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">people_df</span><span class="p">[</span><span class="s1">&#39;lastname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Howard&#39;</span><span class="p">,</span> <span class="s1">&#39;Ashe&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">test_get_initials</span><span class="p">():</span>
+    <span class="n">get_initials</span><span class="p">(</span><span class="n">people_df</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">people_df</span><span class="p">[</span><span class="s1">&#39;initials&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;AS&#39;</span><span class="p">,</span> <span class="s1">&#39;BH&#39;</span><span class="p">,</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>These tests run correctly, but the same tests fail if we change their order such that <code class="docutils literal notranslate"><span class="pre">test_get_intials()</span></code> runs first, because the necessary columns (<code class="docutils literal notranslate"><span class="pre">firstname</span></code> and <code class="docutils literal notranslate"><span class="pre">lastname</span></code>) have not yet been created.</p>
+<p>One simple way to deal with this is to set up all of the necessary structure locally within each test:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="k">def</span> <span class="nf">get_people_df</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Alice Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob Howard&#39;</span><span class="p">,</span> <span class="s1">&#39;Charlie Ashe&#39;</span><span class="p">]})</span> 
+
+<span class="k">def</span> <span class="nf">test_split_names_fullsetup</span><span class="p">():</span>
+    <span class="n">local_people_df</span> <span class="o">=</span> <span class="n">get_people_df</span><span class="p">()</span>
+    <span class="n">split_names</span><span class="p">(</span><span class="n">local_people_df</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">local_people_df</span><span class="p">[</span><span class="s1">&#39;firstname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;Charlie&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">local_people_df</span><span class="p">[</span><span class="s1">&#39;lastname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Howard&#39;</span><span class="p">,</span> <span class="s1">&#39;Ashe&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">test_get_initials_fullsetup</span><span class="p">():</span>
+    <span class="n">local_people_df</span> <span class="o">=</span> <span class="n">get_people_df</span><span class="p">()</span>
+    <span class="n">split_names</span><span class="p">(</span><span class="n">local_people_df</span><span class="p">)</span>
+    <span class="n">get_initials</span><span class="p">(</span><span class="n">local_people_df</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">local_people_df</span><span class="p">[</span><span class="s1">&#39;initials&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;AS&#39;</span><span class="p">,</span> <span class="s1">&#39;BH&#39;</span><span class="p">,</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>For simple functions like these this would not cause too much computational overhead, but for computationally intensive functions we would like to be able to reuse the results from the first time each function is run.  In a later section we will discuss the use of <em>fixtures</em> which allow this kind of reuse across tests while avoiding the ordering problems that we saw above when using a global variable across tests.</p>
+</section>
+</section>
+<section id="testing-frameworks">
+<h2>Testing frameworks<a class="headerlink" href="#testing-frameworks" title="Permalink to this heading">#</a></h2>
+<p>One could write tests without the help of any specialized packages, but we generally use a testing framework to help automate the activities of testing.  There are several testing frameworks for Python; we will focus on the popular and flexible <code class="docutils literal notranslate"><span class="pre">pytest</span></code> framework.</p>
+<p>We will start with a very simple example: a function that generates the Euclidean distance between two points.  Copilot generates the following for us based on the prompt in the comment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate a function that calculates the distance between two points</span>
+<span class="c1"># where each point is defined as a tuple of two numbers</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the distance between two points&quot;&quot;&quot;</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">p1</span>
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">p2</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we would like to generate some tests for this code to make sure that it works properly. If we ask Copilot to generate some tests, it does a seeming decent job:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_distance_zero</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">test_distance_positive_coordinates</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">==</span> <span class="mi">5</span>
+
+<span class="k">def</span> <span class="nf">test_distance_negative_coordinates</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">))</span> <span class="o">==</span> <span class="mi">5</span>
+
+<span class="k">def</span> <span class="nf">test_distance_mixed_coordinates</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">125</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_distance_same_x</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span> <span class="o">==</span> <span class="mi">4</span>
+
+<span class="k">def</span> <span class="nf">test_distance_same_y</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">distance</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="o">==</span> <span class="mi">4</span>
+</pre></div>
+</div>
+<p>Now that we have our tests, we can run them using the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>src/BetterCodeBetterScience/distance_testing
+</pre></div>
+</div>
+<p>This command will cause pytest to search (by default) for any files named <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*_test.py</span></code> in the relevant path, and the select any functions whose name starts with the prefix “test”.  Running those tests, we get an error:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w">       </span>assert<span class="w"> </span>distance<span class="o">((</span><span class="m">1</span>,<span class="w"> </span>-2<span class="o">)</span>,<span class="w"> </span><span class="o">(</span>-4,<span class="w"> </span><span class="m">6</span><span class="o">))</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>math.sqrt<span class="o">(</span><span class="m">125</span><span class="o">)</span>
+E<span class="w">       </span>assert<span class="w"> </span><span class="m">9</span>.433981132056603<span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">11</span>.180339887498949
+E<span class="w">        </span>+<span class="w">  </span>where<span class="w"> </span><span class="m">9</span>.433981132056603<span class="w"> </span><span class="o">=</span><span class="w"> </span>distance<span class="o">((</span><span class="m">1</span>,<span class="w"> </span>-2<span class="o">)</span>,<span class="w"> </span><span class="o">(</span>-4,<span class="w"> </span><span class="m">6</span><span class="o">))</span>
+E<span class="w">        </span>+<span class="w">  </span>and<span class="w">   </span><span class="m">11</span>.180339887498949<span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;built-in<span class="w"> </span><span class="k">function</span><span class="w"> </span>sqrt&gt;<span class="o">(</span><span class="m">125</span><span class="o">)</span>
+E<span class="w">        </span>+<span class="w">    </span>where<span class="w"> </span>&lt;built-in<span class="w"> </span><span class="k">function</span><span class="w"> </span>sqrt&gt;<span class="w"> </span><span class="o">=</span><span class="w"> </span>math.sqrt
+</pre></div>
+</div>
+<p>Here we see that the value returned by our function is different from the one expected by the test; in this case, the test value generated by Copilot is incorrect.  In our research, it was not uncommon for ChatGPT to generate incorrect test values, so these must always be checked by a domain expert.  Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>pytest<span class="w"> </span>src/BetterCodeBetterScience/distance_testing
+<span class="o">====================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">=====================</span><span class="w">                                     </span>
+
+src/codingforscience/simple_testing/test_distance.py<span class="w"> </span>.<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">16</span>%<span class="o">]</span>
+.....<span class="w">                                                  </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">=====================</span><span class="w"> </span><span class="m">6</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.06s<span class="w"> </span><span class="o">======================</span>
+</pre></div>
+</div>
+<section id="potential-problems-with-ai-generated-tests">
+<h3>Potential problems with AI-generated tests<a class="headerlink" href="#potential-problems-with-ai-generated-tests" title="Permalink to this heading">#</a></h3>
+<p>If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.  One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong.</p>
+<p>In our early project that examined the performance of GPT-4 for coding <span id="id2">[<a class="reference internal" href="bibliography.html#id17" title="Russell A Poldrack, Thomas Lu, and Gašper Beguš. Ai-assisted coding: experiments with gpt-4. 2023. URL: https://arxiv.org/abs/2304.13187, arXiv:2304.13187.">Poldrack <em>et al.</em>, 2023</a>]</span>, one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.  One of the functions that was generated was the escape velocity function shown above, for which GPT-4 generated the <a class="reference external" href="https://github.com/poldrack/ai-coding-experiments/blob/main/data/conceptual_prompting/testdirs/conceptual_prompting06/test_answer.py">following test</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_escape_velocity</span><span class="p">():</span>
+
+    <span class="n">mass_earth</span> <span class="o">=</span> <span class="mf">5.972e24</span>
+    <span class="n">radius_earth</span> <span class="o">=</span> <span class="mf">6.371e6</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">escape_velocity</span><span class="p">(</span><span class="n">mass_earth</span><span class="p">,</span> <span class="n">radius_earth</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">pytest</span><span class="o">.</span><span class="n">approx</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">==</span> <span class="mf">11186.25</span>
+
+    <span class="n">mass_mars</span> <span class="o">=</span> <span class="mf">6.4171e23</span>
+    <span class="n">radius_mars</span> <span class="o">=</span> <span class="mf">3.3895e6</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">escape_velocity</span><span class="p">(</span><span class="n">mass_mars</span><span class="p">,</span> <span class="n">radius_mars</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">pytest</span><span class="o">.</span><span class="n">approx</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">==</span> <span class="mf">5027.34</span>
+
+    <span class="n">mass_jupiter</span> <span class="o">=</span> <span class="mf">1.8982e27</span>
+    <span class="n">radius_jupiter</span> <span class="o">=</span> <span class="mf">6.9911e7</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">escape_velocity</span><span class="p">(</span><span class="n">mass_jupiter</span><span class="p">,</span> <span class="n">radius_jupiter</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">pytest</span><span class="o">.</span><span class="n">approx</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">==</span> <span class="mf">59564.97</span>
+</pre></div>
+</div>
+<p>When we run this test (renaming it <code class="docutils literal notranslate"><span class="pre">test_escape_velocity_gpt4</span></code>), we see that one of the tests fails:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>pytest<span class="w"> </span>src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4
+<span class="o">====================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">====================================</span>
+platform<span class="w"> </span>darwin<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.12.0,<span class="w"> </span>pytest-8.4.1,<span class="w"> </span>pluggy-1.5.0
+rootdir:<span class="w"> </span>/Users/poldrack/Dropbox/code/BetterCodeBetterScience
+configfile:<span class="w"> </span>pyproject.toml
+plugins:<span class="w"> </span>cov-5.0.0,<span class="w"> </span>anyio-4.6.0,<span class="w"> </span>hypothesis-6.115.3,<span class="w"> </span>mock-3.14.0
+collected<span class="w"> </span><span class="m">1</span><span class="w"> </span>item
+
+src/BetterCodeBetterScience/escape_velocity.py<span class="w"> </span>F<span class="w">                                      </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">=========================================</span><span class="w"> </span><span class="nv">FAILURES</span><span class="w"> </span><span class="o">==========================================</span>
+_________________________________<span class="w"> </span>test_escape_velocity_gpt4<span class="w"> </span>_________________________________
+
+<span class="w">    </span>def<span class="w"> </span>test_escape_velocity_gpt4<span class="o">()</span>:
+
+<span class="w">        </span><span class="nv">mass_earth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span>.972e24
+<span class="w">        </span><span class="nv">radius_earth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span>.371e6
+<span class="w">        </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>escape_velocity<span class="o">(</span>mass_earth,<span class="w"> </span>radius_earth<span class="o">)</span>
+<span class="w">        </span>assert<span class="w"> </span>pytest.approx<span class="o">(</span>result,<span class="w"> </span><span class="nv">rel</span><span class="o">=</span>1e-3<span class="o">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">11186</span>.25
+
+<span class="w">        </span><span class="nv">mass_mars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span>.4171e23
+<span class="w">        </span><span class="nv">radius_mars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>.3895e6
+<span class="w">        </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>escape_velocity<span class="o">(</span>mass_mars,<span class="w"> </span>radius_mars<span class="o">)</span>
+<span class="w">        </span>assert<span class="w"> </span>pytest.approx<span class="o">(</span>result,<span class="w"> </span><span class="nv">rel</span><span class="o">=</span>1e-3<span class="o">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">5027</span>.34
+
+<span class="w">        </span><span class="nv">mass_jupiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>.8982e27
+<span class="w">        </span><span class="nv">radius_jupiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6</span>.9911e7
+<span class="w">        </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>escape_velocity<span class="o">(</span>mass_jupiter,<span class="w"> </span>radius_jupiter<span class="o">)</span>
+&gt;<span class="w">       </span>assert<span class="w"> </span>pytest.approx<span class="o">(</span>result,<span class="w"> </span><span class="nv">rel</span><span class="o">=</span>1e-3<span class="o">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">59564</span>.97
+E<span class="w">       </span>assert<span class="w"> </span><span class="m">60202</span>.716344497014<span class="w"> </span>±<span class="w"> </span><span class="m">60</span>.2027<span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">59564</span>.97
+E
+E<span class="w">         </span>comparison<span class="w"> </span>failed
+E<span class="w">         </span>Obtained:<span class="w"> </span><span class="m">59564</span>.97
+E<span class="w">         </span>Expected:<span class="w"> </span><span class="m">60202</span>.716344497014<span class="w"> </span>±<span class="w"> </span><span class="m">60</span>.2027
+
+src/BetterCodeBetterScience/escape_velocity.py:52:<span class="w"> </span><span class="nv">AssertionError</span>
+<span class="o">==================================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">==================================</span>
+FAILED<span class="w"> </span>src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4<span class="w"> </span>-<span class="w"> </span>assert<span class="w"> </span><span class="m">60202</span>.716344497014<span class="w"> </span>±<span class="w"> </span><span class="m">60</span>.2027<span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">59564</span>.97
+<span class="o">=====================================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>failed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.12s<span class="w"> </span><span class="o">=====================================</span>
+</pre></div>
+</div>
+<p>It seems that the first two assertions pass but the third one, for Jupiter, fails.  This failure took a bit of digging to fully understand.  In this case, the code and test value are both correct, depending on where you stand on Jupiter! The problem is that planets are <em>oblate</em>, meaning that they are slightly flattened such that the radius around the equator is higher than at other points.  NASA’s <a class="reference external" href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html">Jupiter fact sheet</a> claims an escape velocity of 59.5 km/s, which seems to be the source of the test value.  This is correct when computed using the equatorial radius of 71492 km.  However, the radius given for Jupiter in GPT-4’s test (69911 km) is the volumetric mean radius rather than the equatorial radius, and the value generated by the code (60.2 km/s) is correct when computed using the volumetric mean radius.  Thus, the test failed not due to any problems with the code itself, but due to a mismatch in assumptions regarding the combination of test values.  This example highlights the importance of understanding and checking the tests that are generated by AI coding tools.</p>
+</section>
+</section>
+<section id="test-driven-development-and-ai-assisted-coding">
+<h2>Test-driven development and AI-assisted coding<a class="headerlink" href="#test-driven-development-and-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
+<p>Here we will dive into a more realistic example of an application that one might develop using AI assistance, specifically looking at how we could develop the application using a test-driven development (TDD) approach.  We will develop a Python application that takes in a query for the PubMed database and returns a data frame containing the number of database records matching that query for each year. We start by decomposing the problem and sketching out the main set of functions that we will need to develop, with understandable names for each:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_PubmedIDs_for_query</span></code>: A function that will search pubmed for a given query and return a list of pubmed IDs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_record_from_PubmedID</span></code>: A function that will retrieve the record for a given pubmed ID</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parse_year_from_Pubmed_record</span></code>: A function that will parse a record to extract the year of publication</p></li>
+<li><p>A function that will summarize the number of records per year</p></li>
+<li><p>The main function that will take in a query and return a data frame with the number of records per year for the query</p></li>
+</ul>
+<p>We start by creating <code class="docutils literal notranslate"><span class="pre">get_PubmedIDs_for_query</span></code>.  We could use the <code class="docutils literal notranslate"><span class="pre">Biopython.Entrez</span></code> module to perform this search, but Biopython is a relatively large module that could introduce technical debt.  Instead, we will directly retrieve the result using the Entrez API and the built-in <code class="docutils literal notranslate"><span class="pre">requests</span></code> module. Note that for all of the code shown here we will not include docstrings, but they are available in the code within the repository.</p>
+<p>If we are using the TDD approach, we would first want to develop a set of tests to make sure that our function is working correctly.  The following three tests specify several different outcomes that we might expect. First, we give a query that is known to give a valid result, and test whether it in fact gives such a result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_valid</span><span class="p">():</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;free energy&#39;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># make sure that a list is returned</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>       
+    <span class="c1"># make sure the list is not empty</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>                 
+</pre></div>
+</div>
+<p>Second, we give a query with a known empty result, and make sure it returns an empty list:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_empty</span><span class="p">():</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;fizzbuzz&#39;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># make sure that a list is returned</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>   
+    <span class="c1"># make sure the resulting list is empty</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>With the minimal tests in place, we then move to writing the code for the module.  We first create an empty function to ensure that the tests fail:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                            <span class="n">retmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">esearch_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>The test result shows that all of the tests fail:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-v<span class="w"> </span>tests/textmining
+<span class="o">==================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">===================================</span>
+...
+tests/textmining/test_textmining.py::test_get_PubmedIDs_for_query_check_valid<span class="w"> </span>FAILED<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">50</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_get_PubmedIDs_for_query_check_empty<span class="w"> </span>FAILED<span class="w"> </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">========================================</span><span class="w"> </span><span class="nv">FAILURES</span><span class="w"> </span><span class="o">========================================</span>
+________________________<span class="w"> </span>test_get_PubmedIDs_for_query_check_valid<span class="w"> </span>________________________
+
+<span class="nv">ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>None
+
+<span class="w">    </span>def<span class="w"> </span>test_get_PubmedIDs_for_query_check_valid<span class="o">(</span>ids<span class="o">)</span>:
+&gt;<span class="w">       </span>assert<span class="w"> </span>isinstance<span class="o">(</span>ids,<span class="w"> </span>list<span class="o">)</span>
+E<span class="w">       </span>assert<span class="w"> </span>False
+E<span class="w">        </span>+<span class="w">  </span>where<span class="w"> </span><span class="nv">False</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>isinstance<span class="o">(</span>None,<span class="w"> </span>list<span class="o">)</span>
+
+tests/textmining/test_textmining.py:32:<span class="w"> </span>AssertionError
+________________________<span class="w"> </span>test_get_PubmedIDs_for_query_check_empty<span class="w"> </span>________________________
+
+<span class="w">    </span>def<span class="w"> </span>test_get_PubmedIDs_for_query_check_empty<span class="o">()</span>:
+<span class="w">        </span><span class="nv">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;friston-k AND &#39;fizzbuzz&#39;&quot;</span>
+<span class="w">        </span><span class="nv">ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>get_PubmedIDs_for_query<span class="o">(</span>query<span class="o">)</span>
+&gt;<span class="w">       </span>assert<span class="w"> </span>len<span class="o">(</span>ids<span class="o">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span>
+<span class="w">               </span>^^^^^^^^
+E<span class="w">       </span>TypeError:<span class="w"> </span>object<span class="w"> </span>of<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s1">&#39;NoneType&#39;</span><span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span>len<span class="o">()</span>
+
+tests/textmining/test_textmining.py:39:<span class="w"> </span><span class="nv">TypeError</span>
+<span class="o">================================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">=================================</span>
+FAILED<span class="w"> </span>tests/textmining/test_textmining.py::test_get_PubmedIDs_for_query_check_valid<span class="w"> </span>-<span class="w"> </span>assert<span class="w"> </span>False
+FAILED<span class="w"> </span>tests/textmining/test_textmining.py::test_get_PubmedIDs_for_query_check_empty<span class="w"> </span>-<span class="w"> </span>TypeError:<span class="w"> </span>object<span class="w"> </span>of<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s1">&#39;NoneType&#39;</span><span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span>len<span class="o">()</span>
+<span class="o">===================================</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>failed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.12s<span class="w"> </span><span class="o">====================================</span>
+</pre></div>
+</div>
+<p>Now we work with Copilot write the code to make the tests pass:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the eutils base URL globally for the module</span>
+<span class="c1"># - not best practice but probably ok here</span>
+<span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">get_PubmedIDs_for_query</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">esearch_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search database for a given query and return a list of IDs.</span>
+<span class="sd">    :param query: str, the query to search for</span>
+<span class="sd">    :param retmax: int, the maximum number of results to return</span>
+<span class="sd">    :base_url: str, the base url for the pubmed search</span>
+<span class="sd">    :return: list, a list of pubmed IDs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># define the base url for the pubmed search</span>
+    <span class="k">if</span> <span class="n">esearch_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">esearch_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/esearch.fcgi&quot;</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">format_pubmed_query_params</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">retmax</span><span class="o">=</span><span class="n">retmax</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">esearch_url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_idlist_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">format_pubmed_query_params</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Format a query for use with the pubmed api.</span>
+<span class="sd">    :param query: str, the query to format</span>
+<span class="sd">    :return: dict, the formatted query dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># define the parameters for the search</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;db&quot;</span><span class="p">:</span> <span class="s2">&quot;pubmed&quot;</span><span class="p">,</span> <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;retmode&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;retmax&quot;</span><span class="p">:</span> <span class="n">retmax</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">get_idlist_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="c1"># extract the pubmed IDs from the response</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;esearchresult&quot;</span><span class="p">][</span><span class="s2">&quot;idlist&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ids</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad request&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that we have split parts of the functionality into separate functions in order to make the code more understandable.  Running the tests, we see that both of them pass.  Assuming that our tests cover all possible outcomes of interest, we can consider our function complete.  We can also add additional tests to cover additional functions that we generated; we won’t go into the details here, but you can see them on the Github repo.</p>
+</section>
+<section id="test-coverage">
+<h2>Test coverage<a class="headerlink" href="#test-coverage" title="Permalink to this heading">#</a></h2>
+<p>It can be useful to know if there are any portions of our code that are not being exercised by our tests, which is known as <em>code coverage</em>.  The <code class="docutils literal notranslate"><span class="pre">pytest-cov</span></code> extension for the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing package can provide us with a report of test coverage for these tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>----------<span class="w"> </span>coverage:<span class="w"> </span>platform<span class="w"> </span>darwin,<span class="w"> </span>python<span class="w"> </span><span class="m">3</span>.12.0-final-0<span class="w"> </span>----------
+Name<span class="w">                                                   </span>Stmts<span class="w">   </span>Miss<span class="w">  </span>Cover<span class="w">   </span>Missing
+------------------------------------------------------------------------------------
+src/BetterCodeBetterScience/textmining/textmining.py<span class="w">      </span><span class="m">30</span><span class="w">      </span><span class="m">1</span><span class="w">    </span><span class="m">97</span>%<span class="w">   </span><span class="m">70</span>
+------------------------------------------------------------------------------------
+TOTAL<span class="w">                                                     </span><span class="m">30</span><span class="w">      </span><span class="m">1</span><span class="w">    </span><span class="m">97</span>%
+</pre></div>
+</div>
+<p>This report shows that of the 30 statements in our code, one of them is not covered by the tests.  When we look at the missing code (denoted as being on line 70), we see that the missing line is this one from <code class="docutils literal notranslate"><span class="pre">get_idlist_from_response</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># raise an exception if the search didn&#39;t return a usable response</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad request&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since none of our test cases caused a bad request to occur, this line never gets executed in the tests. We can address this by adding a test that makes sure that an exception is raised if an invalid base url is provided. To check for an exception, we need to use the <code class="docutils literal notranslate"><span class="pre">pytest.raises</span></code> context manager:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_badurl</span><span class="p">():</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;free energy&#39;&quot;</span>
+    <span class="c1"># bad url</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="s1">&#39;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.f&#39;</span>
+    
+    <span class="c1"># make sure that the function raises an exception</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">)</span>
+    
+</pre></div>
+</div>
+<p>After adding this test, we see that we now have 100% coverage. It’s important not to get too hung up on test coverage; rather than always aspiring to 100% coverage, it’s important to make sure that the most likely possible situations are tested.  Just because you have 100% coverage doesn’t mean that your code is perfectly tested, since there could always be situations that you haven’t checked for. And spending too much time testing for unlikely problems can divert your efforts from other most useful activities.</p>
+</section>
+<section id="test-fixtures">
+<h2>Test fixtures<a class="headerlink" href="#test-fixtures" title="Permalink to this heading">#</a></h2>
+<p>Sometimes we need to use a the same data for multiple tests. Rather than duplicating potentially time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a <em>test fixture</em>.  This also helps maintain isolation between tests, since the order of tests shouldn’t matter if an appropriate fixture is generated as soon as it’s needed.</p>
+<p>For our example above, it’s likely that we will need to reuse the list of pubmed IDs from the search to perform various tests on the subsequent functions.  We can create a single version of this list of IDs by creating a fixture. In the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> framework we do this using a special Python operator called a <em>decorator</em>, which is denoted by the symbol <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> as a prefix. A decorator is function that takes another function as input, modifies its functionality, and returns another function; you don’t need to understand in detail how decorators work for this particular usage.  To refactor our tests above, we would first create the fixture by decorating the function that generates the fixture with the <code class="docutils literal notranslate"><span class="pre">&#64;pytest.fixture</span></code> decorator, setting the <code class="docutils literal notranslate"><span class="pre">scope</span></code> variable to “session” so that the fixture is only generated once within the session:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ids</span><span class="p">():</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;free energy&#39;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ids</span>
+</pre></div>
+</div>
+<p>We can then refactor our tests for a valid query to use the fixture by passing it as an argument to the test function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_valid</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>The result is the same, but we now have a set of ids that we can reuse in subsequent tests, so that we don’t have to make repeated queries.  It’s important to note while using a session-scoped fixture: If any of the subsequent tests modify the fixture, those modifications will persist, which will break the isolation between tests.  We could prevent this by removing the <code class="docutils literal notranslate"><span class="pre">scope=&quot;session&quot;</span></code> argument, which would then default to the standard scope which is within a specific function.  If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g. <code class="docutils literal notranslate"><span class="pre">my_ids</span> <span class="pre">=</span> <span class="pre">ids.copy()</span></code>) so that the global fixture object won’t be modified.</p>
+</section>
+<section id="mocking">
+<h2>Mocking<a class="headerlink" href="#mocking" title="Permalink to this heading">#</a></h2>
+<p>Sometimes tests require infrastructure that is outside of the control of the tester. In the example above, we are assuming that the Pubmed API is working correctly for our tests to run; if we were to try to run these tests without an internet connection, they would fail.  In other cases, code may rely upon a database system that may or may not exist on a particular system.  In these cases, we can create a mock object that can stand in for and simulate the behavior of the system that the code needs to interact with.</p>
+<p>In our example, we want to create a mock response that looks sufficiently like a response from the real API to pass our tests.  Using pytest’s <em>monkeypatch</em> fixture, we can temporarily replace the real requests.get function with our own fake function that returns a predictable, controlled response.  We first need to create a class that can replace the <code class="docutils literal notranslate"><span class="pre">requests.get</span></code> call in <code class="docutils literal notranslate"><span class="pre">get_PubmedIDs_for_query</span></code>, replacing it with a mock version that outputs a fixed simulacrum of an API response via its <code class="docutils literal notranslate"><span class="pre">.json()</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MockPubmedResponse</span><span class="p">:</span>
+    <span class="n">status_code</span> <span class="o">=</span> <span class="mi">200</span>
+
+    <span class="k">def</span> <span class="nf">json</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;esearch&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;0.3&#39;</span><span class="p">},</span>
+            <span class="s1">&#39;esearchresult&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;retmax&#39;</span><span class="p">:</span> <span class="s1">&#39;20&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;retstart&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;idlist&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;39312494&#39;</span><span class="p">,</span> <span class="s1">&#39;39089179&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>We now insert this mock response for the standard <code class="docutils literal notranslate"><span class="pre">requests.get</span></code> call within the test. In my initial attempt, I created created a fixture based on the mocked response and then tested that fixture:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">ids_mocked</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">mock_get</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MockPubmedResponse</span><span class="p">()</span>
+
+    <span class="c1"># apply the monkeypatch for requests.get to mock_get</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">requests</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="n">mock_get</span><span class="p">)</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;free energy&#39;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ids</span>
+
+<span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_valid_mocked</span><span class="p">(</span><span class="n">ids_mocked</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids_mocked</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_mocked</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+
+</pre></div>
+</div>
+<p>Turning off my network connection shows that the mocked test passes, while the tests that require connecting to the actual API fail.  However, my usual code review (using Google’s Gemini 2.5 Pro) identified a problem with this fixture: it conflates the setup (creating the mock API) with the execution of the function that uses the mock API.  A better approach (recommended by Gemini) is move the function execution out of the fixture and into the test:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fixture ONLY does the setup (the mocking)</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">mock_pubmed_api</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+
+    <span class="k">class</span> <span class="nc">MockPubmedResponse</span><span class="p">:</span>
+        <span class="n">status_code</span> <span class="o">=</span> <span class="mi">200</span>
+        <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;esearch&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;0.3&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;esearchresult&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;retmax&#39;</span><span class="p">:</span> <span class="s1">&#39;20&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;retstart&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;idlist&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;39312494&#39;</span><span class="p">,</span> <span class="s1">&#39;39089179&#39;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">mock_get</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MockPubmedResponse</span><span class="p">()</span>
+
+    <span class="c1"># Apply the monkeypatch for requests.get to mock_get</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">requests</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="n">mock_get</span><span class="p">)</span>
+
+<span class="c1"># The test requests the setup, then performs the action and assertion.</span>
+<span class="k">def</span> <span class="nf">test_get_PubmedIDs_for_query_check_valid_mocked</span><span class="p">(</span><span class="n">mock_pubmed_api</span><span class="p">):</span>
+    <span class="c1"># Action: Call the function under test</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;friston-k AND &#39;free energy&#39;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">get_PubmedIDs_for_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># Assertion: Check the result</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.  In fact, it’s always a good idea to have tests that specifically assess the usage of the external service and the system’s response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.</p>
+</dd>
+</dl>
 </section>
 </section>
 
@@ -712,6 +1217,24 @@ src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="software_engineering.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Principles of software engineering</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="bibliography.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Bibliography</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -739,6 +1262,19 @@ src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">Bug-driven testing: Any time you encounter a bug, write a test</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-structure-of-a-good-test">The structure of a good test</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-against-the-interface-not-the-implementation">Test against the interface, not the implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tests-should-be-independent">Tests should be independent</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-frameworks">Testing frameworks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#potential-problems-with-ai-generated-tests">Potential problems with AI-generated tests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-driven-development-and-ai-assisted-coding">Test-driven development and AI-assisted coding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-coverage">Test coverage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-fixtures">Test fixtures</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking">Mocking</a></li>
 </ul>
   </nav></div>
 
