@@ -1236,7 +1236,7 @@ At the same time, there are very good reasons for using well-maintained packages
 - A well-maintained package is likely to be well-tested
 - Using a well-maintained package can save a great deal of time compared to writing one's own implementation
 
-While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk.
+While we don't want to suggest that one shouldn't use any old package from PyPI that happens to solve an important problem, we think it's important to keep in mind the fact that when we come to rely on a package, we are taking on technical debt and assuming some degree of risk. 
 The level of concern about this will vary depending upon the expected reuse of the code: If you expect to reuse the code in the future, then you should pay more attention to how well the code is maintained.
 To see what an example of a well-maintained package look like, visit the Github repository for the [Scikit-learn project](https://github.com/scikit-learn/scikit-learn).
 This is a long-lived project with more than 2000 contributors and a consistent history of commits over many years.
@@ -1247,4 +1247,4 @@ Most projects will never reach this level of maturity, but we can use this as a 
 - Testing across multiple python versions, including recent ones
 - An active issues page, with developers responding to issues relatively quickly
 
-You may well decide that the code from a project that doesn't meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.
+You may well decide that the code from a project that doesn't meet these standards is still useful enough to rely upon, but you should make that decision only after thinking through what would happen if the project was no longer maintained in the future.  Considering and managing dependency risk is an essential aspect of building good software.
