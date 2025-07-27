@@ -400,6 +400,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-coverage">Test coverage</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-fixtures">Test fixtures</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking">Mocking</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrized-tests">Parametrized tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#property-based-testing">Property-based testing</a></li>
 </ul>
             </nav>
         </div>
@@ -1178,6 +1180,281 @@ TOTAL<span class="w">                                                     </span
 </pre></div>
 </div>
 <p>Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.  In fact, it’s always a good idea to have tests that specifically assess the usage of the external service and the system’s response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).</p>
+</section>
+<section id="parametrized-tests">
+<h2>Parametrized tests<a class="headerlink" href="#parametrized-tests" title="Permalink to this heading">#</a></h2>
+<p>Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to achieve this is to use a <em>parameterized test</em>, in which the test is repeatedly run across combinations of different possible values.</p>
+<p>For our example, let’s move forward and develop the function <code class="docutils literal notranslate"><span class="pre">parse_year_from_Pubmed_record</span></code> to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function <code class="docutils literal notranslate"><span class="pre">get_record_from_PubmedID</span></code> to retrieve a record based on a Pubmed ID. Following our TDD approach, we first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_record_from_PubmedID</span><span class="p">(</span><span class="n">pmid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">parse_year_from_Pubmed_record</span><span class="p">(</span><span class="n">pubmed_record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record and PubMed ID can be reused in a later test.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">valid_pmid</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;39312494&quot;</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pmid_record</span><span class="p">(</span><span class="n">valid_pmid</span><span class="p">):</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">get_record_from_PubmedID</span><span class="p">(</span><span class="n">valid_pmid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">record</span>
+
+<span class="k">def</span> <span class="nf">test_get_record_from_valid_PubmedID</span><span class="p">(</span><span class="n">pmid_record</span><span class="p">,</span> <span class="n">valid_pmid</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">pmid_record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pmid_record</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">pmid_record</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">valid_pmid</span>
+
+<span class="k">def</span> <span class="nf">test_get_record_from_invalid_PubmedID</span><span class="p">():</span>
+    <span class="n">pmid</span> <span class="o">=</span> <span class="s2">&quot;10000000000&quot;</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">get_record_from_PubmedID</span><span class="p">(</span><span class="n">pmid</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Armed with these tests, we now work with Copilot to develop the code for <code class="docutils literal notranslate"><span class="pre">get_record_from_PubmedID</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_record_from_PubmedID</span><span class="p">(</span><span class="n">pmid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">esummary_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">esummary_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">esummary_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/esummary.fcgi?db=pubmed&amp;id=</span><span class="si">{</span><span class="n">pmid</span><span class="si">}</span><span class="s2">&amp;retmode=json&quot;</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">esummary_url</span><span class="p">)</span>
+
+    <span class="n">result_json</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span>
+        <span class="ow">or</span> <span class="s2">&quot;result&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_json</span>
+        <span class="ow">or</span> <span class="n">pmid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_json</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
+        <span class="ow">or</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">result_json</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">][</span><span class="n">pmid</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad request&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_json</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">][</span><span class="n">pmid</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This passes the tests, so we can now move to writing some initial tests for <code class="docutils literal notranslate"><span class="pre">parse_year_from_Pubmed_record</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_parse_year_from_Pubmed_record</span><span class="p">():</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pubdate&quot;</span><span class="p">:</span> <span class="s2">&quot;2021 Jan 1&quot;</span>
+    <span class="p">}</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">parse_year_from_Pubmed_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">year</span> <span class="o">==</span> <span class="mi">2021</span>
+
+
+<span class="k">def</span> <span class="nf">test_parse_year_from_Pubmed_record_empty</span><span class="p">():</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pubdate&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">}</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">parse_year_from_Pubmed_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">year</span> <span class="ow">is</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>And then we use our AI tool to develop the implementation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_year_from_Pubmed_record</span><span class="p">(</span><span class="n">pubmed_record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">pubdate</span> <span class="o">=</span> <span class="n">pubmed_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pubdate&quot;</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">pubdate</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">pubdate</span> <span class="k">else</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>Now let’s say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years across various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it’s the Pubmed ID and the true year of publication.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">testdata</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;17773841&#39;</span><span class="p">,</span> <span class="mi">1944</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;13148370&#39;</span><span class="p">,</span> <span class="mi">1954</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;14208567&#39;</span><span class="p">,</span> <span class="mi">1964</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;4621244&#39;</span><span class="p">,</span> <span class="mi">1974</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;6728178&#39;</span><span class="p">,</span> <span class="mi">1984</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;10467601&#39;</span><span class="p">,</span> <span class="mi">1994</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;15050513&#39;</span><span class="p">,</span> <span class="mi">2004</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>We then feed this into our test using the <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.parametrize</span></code> decorator on the test, which will feed in each of the values into the test:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;pmid, year_true&quot;</span><span class="p">,</span> <span class="n">testdata</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_parse_year_from_pmid_parametric</span><span class="p">(</span><span class="n">pmid</span><span class="p">,</span> <span class="n">year_true</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span> <span class="c1"># delay to avoid hitting the PubMed API too quickly</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">get_record_from_PubmedID</span><span class="p">(</span><span class="n">pmid</span><span class="p">)</span>
+    <span class="n">year_result</span> <span class="o">=</span> <span class="n">parse_year_from_Pubmed_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">year_result</span> <span class="o">==</span> <span class="n">year_true</span>
+</pre></div>
+</div>
+<p>Note that we inserted a delay at the beginning of the test; this is necessary because the PubMed API will has a rate limit on requests, and running these tests without a delay to limit the request rate will result in intermittent test failures.  Looking at the results of running the test, we will see that each parametric value is run as a separate test:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>...
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">17773841</span>-1944<span class="o">]</span><span class="w"> </span>PASSED<span class="w">       </span><span class="o">[</span><span class="w"> </span><span class="m">62</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">13148370</span>-1954<span class="o">]</span><span class="w"> </span>PASSED<span class="w">       </span><span class="o">[</span><span class="w"> </span><span class="m">68</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">14208567</span>-1964<span class="o">]</span><span class="w"> </span>PASSED<span class="w">       </span><span class="o">[</span><span class="w"> </span><span class="m">75</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">4621244</span>-1974<span class="o">]</span><span class="w"> </span>PASSED<span class="w">        </span><span class="o">[</span><span class="w"> </span><span class="m">81</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">6728178</span>-1984<span class="o">]</span><span class="w"> </span>PASSED<span class="w">        </span><span class="o">[</span><span class="w"> </span><span class="m">87</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">10467601</span>-1994<span class="o">]</span><span class="w"> </span>PASSED<span class="w">       </span><span class="o">[</span><span class="w"> </span><span class="m">93</span>%<span class="o">]</span>
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span class="o">[</span><span class="m">15050513</span>-2004<span class="o">]</span><span class="w"> </span>PASSED<span class="w">       </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+</pre></div>
+</div>
+<p>This test requires a live API, so it would fail in cases where one didn’t have a proper network connection or if the API was down, and it would also be slow for a large number of tests.  It would be more efficient to mock the <code class="docutils literal notranslate"><span class="pre">get_record_from_PubmedID</span></code> function to avoid dependency on the live API, but for our simple purposes it’s fine to use the live API.</p>
+</section>
+<section id="property-based-testing">
+<h2>Property-based testing<a class="headerlink" href="#property-based-testing" title="Permalink to this heading">#</a></h2>
+<p>Parameterized testing can be useful when we have specific values that we want to test, but sometimes we wish to test a large range of possible values drawn from some sort of distribution.  One approach to doing this is known as <em>property-based testing</em>, and basically involves generating random values that match some specification and testing the code against those.</p>
+<p>Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> module in Python to perform property-based testing.  Let’s say that we have developed a function to perform linear regression, taking in two vectors (X and y variables) and return a vector of length 2 (parameter estimates for slope and intercept).  Copilot generates some very terse code for us:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>Asking Copilot to make the code more readable, we get this somewhat overly verbose version:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">linear_regression_verbose</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="c1"># Add a column of ones to the input data to account for the intercept term</span>
+    <span class="n">X_with_intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="p">]</span>
+
+    <span class="c1"># Compute the parameters using the normal equation</span>
+    <span class="n">X_transpose</span> <span class="o">=</span> <span class="n">X_with_intercept</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">X_transpose_X</span> <span class="o">=</span> <span class="n">X_transpose</span> <span class="o">@</span> <span class="n">X_with_intercept</span>
+    <span class="n">X_transpose_y</span> <span class="o">=</span> <span class="n">X_transpose</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X_transpose_X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X_transpose_y</span>
+
+    <span class="k">return</span> <span class="n">beta</span>
+</pre></div>
+</div>
+<p>The linear regression computation requires several things to be true of the input data in order to proceed without error:</p>
+<ul class="simple">
+<li><p>The data must not contain any infinite or <em>NaN</em> values</p></li>
+<li><p>The input data for X and y must each have at least two unique values</p></li>
+<li><p>The X matrix must be full rank</p></li>
+</ul>
+<p>In order to ensure that the input data are valid, we generate a function that validates the inputs, raising an exception if they are not, and we include this in our linear regression function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="k">def</span> <span class="nf">_validate_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data contains infinite values&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data contains NaN values&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data must have at least 2 unique values&quot;</span><span class="p">)</span>
+
+    <span class="n">X_with_intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">X_with_intercept</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">X_with_intercept</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data is not full rank&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">validate</span><span class="p">:</span>
+        <span class="n">_validate_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>Now we can use the <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> module to throw a range of data at this function and see if it fails, using the following test:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@given</span><span class="p">(</span>
+    <span class="c1"># Only generate data that is likely to be valid to start with</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)),</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_linear_regression_without_validation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests that our algorithm matches a reference implementation (scipy).&quot;&quot;&quot;</span>
+
+    <span class="c1"># Now we can safely test the math against a reference implementation (scipy), </span>
+    <span class="c1"># knowing the input is valid.</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Parameters should not be None&quot;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;given</span></code> decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.  We will turn off the validation in order to see what happens if the linear regression function is given invalid data. Running this test, we see that the test fails, with the following output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>pytest<span class="w"> </span>tests/property_based_testing/test_propertybased_smoke.py
+<span class="o">===========================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">===========================</span>
+tests/property_based_testing/test_propertybased_smoke.py<span class="w"> </span>F<span class="w">          </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">================================</span><span class="w"> </span><span class="nv">FAILURES</span><span class="w"> </span><span class="o">=================================</span>
+________________<span class="w"> </span>test_linear_regression_without_validation<span class="w"> </span>________________
+_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_
+tests/property_based_testing/test_propertybased_smoke.py:19:<span class="w"> </span><span class="k">in</span><span class="w"> </span>test_linear_regression_without_validation
+<span class="w">    </span><span class="nv">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>linear_regression<span class="o">(</span>X,<span class="w"> </span>y,<span class="w"> </span><span class="nv">validate</span><span class="o">=</span>False<span class="o">)</span>
+<span class="w">             </span>^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/BetterCodeBetterScience/my_linear_regression.py:61:<span class="w"> </span><span class="k">in</span><span class="w"> </span>linear_regression
+<span class="w">    </span><span class="k">return</span><span class="w"> </span>np.linalg.inv<span class="o">(</span>X.T<span class="w"> </span>@<span class="w"> </span>X<span class="o">)</span><span class="w"> </span>@<span class="w"> </span>X.T<span class="w"> </span>@<span class="w"> </span>y
+<span class="w">           </span>^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:615:<span class="w"> </span><span class="k">in</span><span class="w"> </span>inv
+<span class="w">    </span><span class="nv">ainv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>_umath_linalg.inv<span class="o">(</span>a,<span class="w"> </span><span class="nv">signature</span><span class="o">=</span>signature<span class="o">)</span>
+<span class="w">           </span>^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_<span class="w"> </span>_
+
+<span class="nv">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;invalid value&#39;</span>,<span class="w"> </span><span class="nv">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8</span>
+
+<span class="w">    </span>def<span class="w"> </span>_raise_linalgerror_singular<span class="o">(</span>err,<span class="w"> </span>flag<span class="o">)</span>:
+&gt;<span class="w">       </span>raise<span class="w"> </span>LinAlgError<span class="o">(</span><span class="s2">&quot;Singular matrix&quot;</span><span class="o">)</span>
+E<span class="w">       </span>numpy.linalg.LinAlgError:<span class="w"> </span>Singular<span class="w"> </span>matrix
+E<span class="w">       </span>Falsifying<span class="w"> </span>example:<span class="w"> </span>test_linear_regression_without_validation<span class="o">(</span>
+E<span class="w">           </span><span class="nv">X</span><span class="o">=</span>array<span class="o">([[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]</span>,
+E<span class="w">                  </span><span class="o">[</span><span class="m">0</span>.<span class="o">]])</span>,
+E<span class="w">           </span><span class="nv">y</span><span class="o">=</span>array<span class="o">([</span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.,<span class="w"> </span><span class="m">0</span>.<span class="o">])</span>,<span class="w">  </span><span class="c1"># or any other generated value</span>
+E<span class="w">       </span><span class="o">)</span>
+E<span class="w">       </span>Explanation:
+E<span class="w">           </span>These<span class="w"> </span>lines<span class="w"> </span>were<span class="w"> </span>always<span class="w"> </span>and<span class="w"> </span>only<span class="w"> </span>run<span class="w"> </span>by<span class="w"> </span>failing<span class="w"> </span>examples:
+E<span class="w">               </span>/Users/poldrack/Dropbox/code/BetterCodeBetterScience/.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:104
+
+<span class="o">=========================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">=========================</span>
+FAILED<span class="w"> </span>tests/property_based_testing/test_propertybased_smoke.py::test_linear_regression_without_validation<span class="w"> </span>-<span class="w"> </span>numpy.linalg.LinAlgError:<span class="w"> </span>Singular<span class="w"> </span><span class="nv">matrix</span>
+<span class="o">============================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>failed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">2</span>.33s<span class="w"> </span><span class="o">============================</span>
+</pre></div>
+</div>
+<p>The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return <code class="docutils literal notranslate"><span class="pre">None</span></code> when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Now that we have seen how <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> can identify errors, let’s develop some tests for the code that we can use to make sure that it works properly.  We will first separately test the validator function, making sure that it can detect any of the potential problems that it should be able to detect:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@given</span><span class="p">(</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="n">allow_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_infinity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="n">allow_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_infinity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_validate_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests that our validation function correctly identifies and rejects bad data.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Call the validation function directly</span>
+        <span class="n">_validate_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">linear_regression</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># If it gets here, hypothesis generated valid data and the function ran successfully. </span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># If we get here, the data was invalid. The validator correctly</span>
+        <span class="c1"># raised an error. This is also a successful test case.</span>
+        <span class="k">pass</span> <span class="c1"># Explicitly show that catching the error is the goal.</span>
+</pre></div>
+</div>
+<p>Note that this doesn’t actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases, ensuring that any data passing the validator can run without error on the linear regression function.  When a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the <code class="docutils literal notranslate"><span class="pre">scipy</span></code> module. Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test 2: Test the algorithm&#39;s correctness, assuming valid input</span>
+<span class="c1"># --------------------------------------------------------------</span>
+<span class="nd">@given</span><span class="p">(</span>
+    <span class="c1"># Only generate data that is likely to be valid to start with</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)),</span>
+    <span class="n">nps</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,),</span> <span class="n">elements</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">floats</span><span class="p">(</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_linear_regression_correctness</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests that our algorithm matches a reference implementation (scipy).&quot;&quot;&quot;</span>
+    <span class="c1"># Use `hypothesis.assume` to filter out any edge cases the validator would catch.</span>
+    <span class="c1"># This tells hypothesis: &quot;If this data is bad, just discard it and try another.&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_validate_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">assume</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># Prunes this example from the test run</span>
+
+    <span class="c1"># Now we can safely test the math against a reference implementation (scipy), </span>
+    <span class="c1"># knowing the input is valid.</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">lr_result</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="p">[</span><span class="n">lr_result</span><span class="o">.</span><span class="n">intercept</span><span class="p">,</span> <span class="n">lr_result</span><span class="o">.</span><span class="n">slope</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This test passes, showing that our function closely matches the scipy reference implementation.  Note that we restricted the range of the values generated by the test to <code class="docutils literal notranslate"><span class="pre">[-1e6,</span> <span class="pre">1e6]</span></code>; when the test values were allowed to vary across the full range of 64-bit floating point values (+/- 1.79e+308), we observed minute differences in the parameter estimates between the two functions that nonetheless exceeded the tolerance limits of <code class="docutils literal notranslate"><span class="pre">np.allclose()</span></code>. We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
@@ -1275,6 +1552,8 @@ TOTAL<span class="w">                                                     </span
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-coverage">Test coverage</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-fixtures">Test fixtures</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking">Mocking</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parametrized-tests">Parametrized tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#property-based-testing">Property-based testing</a></li>
 </ul>
   </nav></div>
 
