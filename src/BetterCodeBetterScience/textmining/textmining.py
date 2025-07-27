@@ -98,10 +98,5 @@ def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
     :param pubmed_record: dict, the pubmed record to parse
     :return: int, the year of the record
     """
-    pubdate = pubmed_record.get("pubdate", "")
-    if pubdate:
-        year = int(pubdate.split()[0])
-    else:
-        print("problem:", pubmed_record)
-    year = int(pubdate.split()[0]) if pubdate else None
-    return year
+    pubdate = pubmed_record.get("pubdate") # .get() returns None by default if key is missing
+    return int(pubdate.split()[0]) if pubdate else None

@@ -4,6 +4,7 @@
 
 import pytest
 import requests
+import time
 from BetterCodeBetterScience.textmining.textmining import (
     get_PubmedIDs_for_query,
     parse_year_from_Pubmed_record,
@@ -139,9 +140,8 @@ def test_get_record_from_valid_PubmedID(pmid_record, valid_pmid):
 
 def test_get_record_from_invalid_PubmedID():
     pmid = "10000000000"
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         record = get_record_from_PubmedID(pmid)
-
 
 
 def test_parse_year_from_Pubmed_record():
@@ -167,20 +167,21 @@ def test_parse_year_from_Pubmed_record_valid():
     assert year == 2022
 
 
-# # parameterized tests - specific pubmed records across decades
-# testdata = [
-#     ('17773841', 1944),
-#     ('13148370', 1954),
-#     ('14208567', 1964),
-#     ('4621244', 1974),
-#     ('6728178', 1984),
-#     ('10467601', 1994),
-#     ('15050513', 2004)
-# ]
+# parameterized tests - specific pubmed records across decades
+testdata = [
+    ('17773841', 1944),
+    ('13148370', 1954),
+    ('14208567', 1964),
+    ('4621244', 1974),
+    ('6728178', 1984),
+    ('10467601', 1994),
+    ('15050513', 2004)
+]
 
 
-# @pytest.mark.parametrize("pmid, year_true", testdata)
-# def test_parse_year_from_pmid_parametric(pmid, year_true):
-#     record = get_record_from_PubmedID(pmid)
-#     year_result = parse_year_from_Pubmed_record(record)
-#     assert year_result == year_true
+@pytest.mark.parametrize("pmid, year_true", testdata)
+def test_parse_year_from_pmid_parametric(pmid, year_true):
+    time.sleep(0.5) # delay to avoid hitting the PubMed API too quickly
+    record = get_record_from_PubmedID(pmid)
+    year_result = parse_year_from_Pubmed_record(record)
+    assert year_result == year_true

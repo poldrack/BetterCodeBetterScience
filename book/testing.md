@@ -868,5 +868,336 @@ def test_get_PubmedIDs_for_query_check_valid_mocked(mock_pubmed_api):
 
 Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.  In fact, it's always a good idea to have tests that specifically assess the usage of the external service and the system's response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).
 
+## Parametrized tests
+
+Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to achieve this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
+
+For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. Following our TDD approach, we first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
+
+```python
+def get_record_from_PubmedID(pmid: str) -> dict:
+    pass
+
+def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
+    pass
+```
+
+Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record and PubMed ID can be reused in a later test.
+
+```python
+@pytest.fixture(scope="session")
+def valid_pmid():
+    return "39312494"
+
+@pytest.fixture(scope="session")
+def pmid_record(valid_pmid):
+    record = get_record_from_PubmedID(valid_pmid)
+    return record
+
+def test_get_record_from_valid_PubmedID(pmid_record, valid_pmid):
+    assert pmid_record is not None
+    assert isinstance(pmid_record, dict)
+    assert pmid_record['uid'] == valid_pmid
+
+def test_get_record_from_invalid_PubmedID():
+    pmid = "10000000000"
+    with pytest.raises(ValueError):
+        record = get_record_from_PubmedID(pmid)
+
+```
+
+Armed with these tests, we now work with Copilot to develop the code for `get_record_from_PubmedID`:
+
+```python
+def get_record_from_PubmedID(pmid: str, esummary_url: str = None) -> dict:
+
+    if esummary_url is None:
+        esummary_url = f"{BASE_URL}/esummary.fcgi?db=pubmed&id={pmid}&retmode=json"
+
+    response = requests.get(esummary_url)
+
+    result_json = response.json()
+
+    if (
+        response.status_code != 200
+        or "result" not in result_json
+        or pmid not in result_json["result"]
+        or "error" in result_json["result"][pmid]
+    ):
+        raise ValueError("Bad request")
+
+    return result_json["result"][pmid]
+```
+
+This passes the tests, so we can now move to writing some initial tests for `parse_year_from_Pubmed_record`:
+
+```python
+def test_parse_year_from_Pubmed_record():
+    record = {
+        "pubdate": "2021 Jan 1"
+    }
+    year = parse_year_from_Pubmed_record(record)
+    assert year == 2021
+
+
+def test_parse_year_from_Pubmed_record_empty():
+    record = {
+        "pubdate": ""
+    }
+    year = parse_year_from_Pubmed_record(record)
+    assert year is None
+```
+
+And then we use our AI tool to develop the implementation:
+
+```python
+def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
+    pubdate = pubmed_record.get("pubdate") 
+    return int(pubdate.split()[0]) if pubdate else None
+```
+
+Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years across various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.  
+
+```python
+testdata = [
+    ('17773841', 1944),
+    ('13148370', 1954),
+    ('14208567', 1964),
+    ('4621244', 1974),
+    ('6728178', 1984),
+    ('10467601', 1994),
+    ('15050513', 2004)
+]
+```
+
+We then feed this into our test using the `@pytest.mark.parametrize` decorator on the test, which will feed in each of the values into the test:
+
+```python
+@pytest.mark.parametrize("pmid, year_true", testdata)
+def test_parse_year_from_pmid_parametric(pmid, year_true):
+    time.sleep(0.5) # delay to avoid hitting the PubMed API too quickly
+    record = get_record_from_PubmedID(pmid)
+    year_result = parse_year_from_Pubmed_record(record)
+    assert year_result == year_true
+```
+
+Note that we inserted a delay at the beginning of the test; this is necessary because the PubMed API will has a rate limit on requests, and running these tests without a delay to limit the request rate will result in intermittent test failures.  Looking at the results of running the test, we will see that each parametric value is run as a separate test:
+
+```bash
+...
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[17773841-1944] PASSED       [ 62%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[13148370-1954] PASSED       [ 68%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[14208567-1964] PASSED       [ 75%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[4621244-1974] PASSED        [ 81%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[6728178-1984] PASSED        [ 87%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[10467601-1994] PASSED       [ 93%]
+tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[15050513-2004] PASSED       [100%]
+```
+
+This test requires a live API, so it would fail in cases where one didn't have a proper network connection or if the API was down, and it would also be slow for a large number of tests.  It would be more efficient to mock the `get_record_from_PubmedID` function to avoid dependency on the live API, but for our simple purposes it's fine to use the live API.
+
+## Property-based testing
+
+Parameterized testing can be useful when we have specific values that we want to test, but sometimes we wish to test a large range of possible values drawn from some sort of distribution.  One approach to doing this is known as *property-based testing*, and basically involves generating random values that match some specification and testing the code against those.  
+
+Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the `hypothesis` module in Python to perform property-based testing.  Let's say that we have developed a function to perform linear regression, taking in two vectors (X and y variables) and return a vector of length 2 (parameter estimates for slope and intercept).  Copilot generates some very terse code for us:
+
+```python
+def linear_regression(X, y):
+    X = np.c_[np.ones(X.shape[0]), X]
+    return np.linalg.inv(X.T @ X) @ X.T @ y
+```
+
+Asking Copilot to make the code more readable, we get this somewhat overly verbose version:
+
+```python
+def linear_regression_verbose(X, y):
+    # Add a column of ones to the input data to account for the intercept term
+    X_with_intercept = np.c_[np.ones(X.shape[0]), X]
+
+    # Compute the parameters using the normal equation
+    X_transpose = X_with_intercept.T
+    X_transpose_X = X_transpose @ X_with_intercept
+    X_transpose_y = X_transpose @ y
+    beta = np.linalg.inv(X_transpose_X) @ X_transpose_y
+
+    return beta
+```
+
+The linear regression computation requires several things to be true of the input data in order to proceed without error:
+
+- The data must not contain any infinite or *NaN* values
+- The input data for X and y must each have at least two unique values
+- The X matrix must be full rank
+
+In order to ensure that the input data are valid, we generate a function that validates the inputs, raising an exception if they are not, and we include this in our linear regression function:
+
+```python
+
+def _validate_input(X, y):
+    if np.isinf(X).any() or np.isinf(y).any():
+        raise ValueError("Input data contains infinite values")
+    if np.isnan(X).any() or np.isnan(y).any():
+        raise ValueError("Input data contains NaN values")
+    if len(np.unique(X)) < 2 or len(np.unique(y)) < 2:
+        raise ValueError("Input data must have at least 2 unique values")
+
+    X_with_intercept = np.c_[np.ones(X.shape[0]), X]
+    if np.linalg.matrix_rank(X_with_intercept) < X_with_intercept.shape[1]:
+        raise ValueError("Input data is not full rank")
+
+
+def linear_regression(X, y, validate=True):
+
+    if validate:
+        _validate_input(X, y)
+
+    X = np.c_[np.ones(X.shape[0]), X]
+    return np.linalg.inv(X.T @ X) @ X.T @ y
+```
+
+Now we can use the `hypothesis` module to throw a range of data at this function and see if it fails, using the following test:
+
+```python
+@given(
+    # Only generate data that is likely to be valid to start with
+    nps.arrays(np.float64, (10, 1), elements=st.floats(-1e6, 1e6)),
+    nps.arrays(np.float64, (10,), elements=st.floats(-1e6, 1e6)),
+)
+def test_linear_regression_without_validation(X, y):
+    """Tests that our algorithm matches a reference implementation (scipy)."""
+
+    # Now we can safely test the math against a reference implementation (scipy), 
+    # knowing the input is valid.
+    params = linear_regression(X, y, validate=False)
+    assert params is not None, "Parameters should not be None"
+```
+
+The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.  We will turn off the validation in order to see what happens if the linear regression function is given invalid data. Running this test, we see that the test fails, with the following output:
+
+```bash
+❯ pytest tests/property_based_testing/test_propertybased_smoke.py
+=========================== test session starts ===========================
+tests/property_based_testing/test_propertybased_smoke.py F          [100%]
+
+================================ FAILURES =================================
+________________ test_linear_regression_without_validation ________________
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/property_based_testing/test_propertybased_smoke.py:19: in test_linear_regression_without_validation
+    params = linear_regression(X, y, validate=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/BetterCodeBetterScience/my_linear_regression.py:61: in linear_regression
+    return np.linalg.inv(X.T @ X) @ X.T @ y
+           ^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:615: in inv
+    ainv = _umath_linalg.inv(a, signature=signature)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+err = 'invalid value', flag = 8
+
+    def _raise_linalgerror_singular(err, flag):
+>       raise LinAlgError("Singular matrix")
+E       numpy.linalg.LinAlgError: Singular matrix
+E       Falsifying example: test_linear_regression_without_validation(
+E           X=array([[0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.],
+E                  [0.]]),
+E           y=array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]),  # or any other generated value
+E       )
+E       Explanation:
+E           These lines were always and only run by failing examples:
+E               /Users/poldrack/Dropbox/code/BetterCodeBetterScience/.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:104
+
+========================= short test summary info =========================
+FAILED tests/property_based_testing/test_propertybased_smoke.py::test_linear_regression_without_validation - numpy.linalg.LinAlgError: Singular matrix
+============================ 1 failed in 2.33s ============================
+```
+
+The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  
+
+Now that we have seen how `hypothesis` can identify errors, let's develop some tests for the code that we can use to make sure that it works properly.  We will first separately test the validator function, making sure that it can detect any of the potential problems that it should be able to detect:
+
+```python
+@given(
+    nps.arrays(
+        np.float64, (10, 1), elements=st.floats(allow_nan=True, allow_infinity=True)
+    ),
+    nps.arrays(
+        np.float64, (10,), elements=st.floats(allow_nan=True, allow_infinity=True)
+    ),
+)
+def test_validate_input(X, y):
+    """Tests that our validation function correctly identifies and rejects bad data."""
+    try:
+        # Call the validation function directly
+        _validate_input(X, y)
+        linear_regression(X, y, validate=False)
+        # If it gets here, hypothesis generated valid data and the function ran successfully. 
+    except ValueError:
+        # If we get here, the data was invalid. The validator correctly
+        # raised an error. This is also a successful test case.
+        pass # Explicitly show that catching the error is the goal.
+```
+
+Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases, ensuring that any data passing the validator can run without error on the linear regression function.  When a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the `scipy` module. Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
+
+```python
+# Test 2: Test the algorithm's correctness, assuming valid input
+# --------------------------------------------------------------
+@given(
+    # Only generate data that is likely to be valid to start with
+    nps.arrays(np.float64, (10, 1), elements=st.floats(-1e6, 1e6)),
+    nps.arrays(np.float64, (10,), elements=st.floats(-1e6, 1e6)),
+)
+def test_linear_regression_correctness(X, y):
+    """Tests that our algorithm matches a reference implementation (scipy)."""
+    # Use `hypothesis.assume` to filter out any edge cases the validator would catch.
+    # This tells hypothesis: "If this data is bad, just discard it and try another."
+    try:
+        _validate_input(X, y)
+    except ValueError:
+        assume(False)  # Prunes this example from the test run
+
+    # Now we can safely test the math against a reference implementation (scipy), 
+    # knowing the input is valid.
+    params = linear_regression(X, y)
+    lr_result = linregress(X.flatten(), y.flatten())
+
+    assert np.allclose(params, [lr_result.intercept, lr_result.slope])
+```
+
+This test passes, showing that our function closely matches the scipy reference implementation.  Note that we restricted the range of the values generated by the test to `[-1e6, 1e6]`; when the test values were allowed to vary across the full range of 64-bit floating point values (+/- 1.79e+308), we observed minute differences in the parameter estimates between the two functions that nonetheless exceeded the tolerance limits of `np.allclose()`. We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.
+
+
+## Automated testing and continuous integration
+
+Distributed version control systems like GitHub 
+- one benefit: test on a different machine than you develop on
+
+
+## Speeding up tests
+
+If the tests for a project take too long to run, they are not going to be run regularly.  
+
+- separate unit tests from integration tests
+- run unit tests regularly during coding, run integration tests on the clock (e.g. nightly)
+
+- use smaller mock datasets rather than full-size datasets
+
+- parallelize testing
+
+- longest tests last
+
+## Possible TODOs:
+
+- Fuzzing for web-facing applications: The idea of *fuzzing* (also sometimes called *monkey testing* involves throwing random inputs at an application to look for potential crashes or security problems.  Fuzzing is particularly important when one is developing a web facing application such as a web API.  
 
 [^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
