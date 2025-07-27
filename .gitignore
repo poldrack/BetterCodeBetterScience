@@ -1,3 +1,5 @@
 book/_build
 __pycache__
+.coverage
+.hypothesis
 
