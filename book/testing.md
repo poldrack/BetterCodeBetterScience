@@ -872,47 +872,44 @@ Note that while mocking can be useful for testing specific components by saving 
 
 Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to achieve this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
 
-For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. We first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
+For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. Following our TDD approach, we first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
 
 ```python
 def get_record_from_PubmedID(pmid: str) -> dict:
     pass
 
-
 def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
     pass
 ```
 
-Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record can be reused in a later test.
+Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record and PubMed ID can be reused in a later test.
 
 ```python
-@pytest.fixture
-def pmid_record():
-    pmid = "38691601"
-    record = get_record_from_PubmedID(pmid)
+@pytest.fixture(scope="session")
+def valid_pmid():
+    return "39312494"
+
+@pytest.fixture(scope="session")
+def pmid_record(valid_pmid):
+    record = get_record_from_PubmedID(valid_pmid)
     return record
 
-def test_get_record_from_valid_PubmedID(pmid_record):
+def test_get_record_from_valid_PubmedID(pmid_record, valid_pmid):
     assert pmid_record is not None
     assert isinstance(pmid_record, dict)
-    assert pmid_record['uid'] == pmid
+    assert pmid_record['uid'] == valid_pmid
 
 def test_get_record_from_invalid_PubmedID():
-    pmid = "abcd1234"
-    with pytest.raises(Exception):
+    pmid = "10000000000"
+    with pytest.raises(ValueError):
         record = get_record_from_PubmedID(pmid)
+
 ```
 
 Armed with these tests, we now work with Copilot to develop the code for `get_record_from_PubmedID`:
 
 ```python
-def get_record_from_PubmedID(pmid: str, 
-                             esummary_url: str = None) -> dict:
-    """
-    Retrieve the record for a given pubmed ID.
-    :param pmid: str, the pubmed ID to retrieve
-    :return: dict, the record for the pubmed ID
-    """
+def get_record_from_PubmedID(pmid: str, esummary_url: str = None) -> dict:
 
     if esummary_url is None:
         esummary_url = f"{BASE_URL}/esummary.fcgi?db=pubmed&id={pmid}&retmode=json"
@@ -921,18 +918,27 @@ def get_record_from_PubmedID(pmid: str,
 
     result_json = response.json()
 
-    if (response.status_code != 200 or 
-        'result' not in result_json or 
-        pmid not in result_json['result'] or
-        'error' in result_json['result'][pmid]):
+    if (
+        response.status_code != 200
+        or "result" not in result_json
+        or pmid not in result_json["result"]
+        or "error" in result_json["result"][pmid]
+    ):
         raise ValueError("Bad request")
 
-    return result_json
+    return result_json["result"][pmid]
 ```
 
 This passes the tests, so we can now move to writing some initial tests for `parse_year_from_Pubmed_record`:
 
 ```python
+def test_parse_year_from_Pubmed_record():
+    record = {
+        "pubdate": "2021 Jan 1"
+    }
+    year = parse_year_from_Pubmed_record(record)
+    assert year == 2021
+
 
 def test_parse_year_from_Pubmed_record_empty():
     record = {
@@ -940,17 +946,17 @@ def test_parse_year_from_Pubmed_record_empty():
     }
     year = parse_year_from_Pubmed_record(record)
     assert year is None
-
-def test_parse_year_from_Pubmed_record_valid():
-    record = {
-        "pubdate": "2022 12 05"
-    }
-    year = parse_year_from_Pubmed_record(record)
-    assert year == 2022
-
 ```
 
-Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years or in various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.  
+And then we use our AI tool to develop the implementation:
+
+```python
+def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
+    pubdate = pubmed_record.get("pubdate") 
+    return int(pubdate.split()[0]) if pubdate else None
+```
+
+Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years across various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.  
 
 ```python
 testdata = [
@@ -969,14 +975,16 @@ We then feed this into our test using the `@pytest.mark.parametrize` decorator o
 ```python
 @pytest.mark.parametrize("pmid, year_true", testdata)
 def test_parse_year_from_pmid_parametric(pmid, year_true):
+    time.sleep(0.5) # delay to avoid hitting the PubMed API too quickly
     record = get_record_from_PubmedID(pmid)
     year_result = parse_year_from_Pubmed_record(record)
     assert year_result == year_true
 ```
 
-Looking at the results of running the test, we will see that each parametric value is run as a separate test:
+Note that we inserted a delay at the beginning of the test; this is necessary because the PubMed API will has a rate limit on requests, and running these tests without a delay to limit the request rate will result in intermittent test failures.  Looking at the results of running the test, we will see that each parametric value is run as a separate test:
 
 ```bash
+...
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[17773841-1944] PASSED       [ 62%]
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[13148370-1954] PASSED       [ 68%]
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[14208567-1964] PASSED       [ 75%]
@@ -985,6 +993,8 @@ tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[672817
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[10467601-1994] PASSED       [ 93%]
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[15050513-2004] PASSED       [100%]
 ```
+
+This test requires a live API, so it would fail in cases where one didn't have a proper network connection or if the API was down, and it would also be slow for a large number of tests.  It would be more efficient to mock the `get_record_from_PubmedID` function to avoid dependency on the live API, but for our simple purposes it's fine to use the live API.
 
 ## Property-based testing
 
@@ -1001,7 +1011,7 @@ def linear_regression(X, y):
 Asking Copilot to make the code more readable, we get this somewhat overly verbose version:
 
 ```python
-def linear_regression(X, y):
+def linear_regression_verbose(X, y):
     # Add a column of ones to the input data to account for the intercept term
     X_with_intercept = np.c_[np.ones(X.shape[0]), X]
 
@@ -1014,93 +1024,154 @@ def linear_regression(X, y):
     return beta
 ```
 
+The linear regression computation requires several things to be true of the input data in order to proceed without error:
+
+- The data must not contain any infinite or *NaN* values
+- The input data for X and y must each have at least two unique values
+- The X matrix must be full rank
+
+In order to ensure that the input data are valid, we generate a function that validates the inputs, raising an exception if they are not, and we include this in our linear regression function:
+
+```python
+
+def _validate_input(X, y):
+    if np.isinf(X).any() or np.isinf(y).any():
+        raise ValueError("Input data contains infinite values")
+    if np.isnan(X).any() or np.isnan(y).any():
+        raise ValueError("Input data contains NaN values")
+    if len(np.unique(X)) < 2 or len(np.unique(y)) < 2:
+        raise ValueError("Input data must have at least 2 unique values")
+
+    X_with_intercept = np.c_[np.ones(X.shape[0]), X]
+    if np.linalg.matrix_rank(X_with_intercept) < X_with_intercept.shape[1]:
+        raise ValueError("Input data is not full rank")
+
+
+def linear_regression(X, y, validate=True):
+
+    if validate:
+        _validate_input(X, y)
+
+    X = np.c_[np.ones(X.shape[0]), X]
+    return np.linalg.inv(X.T @ X) @ X.T @ y
+```
+
 Now we can use the `hypothesis` module to throw a range of data at this function and see if it fails, using the following test:
 
 ```python
-from hypothesis import given, strategies as st
-from hypothesis.extra.numpy import arrays
-
 @given(
-    arrays(np.float32, (6, 1), elements=st.floats()),
-    arrays(np.float32, (6, 1), elements=st.floats()),
+    # Only generate data that is likely to be valid to start with
+    nps.arrays(np.float64, (10, 1), elements=st.floats(-1e6, 1e6)),
+    nps.arrays(np.float64, (10,), elements=st.floats(-1e6, 1e6)),
 )
-def test_linear_regression(X, y):
-    params = linear_regression(X, y)
+def test_linear_regression_without_validation(X, y):
+    """Tests that our algorithm matches a reference implementation (scipy)."""
+
+    # Now we can safely test the math against a reference implementation (scipy), 
+    # knowing the input is valid.
+    params = linear_regression(X, y, validate=False)
+    assert params is not None, "Parameters should not be None"
 ```
 
-The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  Note that there are no assertions; we are simply checking to see whether the function successfully executes.  Running this test, we see that the test fails, with the following output:
+The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.  We will turn off the validation in order to see what happens if the linear regression function is given invalid data. Running this test, we see that the test fails, with the following output:
 
 ```bash
+❯ pytest tests/property_based_testing/test_propertybased_smoke.py
+=========================== test session starts ===========================
+tests/property_based_testing/test_propertybased_smoke.py F          [100%]
+
+================================ FAILURES =================================
+________________ test_linear_regression_without_validation ________________
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/property_based_testing/test_propertybased_smoke.py:19: in test_linear_regression_without_validation
+    params = linear_regression(X, y, validate=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/BetterCodeBetterScience/my_linear_regression.py:61: in linear_regression
+    return np.linalg.inv(X.T @ X) @ X.T @ y
+           ^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:615: in inv
+    ainv = _umath_linalg.inv(a, signature=signature)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+err = 'invalid value', flag = 8
+
+    def _raise_linalgerror_singular(err, flag):
+>       raise LinAlgError("Singular matrix")
 E       numpy.linalg.LinAlgError: Singular matrix
-E       Falsifying example: test_linear_regression(
+E       Falsifying example: test_linear_regression_without_validation(
 E           X=array([[0.],
 E                  [0.],
 E                  [0.],
 E                  [0.],
 E                  [0.],
-E                  [0.]], dtype=float32),
-E           y=array([[0.],
 E                  [0.],
 E                  [0.],
 E                  [0.],
 E                  [0.],
-E                  [0.]], dtype=float32),  # or any other generated value
+E                  [0.]]),
+E           y=array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]),  # or any other generated value
 E       )
+E       Explanation:
+E           These lines were always and only run by failing examples:
+E               /Users/poldrack/Dropbox/code/BetterCodeBetterScience/.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:104
+
+========================= short test summary info =========================
+FAILED tests/property_based_testing/test_propertybased_smoke.py::test_linear_regression_without_validation - numpy.linalg.LinAlgError: Singular matrix
+============================ 1 failed in 2.33s ============================
 ```
 
-The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  Instead, what we can do is first test whether there is more than a single unique value in the X matrix, and then perform separate tests for when it is (which should result in an exception being raised) and when it is not (which should run normally).
+The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  
+
+Now that we have seen how `hypothesis` can identify errors, let's develop some tests for the code that we can use to make sure that it works properly.  We will first separately test the validator function, making sure that it can detect any of the potential problems that it should be able to detect:
 
 ```python
 @given(
-    arrays(np.float32, (6, 1), elements=st.floats()),
-    arrays(np.float32, (6, 1), elements=st.floats()),
+    nps.arrays(
+        np.float64, (10, 1), elements=st.floats(allow_nan=True, allow_infinity=True)
+    ),
+    nps.arrays(
+        np.float64, (10,), elements=st.floats(allow_nan=True, allow_infinity=True)
+    ),
 )
-def test_linear_regression(X, y):
-    if len(np.unique(X)) < 2:
-        params = linear_regression(X, y)
-    else:
-        with pytest.raises(Exception):
-            params = linear_regression(X, y)
+def test_validate_input(X, y):
+    """Tests that our validation function correctly identifies and rejects bad data."""
+    try:
+        # Call the validation function directly
+        _validate_input(X, y)
+        linear_regression(X, y, validate=False)
+        # If it gets here, hypothesis generated valid data and the function ran successfully. 
+    except ValueError:
+        # If we get here, the data was invalid. The validator correctly
+        # raised an error. This is also a successful test case.
+        pass # Explicitly show that catching the error is the goal.
 ```
 
-Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases.  If a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the `scipy` module. Initial exploration of this comparison uncovered the fact that the scipy function performs checking on the input data for various problematic conditions, such as infinite or NaN ("not a number") values.  To address this, we implemented a function to validate the input for our linear regression function:
+Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases, ensuring that any data passing the validator can run without error on the linear regression function.  When a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the `scipy` module. Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
 
 ```python
-def _validate_input(X, y):
-    if np.isinf(X).any() or np.isinf(y).any():
-        raise Exception("Input data contains infinite values")
-    if np.isnan(X).any() or np.isnan(y).any():
-        raise Exception("Input data contains NaN values")
-    if len(np.unique(X)) < 2 or len(np.unique(X)) < 2:
-        raise Exception("Input data must have at least 2 unique values")
-    X_with_intercept = np.c_[np.ones(X.shape[0]), X]
-    if np.linalg.matrix_rank(X_with_intercept) < X_with_intercept.shape[1]:
-        raise Exception("Input data is not full rank")
-
-```
-
-Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
-
-```python
+# Test 2: Test the algorithm's correctness, assuming valid input
+# --------------------------------------------------------------
 @given(
-    arrays(np.float64, (6, 1), elements=st.floats(-1e6, 1e6)),
-    arrays(np.float64, (6, 1), elements=st.floats(-1e6, 1e6)),
+    # Only generate data that is likely to be valid to start with
+    nps.arrays(np.float64, (10, 1), elements=st.floats(-1e6, 1e6)),
+    nps.arrays(np.float64, (10,), elements=st.floats(-1e6, 1e6)),
 )
-def test_linear_regression(X, y):
-    bad_X = False
+def test_linear_regression_correctness(X, y):
+    """Tests that our algorithm matches a reference implementation (scipy)."""
+    # Use `hypothesis.assume` to filter out any edge cases the validator would catch.
+    # This tells hypothesis: "If this data is bad, just discard it and try another."
     try:
         _validate_input(X, y)
-    except:
-        bad_X = True
-        
-    if bad_X:
-        with pytest.raises(Exception):
-            params = linear_regression(X, y)
-    else:
-        params = linear_regression(X, y)
-        lr_result = linregress(X.flatten(), y.flatten())
-        assert np.allclose(params.flatten(), 
-                           np.array([lr_result.intercept, lr_result.slope]))
+    except ValueError:
+        assume(False)  # Prunes this example from the test run
+
+    # Now we can safely test the math against a reference implementation (scipy), 
+    # knowing the input is valid.
+    params = linear_regression(X, y)
+    lr_result = linregress(X.flatten(), y.flatten())
+
+    assert np.allclose(params, [lr_result.intercept, lr_result.slope])
 ```
 
 This test passes, showing that our function closely matches the scipy reference implementation.  Note that we restricted the range of the values generated by the test to `[-1e6, 1e6]`; when the test values were allowed to vary across the full range of 64-bit floating point values (+/- 1.79e+308), we observed minute differences in the parameter estimates between the two functions that nonetheless exceeded the tolerance limits of `np.allclose()`. We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.
@@ -1108,6 +1179,7 @@ This test passes, showing that our function closely matches the scipy reference 
 
 ## Automated testing and continuous integration
 
+Distributed version control systems like GitHub 
 - one benefit: test on a different machine than you develop on
 
 

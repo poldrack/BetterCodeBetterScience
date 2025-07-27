@@ -23,11 +23,12 @@ def test_validate_input(X, y):
     try:
         # Call the function directly
         _validate_input(X, y)
-        # If it gets here, hypothesis generated valid data. Test passes implicitly.
+        linear_regression(X, y, validate=False)
+        # If it gets here, hypothesis generated valid data and the function ran successfully. 
     except ValueError:
-        # If a ValueError is raised, it means hypothesis found bad data,
-        # and our validator correctly caught it. This is a success!
-        pass
+        # If we get here, the data was invalid. The validator correctly
+        # raised an error. This is also a successful test case.
+        pass # Explicitly show that catching the error is the goal.
 
 
 # Test 2: Test the algorithm's correctness, assuming valid input
