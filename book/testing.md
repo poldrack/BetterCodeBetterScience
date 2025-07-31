@@ -1179,25 +1179,160 @@ This test passes, showing that our function closely matches the scipy reference 
 
 ## Automated testing and continuous integration
 
-Distributed version control systems like GitHub 
-- one benefit: test on a different machine than you develop on
+Once we have a set of tests for a project, it's important to integrate them into our workflow so that we ensure that new changes to the code don't break the existing code (known as a *regression*).  
+
+One useful way to ensure that the tests are run regularly is to run them automatically every time changes are pushed to version control.  This is known as "continuous integration" (CI for short), referring to the fact that it allows changes to be continuously integrated into the main code branch once they are confirmed to pass all of the tests. There are a number of different platforms one can use for CI; we will focus on *Github Actions* since it is the most tightly integrated into the Github version control system.  Testing using CI also has a useful side effect: Since the CI system uses a virtual machine to run the tests, the use of CI for testing ensures that the code can run on a separate machine from the one where it was developed.  Because setting up the CI system also requires understanding all of the dependencies that are required for the code to run, the CI setup provides a recipe to run the code on any other system.
+
+### Using GitHub Actions
+
+GitHub Actions is a system that allows one to automatically execute workflows in response to events related to any GitHub repository.  At the time of writing, Github Actions are free and unlimited for public repositories when using the standard GitHub-based workflow runners.  
+
+When setting up an automated action using GitHub Actions, there are two primary decisions to specify:
+
+- What is the workflow that I want to run?
+- What are the events that I want to trigger the workflow?
+
+As an example, we will implement a workflow running to execute tests for a simple python package that was generated for this book project, called [mdnewline](https://github.com/poldrack/mdnewline/).  We start by going to the GitHub Actions tab in the repository, and selecting the "Python Package" option, which creates a workflow that builds and tests a Python package.  Generating the workflow results in a file that contains a description of the workflow, located at `.github/workflows/python-package.yml`.  Looking more closely at the workflow file, we can see how it works.  The first section specifies the name of the workflow, and defines the events that will trigger the workflow:
+
+```yaml
+name: Python package
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+```
+
+This section specifies that the workflow will be run any time there is a push or a pull request to the main branch of the repo.  The next section sets up workflow jobs:
+
+```yaml
+jobs:
+  build:
+    name: python-build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+```
+
+The `runs-on` argument tells the workflow runner which virtual machine to use to run the workflows; in this case, we will use the default which is the latest release of Ubuntu Linux.  We also tell it which versions of Python we want to test the code on, updating it to test on all current versions that are compatible with the package requirements (Python >= 3.12). 
+
+We then specify the actual steps in the workflow. The first steps set up the workflow runner so that it can check out the repository, and set up the Python installation.  Since this project uses `uv` to manage packages, we will use the recommended setup code from the [uv documentation](https://docs.astral.sh/uv/guides/integration/github/) for multiple Python versions:
+
+```yaml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+```
+
+This installs uv with the appropriate python version. We can then install the project using `uv sync`, pip install the package within the `uv` environment, and run the tests:
+
+```yaml
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: pip install the package
+        run: uv pip install .
+
+      - name: Run tests
+        # For example, using `pytest`
+        run: uv run pytest tests
+```
+
+When we commit and push this workflow file, it is automatically run by Github Actions. If we got to the Actions tab in the repository, we will see that the tests failed, and by looking at the logs we can see that the `uv` installation process failed:
+
+![Github actions failure](images/github_actions_failure.png)
+
+After fixing the `uv` command, we now get the green light!:
+
+![Github actions success](images/github_actions_success.png)
+
+It's nice to advertise our testing to the world, which we can do by [adding a status badge](https://docs.github.com/en/actions/how-tos/monitor-workflows/add-a-status-badge) to our home page, using the markdown generated by Actions for us:
+
+![Github actions status badge](images/actions_status_badge.png)
 
 
-## Speeding up tests
+## Optimizing the testing workflow
 
-If the tests for a project take too long to run, they are not going to be run regularly.  
+As a project becomes larger and more complex, the tests will necessarily take longer to run. This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.  As an example, our lab develops a tool for fMRI data preprocessing called [fMRIPrep](https://fmriprep.org/en/stable/) that performs a large set of operations on functional MRI datasets.  Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization it takes 10-15 minutes. 
 
-- separate unit tests from integration tests
+There are a number of strategies to optimize one's testing workflow.
+
+### Cherry-picking tests
+
+When developing a new function, it's usually sufficient to run only the tests that directly address that function rather than running the entire test suite.  If all of the tests for a specific function are located within a single test file, then one can simply call `pytest` with that file.  It's also possible to run a specific test within a file by referring to a specific class or function using a double-colon marker:
+
+```bash
+❯ pytest tests/textmining/test_textmining.py::test_parse_year_from_Pubmed_record
+
+============================= test session starts ==============================
+collected 1 item
+
+tests/textmining/test_textmining.py .                                    [100%]
+============================== 1 passed in 0.17s ===============================
+```
+
+This allows one to focus on the tests that are immediately relevant to a specific development task.
+
+### Separate unit tests from longer-running tests
+
 - run unit tests regularly during coding, run integration tests on the clock (e.g. nightly)
 
-- use smaller mock datasets rather than full-size datasets
+### Longest tests last
 
-- parallelize testing
+Another simple strategy that can help optimize the testing workflow is to run tests in order to the time for completion. This ensures that one doesn't end up waiting a long time for long-running tests to complete, only to find that a quick test fails.  
 
-- longest tests last
 
-## Possible TODOs:
+### Using minimal mock datasets
 
-- Fuzzing for web-facing applications: The idea of *fuzzing* (also sometimes called *monkey testing* involves throwing random inputs at an application to look for potential crashes or security problems.  Fuzzing is particularly important when one is developing a web facing application such as a web API.  
+For code that performs data processing operations, the processing of full size datasets can often take a very long time.  One strategy in these cases is to generate minimal mock datasets that can exercise the functions without taking the full amount of time that a real dataset would. In the tests for `fMRIPrep`, we use fMRI datasets that have been reduced in length, and structural MRI datasets that have been downsampled to reduce their spatial resolution. The specific way to reduce the dataset will depend on the particular processes being run. For example, downsampling the data too much for MRI preprocessing would likely cause some operations to fail, so one needs to have a good intuition for the data requirements for the relevant code.
+
+### Adding minimal processing modes for integration tests
+
+When the goal is to the test the integration of components rather than the function of each component, one way to minimize testing time is to provide configuration features that minimize execution time for the component. For example, in `fMRIPrep` there are a number of steps that involve optimization processes that take time to converge.  However, there the package has a "sloppy mode" configuration flag that one can turn on for testing, which provides a more lenient threshold for convergence of those operations, allowing them to finish faster.  Again, knowing where one can cut corners requires a good understanding of the specific requirements of the processing operations.
+
+### Parallelizing testing
+
+If we have written good tests, they should be able to run independently, and thus their execution should be parallelizable, assuming that we are using a system with multiple CPU cores.  If we are using `pytest` as our testing framework, then we can use the `pytest-xdist` extension to enable the parallel execution of tests in pytest.  For example, let's set up a parameterized test that includes a `time.sleep()` command so that execution will take a significant amount of time.
+
+```python
+import pytest
+import time
+
+@pytest.mark.parametrize("x", range(10))
+def test_parallel(x):
+    assert x in range(10), f"Value {x} is not in the expected list."
+    time.sleep(1) # wait for one second
+```
+If we run this using the standard pytest command, we should see that it takes about ten seconds, given that there are ten tests:
+
+```bash
+❯ pytest tests/parallel/tests_parallel.py
+============================= test session starts ==============================
+collected 10 items
+
+tests/parallel/tests_parallel.py ..........                              [100%]
+
+============================= 10 passed in 10.18s ==============================
+
+```
+
+If we have installed `pytest-xdist` then we can add the `-n auto` flag which will automatically detect how manu CPU cores we have available and run the tests in parallel across those cores:
+
+```bash
+❯ pytest tests/parallel/tests_parallel.py -n auto
+============================= test session starts ==============================
+16 workers [10 items]
+..........                                                               [100%]
+============================== 10 passed in 1.97s ==============================
+```
+
+You can see that it detected the 16 cores in my laptop and ran the 10 tests in parallel, greatly reducing the testing time.
 
 [^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
