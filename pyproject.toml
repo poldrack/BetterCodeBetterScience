@@ -48,3 +48,8 @@ check-hidden = true
 ignore-regex = '\b(BLOSUM|Shapin)\b'
 # ignore-words-list = ''
 
+[tool.pytest.ini_options]
+markers = [
+    "unit: mark a test as a unit test.",
+    "integration: mark a test as an integration test."
+]
