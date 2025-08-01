@@ -1260,11 +1260,11 @@ It's nice to advertise our testing to the world, which we can do by [adding a st
 
 ## Optimizing the testing workflow
 
-As a project becomes larger and more complex, the tests will necessarily take longer to run. This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.  As an example, our lab develops a tool for fMRI data preprocessing called [fMRIPrep](https://fmriprep.org/en/stable/) that performs a large set of operations on functional MRI datasets.  Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization it takes 10-15 minutes. 
+As a project becomes larger and more complex, the tests will necessarily take longer to run - and whenever the tests take too long, it's likely that you won't run them as often. This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.  As an example, our lab develops a tool for fMRI data preprocessing called [fMRIPrep](https://fmriprep.org/en/stable/) that performs a large set of operations on functional MRI datasets.  Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization we can complete it in 10-15 minutes. 
 
-There are a number of strategies to optimize one's testing workflow.
+There are a number of strategies to optimize one's testing workflows.
 
-### Cherry-picking tests
+### Cherry-picking specific tests
 
 When developing a new function, it's usually sufficient to run only the tests that directly address that function rather than running the entire test suite.  If all of the tests for a specific function are located within a single test file, then one can simply call `pytest` with that file.  It's also possible to run a specific test within a file by referring to a specific class or function using a double-colon marker:
 
@@ -1280,14 +1280,266 @@ tests/textmining/test_textmining.py .                                    [100%]
 
 This allows one to focus on the tests that are immediately relevant to a specific development task.
 
+### Controlling test execution order
+
+Several of the strategies described below require the ability to execute tests in specific orders.  There are several strategies one can use to do this.
+
+One strategy that *will not* work reliably is to place the tests in a specific order in the test file.  While tests are often executed in the order that the functions appear in the file, this not guaranteed.
+
+For precise ordering of particular tests, one can use the [pytest-order](https://pypi.org/project/pytest-order/) plugin, which allows the use of marks to specify test order[^2].  We start with two tests that are out of order in the test code:
+
+```python
+import pytest
+
+def test_second():
+    """This is the second test."""
+    assert True
+
+def test_first():
+    """This is the first test."""
+    assert True
+```
+
+Running this, we see that these are run in the order they are defined in the test code:
+
+```bash
+❯ pytest -vv tests/ordering/test_order.py
+=========================== test session starts ============================
+collected 2 items
+
+tests/ordering/test_order.py::test_second PASSED                     [ 50%]
+tests/ordering/test_order.py::test_first PASSED                      [100%]
+============================ 2 passed in 0.05s =============================
+```
+
+After installing the `pytest-order` plugin, we can now add marks that control the execution order of the tests:
+
+```python
+import pytest
+
+@pytest.mark.order(2)
+def test_second():
+    """This is the second test."""
+    assert True
+
+@pytest.mark.order(1)
+def test_first():
+    """This is the first test."""
+    assert True
+```
+
+Running this, we see that these are run in the order they are defined in the test code:
+
+```bash
+❯ pytest -vv tests/ordering/test_order.py
+=========================== test session starts ============================
+collected 2 items
+
+tests/ordering/test_order.py::test_first PASSED                      [ 50%]
+tests/ordering/test_order.py::test_second PASSED                     [100%]
+============================ 2 passed in 0.05s =============================
+```
+
+This package also provides other useful ways to control execution order, such as relative markers like "before" or "last". 
+
+Note that while it might be tempting to use test ordering to ensure the proper executions of tests that relu upon one another, this is generally a bad practice. Instead, one should generate fixtures for any dependencies that are shared by tests.
+
+### Only run failed tests, or run them first
+
+Pytest has a set of features that allow one to focus testing on those tests that have most recently failed, which can be useful in the context of test-driven development.  The first command, `pytest --lf` (short for `--last-failed`) will check the cache of the most recent test run results, and only run those tests that failed in the most recent run. It's important to realize that if one introduces a condition that would cause a previously passed test to fail, it may not be caught, such that one could run a string of tests using the `--lf` flag, get to the point where the tests all seem to pass, but then find that some tests that had passed earlier will fail due to conditions introduced when fixing the later tests.
+
+A related command, `pytest --ff` (for `--failed-first`) will run the most recent failed tests before running the rest of the tasks. This command is probably better for general use than the `--lf` flag, since it ensures that all tests are run, but prioritizes the running of the failing tests first. This might be an option that one would consider using by default, which can be achieved by adding the option to one of the relevant configuration files.  In our case, this would be `pyproject.toml`, where we could add:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "--ff"
+```
+
 ### Separate unit tests from longer-running tests
 
-- run unit tests regularly during coding, run integration tests on the clock (e.g. nightly)
+If we are writing short functions (which we are, right?), then our unit tests should usually run fairly quickly, whereas our integration tests (which integrate across a potentially large number of modules) may take much longer.  One thing we can do is to run only unit tests while we are developing, while having the integration tests run less frequently.  For example, we could have the unit tests run any time we commit our code (for example, by running them as pre-commit items), while having the integration tests run automatically on our CI system when the code is actually pushed to the GitHub repository.
+
+One way to accomplish this is to use pytest markers (as we saw earlier) to make 
+
+We first need to define our own custom markers in our `pyproject.toml` file:
+
+```toml
+[tool.pytest.ini_options]
+markers = [
+    "unit: mark a test as a unit test.",
+    "integration: mark a test as an integration test."
+]
+```
+
+We can then generate two tests with these markers:
+
+```python
+import pytest
+
+@pytest.mark.unit
+def test_unit1():
+    """This is a unit test."""
+    assert True
+
+@pytest.mark.unit
+def test_unit2():
+    """This is a unit test."""
+    assert True
+
+@pytest.mark.integration
+def test_integration():
+    """This is an integration test."""
+    assert True
+```
+
+Running these using the standard pytest command, both tests are executed:
+
+```bash
+❯ pytest -vv tests/markers/test_markers.py
+=========================== test session starts ============================
+collected 3 items
+
+tests/markers/test_markers.py::test_unit1 PASSED                     [ 33%]
+tests/markers/test_markers.py::test_unit2 PASSED                     [ 66%]
+tests/markers/test_markers.py::test_integration PASSED               [100%]
+============================ 3 passed in 0.05s =============================
+```
+
+However, we can also specify that only the unit tests should be executed, using the `-m` flag to deselect all other flags:
+
+```bash
+❯ pytest -vv -m unit tests/markers/test_markers.py
+=========================== test session starts ============================
+collected 3 items / 1 deselected / 2 selected
+
+tests/markers/test_markers.py::test_unit1 PASSED                     [ 50%]
+tests/markers/test_markers.py::test_unit2 PASSED                     [100%]
+===================== 2 passed, 1 deselected in 0.05s ======================
+
+```
+
+We could also run all tests that to not match a particular marker:
+
+```bash
+❯ pytest -vv -m "not unit" tests/markers/test_markers.py
+=========================== test session starts ============================
+collected 3 items / 2 deselected / 1 selected
+
+tests/markers/test_markers.py::test_integration PASSED               [100%]
+===================== 1 passed, 2 deselected in 0.05s ======================
+```
+
 
 ### Longest tests last
 
 Another simple strategy that can help optimize the testing workflow is to run tests in order to the time for completion. This ensures that one doesn't end up waiting a long time for long-running tests to complete, only to find that a quick test fails.  
 
+We can use pytest's `--durations` flag to get the durations for each test. Here is an example with three tests with different durations to completion:
+
+```python
+import pytest
+from time import sleep
+
+def test_duration_3():
+    sleep(3)
+    assert True
+
+def test_duration_5():
+    sleep(5)
+    assert True
+
+def test_duration_1():
+    sleep(1)
+    assert True
+```
+
+We can call pytest with `--durations=0` which will return the duration for all of the tests:
+
+```bash
+❯ pytest --durations=0 tests/ordering/test_duration.py
+============================= test session starts ==============================
+collected 3 items
+
+tests/ordering/test_duration.py ...                                      [100%]
+
+============================== slowest durations ===============================
+5.00s call     tests/ordering/test_duration.py::test_duration_5
+3.01s call     tests/ordering/test_duration.py::test_duration_3
+1.00s call     tests/ordering/test_duration.py::test_duration_1
+============================== 3 passed in 9.10s ===============================
+```
+
+Using the results of this, we could impose ordering on test execution so that the slowest ones are executed last, or add a `slow` marker that we could exclude from our regular testing.
+
+There are plugins for `pytest` that can measure the duration of each test and order tests accordingly, but they don't seem to be very well maintained. However, with agentic AI coding tools we can have our AI system make the appropriate call to pytest to obtain the durations and then add the appropriate ordering markers.  I tried this using the agentic chat window in VSCode (with Claude Sonnet 4).  On the first pass, Claude immediately noticed that it could infer the completion times directly from the `sleep()` commands in the code.  I asked it not to do this, and instead to use the outputs from `pytest --durations` but it had trouble waiting for the tests to finish, and ended up continuing to try to things that didn't work. However, Claude Code was able to successfully solve the problem'; the first line marked with ">" was my prompt, and the remainder is Claude Code's output:
+
+```
+> the file tests/ordering/test_duration.py contains several
+  tests.  Use pytest --duration to determine the durations for
+  each of the tests in this file. DO NOT try to infer the 
+  durations from the code itself. The tests will take about
+  fifteen seconds to complete, so be sure to wait for them. 
+  Then, add marks to each test using pytest-order to specify 
+  that the fastest tests are executed first.
+
+⏺ I'll run pytest with the --durations flag to measure the 
+actual test durations, then add pytest-order marks to run the
+fastest tests first.
+
+⏺ Update Todos
+  ⎿  ☐ Run pytest with --durations flag on test_duration.py
+     ☐ Analyze test duration results
+     ☐ Add pytest-order marks to tests based on duration
+
+⏺ Bash(pytest tests/ordering/test_duration.py --durations=0 -v)
+  ⎿ ============================= test session starts =====================
+    =========
+    platform darwin -- Python 3.12.0, pytest-8.4.1, pluggy-1.5.0 -- /Users/
+    … +27 lines (ctrl+r to expand)
+
+⏺ Based on the test durations:
+  - test_duration_1: 1.00s (fastest)
+  - test_duration_3: 3.00s
+  - test_duration_5: 5.01s (slowest)
+
+⏺ Now I'll add pytest-order marks to run tests from fastest to slowest:
+
+⏺ Update(tests/ordering/test_duration.py)
+  ⎿  Updated tests/ordering/test_duration.py with 3 additions
+        2    from time import sleep
+        3
+        4
+        5 +  @pytest.mark.order(2)
+        6    def test_duration_3():
+        7        sleep(3)
+        8        assert True
+        9
+       10 +  @pytest.mark.order(3)
+       11    def test_duration_5():
+       12        sleep(5)
+       13        assert True
+       14
+       15 +  @pytest.mark.order(1)
+       16    def test_duration_1():
+       17        sleep(1)
+       18        assert True
+
+⏺ Let me verify the ordering works correctly:
+
+⏺ Bash(pytest tests/ordering/test_duration.py -v)
+  ⎿ ============================= test session starts =====================
+    =========
+    platform darwin -- Python 3.12.0, pytest-8.4.1, pluggy-1.5.0 -- /Users/
+    … +20 lines (ctrl+r to expand)
+
+⏺ Perfect! The tests now run in order from fastest to slowest:
+  1. test_duration_1 (1 second)
+  2. test_duration_3 (3 seconds)
+  3. test_duration_5 (5 seconds)
+
+```
+
+This is a great example of how we can increasingly rely upon AI coding tools to solve problems that would once have required specialized tools.
 
 ### Using minimal mock datasets
 
@@ -1336,3 +1588,4 @@ If we have installed `pytest-xdist` then we can add the `-n auto` flag which wil
 You can see that it detected the 16 cores in my laptop and ran the 10 tests in parallel, greatly reducing the testing time.
 
 [^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
+[^2]: As discussed in the earlier section on technical debt, I don't think it's generally a good policy to rely upon packages that one randomly finds on Pypi or GitHub. Before recommending `python-order` as a possible solution, I looked at its [GitHub page](https://github.com/pytest-dev/pytest-order), where I saw that it appears to be a well-maintained and currently active package, with recent commits and solid handling of issues.  Conversely, during the course of writing I came across a number of other packages that had been recommended on Staack Overflow to solve various problems, some of which had not seen commits in several years or had longstanding unaddressed issues.
