@@ -2,38 +2,69 @@
 
 Tests define the expected behavior of code, and detect when the code doesn't match that expected behavior.
 
-One useful analogy for software testing comes from the biosciences.  Think for a moment about the rapid COVID-19 tests that we  all came to know during the pandemic.  These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.  This is known as a *positive control* because it assesses the test's ability to identify a positive response[^1].  Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
+One useful analogy for software testing comes from the biosciences.
+Think for a moment about the rapid COVID-19 tests that we all came to know during the pandemic.
+These tests had two lines, one of which was a *control* line; if this line didn't show up, then that meant that the test was not functioning as expected.
+This is known as a *positive control* because it assesses the test's ability to identify a positive response[^1].
+Other tests also include *negative controls*, which ensure that the test returns a negative result when it should.
 
-By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.  A positive test assesses whether, given a particular valid input, the component returns the correct output.  A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.  
+By analogy, we can think of software tests as being either positive or negative controls for the expected outcome of a software component.
+A positive test assesses whether, given a particular valid input, the component returns the correct output.
+A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.
 
 ## Why use software tests?
 
-The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.  This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming *more important* than code generation as a skill for generating good scientific code.  But creating correct code is far from the only reason for writing tests.
+The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.
+This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming *more important* than code generation as a skill for generating good scientific code.
+But creating correct code is far from the only reason for writing tests.
 
-A second reason for testing was highlighted in our earlier discussion of test-driven development.  Tests can provide the coder with a measure of task completion; when the tests pass, the job is done, other than refactoring the code to make it cleaner and more robust.  Writing tests make one think harder about what exactly they want/need the code to do, and to specify those goals in as clear a way as possible.  Focusing on tests can help keep the coder's "eyes on the MVP prize" and prevent generating too much extraneous code ("gold plating").
+A second reason for testing was highlighted in our earlier discussion of test-driven development.
+Tests can provide the coder with a measure of task completion; when the tests pass, the job is done, other than refactoring the code to make it cleaner and more robust.
+Writing tests make one think harder about what exactly they want/need the code to do, and to specify those goals in as clear a way as possible.
+Focusing on tests can help keep the coder's "eyes on the MVP prize" and prevent generating too much extraneous code ("gold plating").
 
-A third reason to write tests is that they can help drive modularity in the code.  It's much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.  Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored. In this way, writing tests can give us useful insights into the structure of the code.
+A third reason to write tests is that they can help drive modularity in the code.
+It's much easier to write tests for a simple function that does a single thing than for a complex function with many different roles.
+Testing can also help drive modularity by causing you to think more clearly about what a function does when developing the test; the inability to easily write a test for a function can suggest that the function might be overly complex and should be refactored.
+In this way, writing tests can give us useful insights into the structure of the code.
 
-A final reason to write tests is that they make it much easier to make changes to the code.  Without a robust test suite, one is always left worried that changing some aspect of the code will have unexpected effects on its former behavior (known as a "regression").  Tests can provide you with the comfort you need to make changes, knowing that you will detect any untoward effects your changes might have.  This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.
+A final reason to write tests is that they make it much easier to make changes to the code.
+Without a robust test suite, one is always left worried that changing some aspect of the code will have unexpected effects on its former behavior (known as a "regression").
+Tests can provide you with the comfort you need to make changes, knowing that you will detect any untoward effects your changes might have.
+This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.
 
 
 ## Types of tests
 
 ### Unit tests
 
-Unit tests are the bread and butter of software testing.  They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.  This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.  A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.  For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.  In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").  That is, we want to aim for "garbage in, exception out" behavior.
+Unit tests are the bread and butter of software testing.
+They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.
+This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.
+A major goal of unit testing in the latter case is preventing "garbage in, garbage out" behavior.
+For example, say that we are testing a function that takes in two matrices, and that the size of these matrices along their first dimension is assumed to match.
+In this case, we would want to test to make sure that if the function is provided with two matrices that mismatch in their first dimension, the function will respond by raising an exception rather than by giving back an answer that is incorrect or nonsensical (such as *NaN*, or "not a number").
+That is, we want to aim for "garbage in, exception out" behavior.
 
 ### Integration tests
 
-As the name suggests, an integration test assesses whether the entire application works as it should, integrating all of the components that were tested via unit testing. 
+As the name suggests, an integration test assesses whether the entire application works as it should, integrating all of the components that were tested via unit testing.
 
-One simple type of integration test is a "smoke test".  This name [apparently](https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)) derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.  In coding, a smoke test is a simple sanity check meant to ensure that the entire application runs without crashing.  This is usually accomplished by running a top-level function that exercises the entire application.  Smoke tests are useful for quickly identifying major problems, but they don't actually test whether the application performs its function correctly.  They can be especially useful for large applications, where the full test suite may take hours to run. An initial smoke test can determine whether something is broken downstream, saving lots of wasted testing time. 
+One simple type of integration test is a "smoke test".
+This name [apparently](https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)) derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.
+In coding, a smoke test is a simple sanity check meant to ensure that the entire application runs without crashing.
+This is usually accomplished by running a top-level function that exercises the entire application.
+Smoke tests are useful for quickly identifying major problems, but they don't actually test whether the application performs its function correctly.
+They can be especially useful for large applications, where the full test suite may take hours to run.
+An initial smoke test can determine whether something is broken downstream, saving lots of wasted testing time.
 
-Full integration tests assess the function of the entire application; one can think of them as unit tests where the unit is the entire application. Just as with unit tests, we want integration tests that both confirm proper operation under intended conditions, as well as confirming proper behavior (such as exiting with an error message) under improper conditions.
+Full integration tests assess the function of the entire application; one can think of them as unit tests where the unit is the entire application.
+Just as with unit tests, we want integration tests that both confirm proper operation under intended conditions, as well as confirming proper behavior (such as exiting with an error message) under improper conditions.
 
 ## The anatomy of a test
 
-A test is generally structured as a function that executes without raising an exception as long as the code behaves in an expected way.  Let's say that we want to generate a function that returns the escape velocity of a planet:
+A test is generally structured as a function that executes without raising an exception as long as the code behaves in an expected way.
+Let's say that we want to generate a function that returns the escape velocity of a planet:
 
 ```python
 import math
@@ -80,7 +111,8 @@ src/BetterCodeBetterScience/escape_velocity.py ..          [100%]
 ```
 
 
-If the returned value didn't match the known value (within a given level of tolerance, which is handled by `np.allclose()`), then the assertion will fail and raise an exception, causing the test to fail.  For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:
+If the returned value didn't match the known value (within a given level of tolerance, which is handled by `np.allclose()`), then the assertion will fail and raise an exception, causing the test to fail.
+For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:
 
 ```bash
 ❯ pytest src/BetterCodeBetterScience/escape_velocity.py
@@ -111,7 +143,9 @@ FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity - As
 ======================== 1 failed in 0.11s ========================
 ```
 
-It's also important to make sure that an exception is raised whenever it should be.  For example, the version of the `escape_velocity()` function above did not check to make sure that the mass and radius arguments had positive values, which means that it would give nonsensical results when passed a negative mass or radius value.  To address this we should add code to the function that causes it to raise an exception if either of the arguments is negative:
+It's also important to make sure that an exception is raised whenever it should be.
+For example, the version of the `escape_velocity()` function above did not check to make sure that the mass and radius arguments had positive values, which means that it would give nonsensical results when passed a negative mass or radius value.
+To address this we should add code to the function that causes it to raise an exception if either of the arguments is negative:
 
 ```python
 def escape_velocity(mass: float, radius: float, G=6.67430e-11):
@@ -131,7 +165,8 @@ def escape_velocity(mass: float, radius: float, G=6.67430e-11):
 
 ```
 
-We can then specify a test that checks whether the function properly raises an exception when passed a negative value. To do this we can use a feature of the `pytest` package (`pytest.raises`) that passes only if the specified exception is raised:
+We can then specify a test that checks whether the function properly raises an exception when passed a negative value.
+To do this we can use a feature of the `pytest` package (`pytest.raises`) that passes only if the specified exception is raised:
 
 ```python
 def test_escape_velocity_negative():
@@ -145,11 +180,15 @@ def test_escape_velocity_negative():
 
 ## When to write tests
 
-Too often researchers decide to write tests after they have written an entire codebase.  Having any tests is certainly better than having no tests, but integrating testing into ones development workflow from the start can help improve the development experience and ultimately lead to better and more maintainable software.  In Chapter 1 we mentioned the idea of *test-driven development*, which we outline in more detail below, but we first discuss a simple approach to introducing testing into the development process.  
+Too often researchers decide to write tests after they have written an entire codebase.
+Having any tests is certainly better than having no tests, but integrating testing into ones development workflow from the start can help improve the development experience and ultimately lead to better and more maintainable software.
+In Chapter 1 we mentioned the idea of *test-driven development*, which we outline in more detail below, but we first discuss a simple approach to introducing testing into the development process.
 
 ### Bug-driven testing: Any time you encounter a bug, write a test
 
-An easy way to introduce testing into the development process is to write a new test any time one encounters a bug, which we refer to as *bug-driven testing*.  This makes it easy to then work on fixing the bug, since the test will determine when the bug has been fixed. In addition, the test will detect if future changes reintroduce the bug.  
+An easy way to introduce testing into the development process is to write a new test any time one encounters a bug, which we refer to as *bug-driven testing*.
+This makes it easy to then work on fixing the bug, since the test will determine when the bug has been fixed.
+In addition, the test will detect if future changes reintroduce the bug.
 
 As an example, take the following function:
 
@@ -217,7 +256,8 @@ ZeroDivisionError: float division by zero
 
 ```
 
-Our intended behavior if all of the values are equal is to return an empty list, since there are by definition no outliers.  But before we do this, let's create a couple of tests to check for the intended behavior and provide useful error messages if the test fails:
+Our intended behavior if all of the values are equal is to return an empty list, since there are by definition no outliers.
+But before we do this, let's create a couple of tests to check for the intended behavior and provide useful error messages if the test fails:
 
 ```python
 def test_find_outliers_normal_case():
@@ -302,7 +342,8 @@ We can now fix the code by returning an empty list if zero standard deviation is
         return []
 ```
 
-Here we add a comment to explain the intention of the statement. Running the tests now will show that the problem is fixed:
+Here we add a comment to explain the intention of the statement.
+Running the tests now will show that the problem is fixed:
 
 ```python
 ❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
@@ -325,9 +366,11 @@ A commonly used scheme for writing a test is "given/when/then":
 - when something happens (such as a particular input)
 - then something else should happen (such as a particular output or exception)
 
-Importantly, a test should only test one thing at a time.  This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").  You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one) that together define the condition that we are interested in testing for.
+Importantly, a test should only test one thing at a time.
+This doesn't mean that the test should necessarily only test for one specific error at a time; rather, it means that the test should assess a specific situation ("given/when"), and then assess all of the possible outcomes that are necessary to ensure that the component functions properly ("then").
+You can see this in the test for zero standard deviation that we generated in the earlier example, which actually tested for two conditions (the intended value being present in the list, and the list having a length of one) that together define the condition that we are interested in testing for.
 
-How do we test that the output of a function is correct given the input?  There are different answers for different situations:
+How do we test that the output of a function is correct given the input? There are different answers for different situations:
 
 - *commonly known answer*: Sometimes we possess inputs where the output is known.  For example, if we were creating a function that computes the circumference of a circle, then we know that the output for an input radius of 1 should be 2 * pi.  This is generally only the case for very simple functions.  
 - *reference implementation*: In other cases we may have a standard implementation of an algorithm that we can compare against.  While in general it's not a good idea to reimplement code that already exists in a standard library, in come cases we may want to extend existing code but also check that the basic version still works as planned. 
@@ -336,9 +379,11 @@ How do we test that the output of a function is correct given the input?  There 
 
 ### Test against the interface, not the implementation
 
-A good test shouldn't know about the internal implementation details of the function that it is testing, and changes in the internal code that do not modify the input-output relationship should not affect the test.  That is, from the standpoint of the test, a function should be a "black box".  
+A good test shouldn't know about the internal implementation details of the function that it is testing, and changes in the internal code that do not modify the input-output relationship should not affect the test.
+That is, from the standpoint of the test, a function should be a "black box".
 
-The most common way in which a test can violate this principle is by accessing the internal variables of a class that it is testing.  For example, we might generate a class that performs a scaling operation on a numpy matrix:
+The most common way in which a test can violate this principle is by accessing the internal variables of a class that it is testing.
+For example, we might generate a class that performs a scaling operation on a numpy matrix:
 
 ```python
 class SimpleScaler:
@@ -386,13 +431,21 @@ def test_simple_scaler_internals():
 
 ```
 
-Both of these tests pass against the class definition shown above. However, if we were to change the way that the transformation is performed (for example, we decide to use the `StandardScaler` function from `scikit-learn` instead of writing our own), then the implementation-aware tests are likely to fail unless the sample internal variable names are used.  In general we should only interact with a function or class via its explicit interfaces.
+Both of these tests pass against the class definition shown above.
+However, if we were to change the way that the transformation is performed (for example, we decide to use the `StandardScaler` function from `scikit-learn` instead of writing our own), then the implementation-aware tests are likely to fail unless the sample internal variable names are used.
+In general we should only interact with a function or class via its explicit interfaces.
 
 ### Tests should be independent
 
-In scientific computing it's common to compose many different operations into a workflow.  If we want to test the workflow, then the tests of later steps in the workflow must necessarily rely upon earlier steps.  We could in theory write a set of tests that operate on a shared object, but the tests would fail if executed in an incorrect order, even if the code was correct.  Similarly, a failure on an early test would cause cascading failures in later tests, even if their code was correct.  The use of ordered tests also prevents the parallel execution of tests, which may slow down testing for complex projects.  For these reasons, we should always aim to create tests that can be executed independently.
+In scientific computing it's common to compose many different operations into a workflow.
+If we want to test the workflow, then the tests of later steps in the workflow must necessarily rely upon earlier steps.
+We could in theory write a set of tests that operate on a shared object, but the tests would fail if executed in an incorrect order, even if the code was correct.
+Similarly, a failure on an early test would cause cascading failures in later tests, even if their code was correct.
+The use of ordered tests also prevents the parallel execution of tests, which may slow down testing for complex projects.
+For these reasons, we should always aim to create tests that can be executed independently.
 
-Here is an example where coupling between tests could cause failures.  First we generate two functions that make changes in place to a data frame:
+Here is an example where coupling between tests could cause failures.
+First we generate two functions that make changes in place to a data frame:
 
 ```python
 def split_names(df):
@@ -404,7 +457,8 @@ def get_initials(df):
 
 ```
 
-In this case, the `get_initials()` function relies upon the `split_names()` function having been run, since otherwise the necessary columns won't exist in the data frame. We can then create tests for each of these, and a data frame that they can both use:
+In this case, the `get_initials()` function relies upon the `split_names()` function having been run, since otherwise the necessary columns won't exist in the data frame.
+We can then create tests for each of these, and a data frame that they can both use:
 
 ```python
 people_df = pd.DataFrame({'name': ['Alice Smith', 'Bob Howard', 'Charlie Ashe']}) 
@@ -419,7 +473,7 @@ def test_get_initials():
     assert people_df['initials'].tolist() == ['AS', 'BH', 'CA']
 ```
 
-These tests run correctly, but the same tests fail if we change their order such that `test_get_intials()` runs first, because the necessary columns (`firstname` and `lastname`) have not yet been created.  
+These tests run correctly, but the same tests fail if we change their order such that `test_get_intials()` runs first, because the necessary columns (`firstname` and `lastname`) have not yet been created.
 
 One simple way to deal with this is to set up all of the necessary structure locally within each test:
 
@@ -441,13 +495,16 @@ def test_get_initials_fullsetup():
     assert local_people_df['initials'].tolist() == ['AS', 'BH', 'CA']
 ```
 
-For simple functions like these this would not cause too much computational overhead, but for computationally intensive functions we would like to be able to reuse the results from the first time each function is run.  In a later section we will discuss the use of *fixtures* which allow this kind of reuse across tests while avoiding the ordering problems that we saw above when using a global variable across tests.
+For simple functions like these this would not cause too much computational overhead, but for computationally intensive functions we would like to be able to reuse the results from the first time each function is run.
+In a later section we will discuss the use of *fixtures* which allow this kind of reuse across tests while avoiding the ordering problems that we saw above when using a global variable across tests.
 
 ## Testing frameworks
 
-One could write tests without the help of any specialized packages, but we generally use a testing framework to help automate the activities of testing.  There are several testing frameworks for Python; we will focus on the popular and flexible `pytest` framework.
+One could write tests without the help of any specialized packages, but we generally use a testing framework to help automate the activities of testing.
+There are several testing frameworks for Python; we will focus on the popular and flexible `pytest` framework.
 
-We will start with a very simple example: a function that generates the Euclidean distance between two points.  Copilot generates the following for us based on the prompt in the comment:
+We will start with a very simple example: a function that generates the Euclidean distance between two points.
+Copilot generates the following for us based on the prompt in the comment:
 
 ```python
 # generate a function that calculates the distance between two points
@@ -462,7 +519,8 @@ def distance(p1, p2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 ```
 
-Now we would like to generate some tests for this code to make sure that it works properly. If we ask Copilot to generate some tests, it does a seeming decent job:
+Now we would like to generate some tests for this code to make sure that it works properly.
+If we ask Copilot to generate some tests, it does a seeming decent job:
 
 ```python
 def test_distance_zero():
@@ -490,7 +548,8 @@ Now that we have our tests, we can run them using the `pytest` command:
 pytest src/BetterCodeBetterScience/distance_testing
 ```
 
-This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".  Running those tests, we get an error:
+This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".
+Running those tests, we get an error:
 
 
 ```bash
@@ -502,7 +561,9 @@ E        +    where <built-in function sqrt> = math.sqrt
 
 ```
 
-Here we see that the value returned by our function is different from the one expected by the test; in this case, the test value generated by Copilot is incorrect.  In our research, it was not uncommon for ChatGPT to generate incorrect test values, so these must always be checked by a domain expert.  Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:
+Here we see that the value returned by our function is different from the one expected by the test; in this case, the test value generated by Copilot is incorrect.
+In our research, it was not uncommon for ChatGPT to generate incorrect test values, so these must always be checked by a domain expert.
+Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:
 
 ```bash
 python -m pytest pytest src/BetterCodeBetterScience/distance_testing
@@ -517,9 +578,11 @@ src/codingforscience/simple_testing/test_distance.py . [ 16%]
 
 ### Potential problems with AI-generated tests
 
-If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.  One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong. 
+If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.
+One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong.
 
-In our early project that examined the performance of GPT-4 for coding {cite:p}`Poldrack:2023aa`, one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.  One of the functions that was generated was the escape velocity function shown above, for which GPT-4 generated the [following test](https://github.com/poldrack/ai-coding-experiments/blob/main/data/conceptual_prompting/testdirs/conceptual_prompting06/test_answer.py):
+In our early project that examined the performance of GPT-4 for coding {cite:p}`Poldrack:2023aa`, one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.
+One of the functions that was generated was the escape velocity function shown above, for which GPT-4 generated the [following test](https://github.com/poldrack/ai-coding-experiments/blob/main/data/conceptual_prompting/testdirs/conceptual_prompting06/test_answer.py):
 
 
 ```python
@@ -585,11 +648,20 @@ FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4
 ===================================== 1 failed in 0.12s =====================================
 ```
  
-It seems that the first two assertions pass but the third one, for Jupiter, fails.  This failure took a bit of digging to fully understand.  In this case, the code and test value are both correct, depending on where you stand on Jupiter! The problem is that planets are *oblate*, meaning that they are slightly flattened such that the radius around the equator is higher than at other points.  NASA’s [Jupiter fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html) claims an escape velocity of 59.5 km/s, which seems to be the source of the test value.  This is correct when computed using the equatorial radius of 71492 km.  However, the radius given for Jupiter in GPT-4's test (69911 km) is the volumetric mean radius rather than the equatorial radius, and the value generated by the code (60.2 km/s) is correct when computed using the volumetric mean radius.  Thus, the test failed not due to any problems with the code itself, but due to a mismatch in assumptions regarding the combination of test values.  This example highlights the importance of understanding and checking the tests that are generated by AI coding tools.
+It seems that the first two assertions pass but the third one, for Jupiter, fails.
+This failure took a bit of digging to fully understand.
+In this case, the code and test value are both correct, depending on where you stand on Jupiter! The problem is that planets are *oblate*, meaning that they are slightly flattened such that the radius around the equator is higher than at other points.
+NASA’s [Jupiter fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html) claims an escape velocity of 59.5 km/s, which seems to be the source of the test value.
+This is correct when computed using the equatorial radius of 71492 km.
+However, the radius given for Jupiter in GPT-4's test (69911 km) is the volumetric mean radius rather than the equatorial radius, and the value generated by the code (60.2 km/s) is correct when computed using the volumetric mean radius.
+Thus, the test failed not due to any problems with the code itself, but due to a mismatch in assumptions regarding the combination of test values.
+This example highlights the importance of understanding and checking the tests that are generated by AI coding tools.
 
 ## Test-driven development and AI-assisted coding
 
-Here we will dive into a more realistic example of an application that one might develop using AI assistance, specifically looking at how we could develop the application using a test-driven development (TDD) approach.  We will develop a Python application that takes in a query for the PubMed database and returns a data frame containing the number of database records matching that query for each year. We start by decomposing the problem and sketching out the main set of functions that we will need to develop, with understandable names for each:
+Here we will dive into a more realistic example of an application that one might develop using AI assistance, specifically looking at how we could develop the application using a test-driven development (TDD) approach.
+We will develop a Python application that takes in a query for the PubMed database and returns a data frame containing the number of database records matching that query for each year.
+We start by decomposing the problem and sketching out the main set of functions that we will need to develop, with understandable names for each:
 
 - `get_PubmedIDs_for_query`: A function that will search pubmed for a given query and return a list of pubmed IDs
 - `get_record_from_PubmedID`: A function that will retrieve the record for a given pubmed ID
@@ -597,9 +669,14 @@ Here we will dive into a more realistic example of an application that one might
 - A function that will summarize the number of records per year
 - The main function that will take in a query and return a data frame with the number of records per year for the query
 
-We start by creating `get_PubmedIDs_for_query`.  We could use the `Biopython.Entrez` module to perform this search, but Biopython is a relatively large module that could introduce technical debt.  Instead, we will directly retrieve the result using the Entrez API and the built-in `requests` module. Note that for all of the code shown here we will not include docstrings, but they are available in the code within the repository.
+We start by creating `get_PubmedIDs_for_query`.
+We could use the `Biopython.Entrez` module to perform this search, but Biopython is a relatively large module that could introduce technical debt.
+Instead, we will directly retrieve the result using the Entrez API and the built-in `requests` module.
+Note that for all of the code shown here we will not include docstrings, but they are available in the code within the repository.
 
-If we are using the TDD approach, we would first want to develop a set of tests to make sure that our function is working correctly.  The following three tests specify several different outcomes that we might expect. First, we give a query that is known to give a valid result, and test whether it in fact gives such a result:
+If we are using the TDD approach, we would first want to develop a set of tests to make sure that our function is working correctly.
+The following three tests specify several different outcomes that we might expect.
+First, we give a query that is known to give a valid result, and test whether it in fact gives such a result:
 
 ```python
 def test_get_PubmedIDs_for_query_check_valid():
@@ -626,7 +703,8 @@ def test_get_PubmedIDs_for_query_check_empty():
 ```
 
 
-With the minimal tests in place, we then move to writing the code for the module.  We first create an empty function to ensure that the tests fail:
+With the minimal tests in place, we then move to writing the code for the module.
+We first create an empty function to ensure that the tests fail:
 
 ```python
 def get_PubmedIDs_for_query(query: str, 
@@ -720,12 +798,16 @@ def get_idlist_from_response(response: requests.Response) -> list:
         raise ValueError("Bad request")
 ```
 
-Note that we have split parts of the functionality into separate functions in order to make the code more understandable.  Running the tests, we see that both of them pass.  Assuming that our tests cover all possible outcomes of interest, we can consider our function complete.  We can also add additional tests to cover additional functions that we generated; we won't go into the details here, but you can see them on the Github repo.
+Note that we have split parts of the functionality into separate functions in order to make the code more understandable.
+Running the tests, we see that both of them pass.
+Assuming that our tests cover all possible outcomes of interest, we can consider our function complete.
+We can also add additional tests to cover additional functions that we generated; we won't go into the details here, but you can see them on the Github repo.
 
 
 ## Test coverage
 
-It can be useful to know if there are any portions of our code that are not being exercised by our tests, which is known as *code coverage*.  The `pytest-cov` extension for the `pytest` testing package can provide us with a report of test coverage for these tests:
+It can be useful to know if there are any portions of our code that are not being exercised by our tests, which is known as *code coverage*.
+The `pytest-cov` extension for the `pytest` testing package can provide us with a report of test coverage for these tests:
 
 ```bash
 ---------- coverage: platform darwin, python 3.12.0-final-0 ----------
@@ -736,7 +818,8 @@ src/BetterCodeBetterScience/textmining/textmining.py      30      1    97%   70
 TOTAL                                                     30      1    97%
 ```
 
-This report shows that of the 30 statements in our code, one of them is not covered by the tests.  When we look at the missing code (denoted as being on line 70), we see that the missing line is this one from `get_idlist_from_response`:
+This report shows that of the 30 statements in our code, one of them is not covered by the tests.
+When we look at the missing code (denoted as being on line 70), we see that the missing line is this one from `get_idlist_from_response`:
 
 ```python
     else:
@@ -744,7 +827,9 @@ This report shows that of the 30 statements in our code, one of them is not cove
         raise ValueError("Bad request")
 ```
 
-Since none of our test cases caused a bad request to occur, this line never gets executed in the tests. We can address this by adding a test that makes sure that an exception is raised if an invalid base url is provided. To check for an exception, we need to use the `pytest.raises` context manager:
+Since none of our test cases caused a bad request to occur, this line never gets executed in the tests.
+We can address this by adding a test that makes sure that an exception is raised if an invalid base url is provided.
+To check for an exception, we need to use the `pytest.raises` context manager:
 
 ```python
 def test_get_PubmedIDs_for_query_check_badurl():
@@ -758,14 +843,23 @@ def test_get_PubmedIDs_for_query_check_badurl():
     
 ```
 
-After adding this test, we see that we now have 100% coverage. It's important not to get too hung up on test coverage; rather than always aspiring to 100% coverage, it's important to make sure that the most likely possible situations are tested.  Just because you have 100% coverage doesn't mean that your code is perfectly tested, since there could always be situations that you haven't checked for. And spending too much time testing for unlikely problems can divert your efforts from other most useful activities.
+After adding this test, we see that we now have 100% coverage.
+It's important not to get too hung up on test coverage; rather than always aspiring to 100% coverage, it's important to make sure that the most likely possible situations are tested.
+Just because you have 100% coverage doesn't mean that your code is perfectly tested, since there could always be situations that you haven't checked for.
+And spending too much time testing for unlikely problems can divert your efforts from other most useful activities.
 
 
 ## Test fixtures
 
-Sometimes we need to use a the same data for multiple tests. Rather than duplicating potentially time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a *test fixture*.  This also helps maintain isolation between tests, since the order of tests shouldn't matter if an appropriate fixture is generated as soon as it's needed.
+Sometimes we need to use a the same data for multiple tests.
+Rather than duplicating potentially time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a *test fixture*.
+This also helps maintain isolation between tests, since the order of tests shouldn't matter if an appropriate fixture is generated as soon as it's needed.
 
-For our example above, it's likely that we will need to reuse the list of pubmed IDs from the search to perform various tests on the subsequent functions.  We can create a single version of this list of IDs by creating a fixture. In the `pytest` framework we do this using a special Python operator called a *decorator*, which is denoted by the symbol `@` as a prefix. A decorator is function that takes another function as input, modifies its functionality, and returns another function; you don't need to understand in detail how decorators work for this particular usage.  To refactor our tests above, we would first create the fixture by decorating the function that generates the fixture with the `@pytest.fixture` decorator, setting the `scope` variable to "session" so that the fixture is only generated once within the session:
+For our example above, it's likely that we will need to reuse the list of pubmed IDs from the search to perform various tests on the subsequent functions.
+We can create a single version of this list of IDs by creating a fixture.
+In the `pytest` framework we do this using a special Python operator called a *decorator*, which is denoted by the symbol `@` as a prefix.
+A decorator is function that takes another function as input, modifies its functionality, and returns another function; you don't need to understand in detail how decorators work for this particular usage.
+To refactor our tests above, we would first create the fixture by decorating the function that generates the fixture with the `@pytest.fixture` decorator, setting the `scope` variable to "session" so that the fixture is only generated once within the session:
 
 ```python
 @pytest.fixture(scope="session")
@@ -783,13 +877,21 @@ def test_get_PubmedIDs_for_query_check_valid(ids):
     assert len(ids) > 0
 ```
 
-The result is the same, but we now have a set of ids that we can reuse in subsequent tests, so that we don't have to make repeated queries.  It's important to note while using a session-scoped fixture: If any of the subsequent tests modify the fixture, those modifications will persist, which will break the isolation between tests.  We could prevent this by removing the `scope="session"` argument, which would then default to the standard scope which is within a specific function.  If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g. `my_ids = ids.copy()`) so that the global fixture object won't be modified.
+The result is the same, but we now have a set of ids that we can reuse in subsequent tests, so that we don't have to make repeated queries.
+It's important to note while using a session-scoped fixture: If any of the subsequent tests modify the fixture, those modifications will persist, which will break the isolation between tests.
+We could prevent this by removing the `scope="session"` argument, which would then default to the standard scope which is within a specific function.
+If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g. `my_ids = ids.copy()`) so that the global fixture object won't be modified.
 
 ## Mocking
 
-Sometimes tests require infrastructure that is outside of the control of the tester. In the example above, we are assuming that the Pubmed API is working correctly for our tests to run; if we were to try to run these tests without an internet connection, they would fail.  In other cases, code may rely upon a database system that may or may not exist on a particular system.  In these cases, we can create a mock object that can stand in for and simulate the behavior of the system that the code needs to interact with.
+Sometimes tests require infrastructure that is outside of the control of the tester.
+In the example above, we are assuming that the Pubmed API is working correctly for our tests to run; if we were to try to run these tests without an internet connection, they would fail.
+In other cases, code may rely upon a database system that may or may not exist on a particular system.
+In these cases, we can create a mock object that can stand in for and simulate the behavior of the system that the code needs to interact with.
 
-In our example, we want to create a mock response that looks sufficiently like a response from the real API to pass our tests.  Using pytest's *monkeypatch* fixture, we can temporarily replace the real requests.get function with our own fake function that returns a predictable, controlled response.  We first need to create a class that can replace the `requests.get` call in `get_PubmedIDs_for_query`, replacing it with a mock version that outputs a fixed simulacrum of an API response via its `.json()` method.  
+In our example, we want to create a mock response that looks sufficiently like a response from the real API to pass our tests.
+Using pytest's *monkeypatch* fixture, we can temporarily replace the real requests.get function with our own fake function that returns a predictable, controlled response.
+We first need to create a class that can replace the `requests.get` call in `get_PubmedIDs_for_query`, replacing it with a mock version that outputs a fixed simulacrum of an API response via its `.json()` method.
 
 ```python
 class MockPubmedResponse:
@@ -807,7 +909,8 @@ class MockPubmedResponse:
         }
 ```
 
-We now insert this mock response for the standard `requests.get` call within the test. In my initial attempt, I created created a fixture based on the mocked response and then tested that fixture:
+We now insert this mock response for the standard `requests.get` call within the test.
+In my initial attempt, I created created a fixture based on the mocked response and then tested that fixture:
 
 ```python
 @pytest.fixture
@@ -829,7 +932,9 @@ def test_get_PubmedIDs_for_query_check_valid_mocked(ids_mocked):
 
 ```
 
-Turning off my network connection shows that the mocked test passes, while the tests that require connecting to the actual API fail.  However, my usual code review (using Google's Gemini 2.5 Pro) identified a problem with this fixture: it conflates the setup (creating the mock API) with the execution of the function that uses the mock API.  A better approach (recommended by Gemini) is move the function execution out of the fixture and into the test:
+Turning off my network connection shows that the mocked test passes, while the tests that require connecting to the actual API fail.
+However, my usual code review (using Google's Gemini 2.5 Pro) identified a problem with this fixture: it conflates the setup (creating the mock API) with the execution of the function that uses the mock API.
+A better approach (recommended by Gemini) is move the function execution out of the fixture and into the test:
 
 ```python
 # Fixture ONLY does the setup (the mocking)
@@ -866,13 +971,18 @@ def test_get_PubmedIDs_for_query_check_valid_mocked(mock_pubmed_api):
     assert len(ids) == 2
 ```
 
-Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.  In fact, it's always a good idea to have tests that specifically assess the usage of the external service and the system's response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).
+Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.
+In fact, it's always a good idea to have tests that specifically assess the usage of the external service and the system's response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).
 
 ## Parametrized tests
 
-Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.  When the different inputs are known, one way to achieve this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
+Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.
+When the different inputs are known, one way to achieve this is to use a *parameterized test*, in which the test is repeatedly run across combinations of different possible values.
 
-For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.  We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID. Following our TDD approach, we first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.  We also need to create empty functions so that they can be imported to run the (failing) tests:
+For our example, let's move forward and develop the function `parse_year_from_Pubmed_record` to extract the year from Pubmed records, which can differ in their structure.
+We first need to develop the function `get_record_from_PubmedID` to retrieve a record based on a Pubmed ID.
+Following our TDD approach, we first develop two simple tests: one to ensure that it returns a non-empty dictionary for a valid Pubmed ID, and one to ensure that it raises an exception for an invalid Pubmed ID.
+We also need to create empty functions so that they can be imported to run the (failing) tests:
 
 ```python
 def get_record_from_PubmedID(pmid: str) -> dict:
@@ -882,7 +992,8 @@ def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
     pass
 ```
 
-Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.  We will generate a fixture so that the valid record and PubMed ID can be reused in a later test.
+Here are the initial tests; note that writing these tests requires a bit of knowledge about the expected structure of a Pubmed record.
+We will generate a fixture so that the valid record and PubMed ID can be reused in a later test.
 
 ```python
 @pytest.fixture(scope="session")
@@ -956,7 +1067,8 @@ def parse_year_from_Pubmed_record(pubmed_record: dict) -> int:
     return int(pubdate.split()[0]) if pubdate else None
 ```
 
-Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years across various journals. To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.  
+Now let's say that you had a specific set of Pubmed IDs that you wanted to test the code against; for example, you might select IDs from papers published in various years across various journals.
+To do this, we first create a list of tuples that include the information that we will need for the test; in this case it's the Pubmed ID and the true year of publication.
 
 ```python
 testdata = [
@@ -981,7 +1093,8 @@ def test_parse_year_from_pmid_parametric(pmid, year_true):
     assert year_result == year_true
 ```
 
-Note that we inserted a delay at the beginning of the test; this is necessary because the PubMed API will has a rate limit on requests, and running these tests without a delay to limit the request rate will result in intermittent test failures.  Looking at the results of running the test, we will see that each parametric value is run as a separate test:
+Note that we inserted a delay at the beginning of the test; this is necessary because the PubMed API will has a rate limit on requests, and running these tests without a delay to limit the request rate will result in intermittent test failures.
+Looking at the results of running the test, we will see that each parametric value is run as a separate test:
 
 ```bash
 ...
@@ -994,13 +1107,17 @@ tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[104676
 tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric[15050513-2004] PASSED       [100%]
 ```
 
-This test requires a live API, so it would fail in cases where one didn't have a proper network connection or if the API was down, and it would also be slow for a large number of tests.  It would be more efficient to mock the `get_record_from_PubmedID` function to avoid dependency on the live API, but for our simple purposes it's fine to use the live API.
+This test requires a live API, so it would fail in cases where one didn't have a proper network connection or if the API was down, and it would also be slow for a large number of tests.
+It would be more efficient to mock the `get_record_from_PubmedID` function to avoid dependency on the live API, but for our simple purposes it's fine to use the live API.
 
 ## Property-based testing
 
-Parameterized testing can be useful when we have specific values that we want to test, but sometimes we wish to test a large range of possible values drawn from some sort of distribution.  One approach to doing this is known as *property-based testing*, and basically involves generating random values that match some specification and testing the code against those.  
+Parameterized testing can be useful when we have specific values that we want to test, but sometimes we wish to test a large range of possible values drawn from some sort of distribution.
+One approach to doing this is known as *property-based testing*, and basically involves generating random values that match some specification and testing the code against those.
 
-Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the `hypothesis` module in Python to perform property-based testing.  Let's say that we have developed a function to perform linear regression, taking in two vectors (X and y variables) and return a vector of length 2 (parameter estimates for slope and intercept).  Copilot generates some very terse code for us:
+Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the `hypothesis` module in Python to perform property-based testing.
+Let's say that we have developed a function to perform linear regression, taking in two vectors (X and y variables) and return a vector of length 2 (parameter estimates for slope and intercept).
+Copilot generates some very terse code for us:
 
 ```python
 def linear_regression(X, y):
@@ -1073,7 +1190,10 @@ def test_linear_regression_without_validation(X, y):
     assert params is not None, "Parameters should not be None"
 ```
 
-The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.  The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.  We will turn off the validation in order to see what happens if the linear regression function is given invalid data. Running this test, we see that the test fails, with the following output:
+The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.
+The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.
+We will turn off the validation in order to see what happens if the linear regression function is given invalid data.
+Running this test, we see that the test fails, with the following output:
 
 ```bash
 ❯ pytest tests/property_based_testing/test_propertybased_smoke.py
@@ -1121,9 +1241,11 @@ FAILED tests/property_based_testing/test_propertybased_smoke.py::test_linear_reg
 ============================ 1 failed in 2.33s ============================
 ```
 
-The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.  We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.  
+The test has identified a specific input that will cause the code to fail - namely, when the X variable is all zeros, which leads to an error when trying to invert the singular matrix.
+We could get the test to pass by causing the function to return `None` when the matrix is no invertible, but this is not a great practice; we should announce problems loudly by raising an exception, rather than burying them quietly by returning `None`.
 
-Now that we have seen how `hypothesis` can identify errors, let's develop some tests for the code that we can use to make sure that it works properly.  We will first separately test the validator function, making sure that it can detect any of the potential problems that it should be able to detect:
+Now that we have seen how `hypothesis` can identify errors, let's develop some tests for the code that we can use to make sure that it works properly.
+We will first separately test the validator function, making sure that it can detect any of the potential problems that it should be able to detect:
 
 ```python
 @given(
@@ -1147,7 +1269,10 @@ def test_validate_input(X, y):
         pass # Explicitly show that catching the error is the goal.
 ```
 
-Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases, ensuring that any data passing the validator can run without error on the linear regression function.  When a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.  Here we will compare to the outputs from the from the linear regression function from the `scipy` module. Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
+Note that this doesn't actually whether our code actually gives the right answer, only that it runs without error and catches the appropriate problem cases, ensuring that any data passing the validator can run without error on the linear regression function.
+When a reference implementation exists for a function (as it does in the case of linear regression), then we can compare our results to the results from the reference.
+Here we will compare to the outputs from the from the linear regression function from the `scipy` module.
+Using this, we can check the randomly generated input to see whether it should raise an exception, and otherwise compare the results of our function to the scipy function:
 
 ```python
 # Test 2: Test the algorithm's correctness, assuming valid input
@@ -1174,25 +1299,36 @@ def test_linear_regression_correctness(X, y):
     assert np.allclose(params, [lr_result.intercept, lr_result.slope])
 ```
 
-This test passes, showing that our function closely matches the scipy reference implementation.  Note that we restricted the range of the values generated by the test to `[-1e6, 1e6]`; when the test values were allowed to vary across the full range of 64-bit floating point values (+/- 1.79e+308), we observed minute differences in the parameter estimates between the two functions that nonetheless exceeded the tolerance limits of `np.allclose()`. We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.
+This test passes, showing that our function closely matches the scipy reference implementation.
+Note that we restricted the range of the values generated by the test to `[-1e6, 1e6]`; when the test values were allowed to vary across the full range of 64-bit floating point values (+/- 1.79e+308), we observed minute differences in the parameter estimates between the two functions that nonetheless exceeded the tolerance limits of `np.allclose()`.
+We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.
 
 
 ## Automated testing and continuous integration
 
-Once we have a set of tests for a project, it's important to integrate them into our workflow so that we ensure that new changes to the code don't break the existing code (known as a *regression*).  
+Once we have a set of tests for a project, it's important to integrate them into our workflow so that we ensure that new changes to the code don't break the existing code (known as a *regression*).
 
-One useful way to ensure that the tests are run regularly is to run them automatically every time changes are pushed to version control.  This is known as "continuous integration" (CI for short), referring to the fact that it allows changes to be continuously integrated into the main code branch once they are confirmed to pass all of the tests. There are a number of different platforms one can use for CI; we will focus on *Github Actions* since it is the most tightly integrated into the Github version control system.  Testing using CI also has a useful side effect: Since the CI system uses a virtual machine to run the tests, the use of CI for testing ensures that the code can run on a separate machine from the one where it was developed.  Because setting up the CI system also requires understanding all of the dependencies that are required for the code to run, the CI setup provides a recipe to run the code on any other system.
+One useful way to ensure that the tests are run regularly is to run them automatically every time changes are pushed to version control.
+This is known as "continuous integration" (CI for short), referring to the fact that it allows changes to be continuously integrated into the main code branch once they are confirmed to pass all of the tests.
+There are a number of different platforms one can use for CI; we will focus on *Github Actions* since it is the most tightly integrated into the Github version control system.
+Testing using CI also has a useful side effect: Since the CI system uses a virtual machine to run the tests, the use of CI for testing ensures that the code can run on a separate machine from the one where it was developed.
+Because setting up the CI system also requires understanding all of the dependencies that are required for the code to run, the CI setup provides a recipe to run the code on any other system.
 
 ### Using GitHub Actions
 
-GitHub Actions is a system that allows one to automatically execute workflows in response to events related to any GitHub repository.  At the time of writing, Github Actions are free and unlimited for public repositories when using the standard GitHub-based workflow runners.  
+GitHub Actions is a system that allows one to automatically execute workflows in response to events related to any GitHub repository.
+At the time of writing, Github Actions are free and unlimited for public repositories when using the standard GitHub-based workflow runners.
 
 When setting up an automated action using GitHub Actions, there are two primary decisions to specify:
 
 - What is the workflow that I want to run?
 - What are the events that I want to trigger the workflow?
 
-As an example, we will implement a workflow running to execute tests for a simple python package that was generated for this book project, called [mdnewline](https://github.com/poldrack/mdnewline/).  We start by going to the GitHub Actions tab in the repository, and selecting the "Python Package" option, which creates a workflow that builds and tests a Python package.  Generating the workflow results in a file that contains a description of the workflow, located at `.github/workflows/python-package.yml`.  Looking more closely at the workflow file, we can see how it works.  The first section specifies the name of the workflow, and defines the events that will trigger the workflow:
+As an example, we will implement a workflow running to execute tests for a simple python package that was generated for this book project, called [mdnewline](https://github.com/poldrack/mdnewline/).
+We start by going to the GitHub Actions tab in the repository, and selecting the "Python Package" option, which creates a workflow that builds and tests a Python package.
+Generating the workflow results in a file that contains a description of the workflow, located at `.github/workflows/python-package.yml`.
+Looking more closely at the workflow file, we can see how it works.
+The first section specifies the name of the workflow, and defines the events that will trigger the workflow:
 
 ```yaml
 name: Python package
@@ -1205,7 +1341,8 @@ on:
 
 ```
 
-This section specifies that the workflow will be run any time there is a push or a pull request to the main branch of the repo.  The next section sets up workflow jobs:
+This section specifies that the workflow will be run any time there is a push or a pull request to the main branch of the repo.
+The next section sets up workflow jobs:
 
 ```yaml
 jobs:
@@ -1217,9 +1354,12 @@ jobs:
         python-version: ["3.12", "3.13"]
 ```
 
-The `runs-on` argument tells the workflow runner which virtual machine to use to run the workflows; in this case, we will use the default which is the latest release of Ubuntu Linux.  We also tell it which versions of Python we want to test the code on, updating it to test on all current versions that are compatible with the package requirements (Python >= 3.12). 
+The `runs-on` argument tells the workflow runner which virtual machine to use to run the workflows; in this case, we will use the default which is the latest release of Ubuntu Linux.
+We also tell it which versions of Python we want to test the code on, updating it to test on all current versions that are compatible with the package requirements (Python >= 3.12).
 
-We then specify the actual steps in the workflow. The first steps set up the workflow runner so that it can check out the repository, and set up the Python installation.  Since this project uses `uv` to manage packages, we will use the recommended setup code from the [uv documentation](https://docs.astral.sh/uv/guides/integration/github/) for multiple Python versions:
+We then specify the actual steps in the workflow.
+The first steps set up the workflow runner so that it can check out the repository, and set up the Python installation.
+Since this project uses `uv` to manage packages, we will use the recommended setup code from the [uv documentation](https://docs.astral.sh/uv/guides/integration/github/) for multiple Python versions:
 
 ```yaml
     steps:
@@ -1231,7 +1371,8 @@ We then specify the actual steps in the workflow. The first steps set up the wor
           python-version: ${{ matrix.python-version }}
 ```
 
-This installs uv with the appropriate python version. We can then install the project using `uv sync`, pip install the package within the `uv` environment, and run the tests:
+This installs uv with the appropriate python version.
+We can then install the project using `uv sync`, pip install the package within the `uv` environment, and run the tests:
 
 ```yaml
       - name: Install the project
@@ -1245,7 +1386,8 @@ This installs uv with the appropriate python version. We can then install the pr
         run: uv run pytest tests
 ```
 
-When we commit and push this workflow file, it is automatically run by Github Actions. If we got to the Actions tab in the repository, we will see that the tests failed, and by looking at the logs we can see that the `uv` installation process failed:
+When we commit and push this workflow file, it is automatically run by Github Actions.
+If we got to the Actions tab in the repository, we will see that the tests failed, and by looking at the logs we can see that the `uv` installation process failed:
 
 ![Github actions failure](images/github_actions_failure.png)
 
@@ -1260,13 +1402,18 @@ It's nice to advertise our testing to the world, which we can do by [adding a st
 
 ## Optimizing the testing workflow
 
-As a project becomes larger and more complex, the tests will necessarily take longer to run - and whenever the tests take too long, it's likely that you won't run them as often. This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.  As an example, our lab develops a tool for fMRI data preprocessing called [fMRIPrep](https://fmriprep.org/en/stable/) that performs a large set of operations on functional MRI datasets.  Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization we can complete it in 10-15 minutes. 
+As a project becomes larger and more complex, the tests will necessarily take longer to run - and whenever the tests take too long, it's likely that you won't run them as often.
+This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.
+As an example, our lab develops a tool for fMRI data preprocessing called [fMRIPrep](https://fmriprep.org/en/stable/) that performs a large set of operations on functional MRI datasets.
+Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization we can complete it in 10-15 minutes.
 
 There are a number of strategies to optimize one's testing workflows.
 
 ### Cherry-picking specific tests
 
-When developing a new function, it's usually sufficient to run only the tests that directly address that function rather than running the entire test suite.  If all of the tests for a specific function are located within a single test file, then one can simply call `pytest` with that file.  It's also possible to run a specific test within a file by referring to a specific class or function using a double-colon marker:
+When developing a new function, it's usually sufficient to run only the tests that directly address that function rather than running the entire test suite.
+If all of the tests for a specific function are located within a single test file, then one can simply call `pytest` with that file.
+It's also possible to run a specific test within a file by referring to a specific class or function using a double-colon marker:
 
 ```bash
 ❯ pytest tests/textmining/test_textmining.py::test_parse_year_from_Pubmed_record
@@ -1282,11 +1429,14 @@ This allows one to focus on the tests that are immediately relevant to a specifi
 
 ### Controlling test execution order
 
-Several of the strategies described below require the ability to execute tests in specific orders.  There are several strategies one can use to do this.
+Several of the strategies described below require the ability to execute tests in specific orders.
+There are several strategies one can use to do this.
 
-One strategy that *will not* work reliably is to place the tests in a specific order in the test file.  While tests are often executed in the order that the functions appear in the file, this not guaranteed.
+One strategy that *will not* work reliably is to place the tests in a specific order in the test file.
+While tests are often executed in the order that the functions appear in the file, this not guaranteed.
 
-For precise ordering of particular tests, one can use the [pytest-order](https://pypi.org/project/pytest-order/) plugin, which allows the use of marks to specify test order[^2].  We start with two tests that are out of order in the test code:
+For precise ordering of particular tests, one can use the [pytest-order](https://pypi.org/project/pytest-order/) plugin, which allows the use of marks to specify test order[^2].
+We start with two tests that are out of order in the test code:
 
 ```python
 import pytest
@@ -1340,15 +1490,21 @@ tests/ordering/test_order.py::test_second PASSED                     [100%]
 ============================ 2 passed in 0.05s =============================
 ```
 
-This package also provides other useful ways to control execution order, such as relative markers like "before" or "last". 
+This package also provides other useful ways to control execution order, such as relative markers like "before" or "last".
 
-Note that while it might be tempting to use test ordering to ensure the proper executions of tests that rely upon one another, this is generally a bad practice. Instead, one should generate fixtures for any dependencies that are shared by tests.
+Note that while it might be tempting to use test ordering to ensure the proper executions of tests that rely upon one another, this is generally a bad practice.
+Instead, one should generate fixtures for any dependencies that are shared by tests.
 
 ### Only run failed tests, or run them first
 
-Pytest has a set of features that allow one to focus testing on those tests that have most recently failed, which can be useful in the context of test-driven development.  The first command, `pytest --lf` (short for `--last-failed`) will check the cache of the most recent test run results, and only run those tests that failed in the most recent run. It's important to realize that if one introduces a condition that would cause a previously passed test to fail, it may not be caught, such that one could run a string of tests using the `--lf` flag, get to the point where the tests all seem to pass, but then find that some tests that had passed earlier will fail due to conditions introduced when fixing the later tests.
+Pytest has a set of features that allow one to focus testing on those tests that have most recently failed, which can be useful in the context of test-driven development.
+The first command, `pytest --lf` (short for `--last-failed`) will check the cache of the most recent test run results, and only run those tests that failed in the most recent run.
+It's important to realize that if one introduces a condition that would cause a previously passed test to fail, it may not be caught, such that one could run a string of tests using the `--lf` flag, get to the point where the tests all seem to pass, but then find that some tests that had passed earlier will fail due to conditions introduced when fixing the later tests.
 
-A related command, `pytest --ff` (for `--failed-first`) will run the most recent failed tests before running the rest of the tasks. This command is probably better for general use than the `--lf` flag, since it ensures that all tests are run, but prioritizes the running of the failing tests first. This might be an option that one would consider using by default, which can be achieved by adding the option to one of the relevant configuration files.  In our case, this would be `pyproject.toml`, where we could add:
+A related command, `pytest --ff` (for `--failed-first`) will run the most recent failed tests before running the rest of the tasks.
+This command is probably better for general use than the `--lf` flag, since it ensures that all tests are run, but prioritizes the running of the failing tests first.
+This might be an option that one would consider using by default, which can be achieved by adding the option to one of the relevant configuration files.
+In our case, this would be `pyproject.toml`, where we could add:
 
 ```toml
 [tool.pytest.ini_options]
@@ -1357,9 +1513,12 @@ addopts = "--ff"
 
 ### Separate unit tests from longer-running tests
 
-If we are writing short functions (which we are, right?), then our unit tests should usually run fairly quickly, whereas our integration tests (which integrate across a potentially large number of modules) may take much longer.  One thing we can do is to run only unit tests while we are developing, while having the integration tests run less frequently.  For example, we could have the unit tests run any time we commit our code (for example, by running them as pre-commit items), while having the integration tests run automatically on our CI system when the code is actually pushed to the GitHub repository.
+If we are writing short functions (which we are, right?), then our unit tests should usually run fairly quickly, whereas our integration tests (which integrate across a potentially large number of modules) may take much longer.
+One thing we can do is to run only unit tests while we are developing, while having the integration tests run less frequently.
+For example, we could have the unit tests run any time we commit our code (for example, by running them as pre-commit items), while having the integration tests run automatically on our CI system when the code is actually pushed to the GitHub repository.
 
-One way to accomplish this is to use pytest markers (as we saw earlier) to mark groups of tests. We first need to define our own custom markers in our `pyproject.toml` file:
+One way to accomplish this is to use pytest markers (as we saw earlier) to mark groups of tests.
+We first need to define our own custom markers in our `pyproject.toml` file:
 
 ```toml
 [tool.pytest.ini_options]
@@ -1430,9 +1589,11 @@ tests/markers/test_markers.py::test_integration PASSED               [100%]
 
 ### Longest tests last
 
-Another simple strategy that can help optimize the testing workflow is to run tests in order to the time for completion. This ensures that one doesn't end up waiting a long time for long-running tests to complete, only to find that a quick test fails.  
+Another simple strategy that can help optimize the testing workflow is to run tests in order to the time for completion.
+This ensures that one doesn't end up waiting a long time for long-running tests to complete, only to find that a quick test fails.
 
-We can use pytest's `--durations` flag to get the durations for each test. Here is an example with three tests with different durations to completion:
+We can use pytest's `--durations` flag to get the durations for each test.
+Here is an example with three tests with different durations to completion:
 
 ```python
 import pytest
@@ -1469,7 +1630,12 @@ tests/ordering/test_duration.py ...                                      [100%]
 
 Using the results of this, we could impose ordering on test execution so that the slowest ones are executed last, or add a `slow` marker that we could exclude from our regular testing.
 
-There are plugins for `pytest` that can measure the duration of each test and order tests accordingly, but they don't seem to be very well maintained so I am avoiding them. However, with agentic AI coding tools we can have our AI system make the appropriate call to pytest to obtain the durations and then add the appropriate ordering markers.  I tried this using the agentic chat window in VSCode (with Claude Sonnet 4).  On the first pass, Claude immediately noticed that it could infer the completion times directly from the `sleep()` commands in the code.  I asked it not to do this, and instead to use the outputs from `pytest --durations` but it had trouble waiting for the tests to finish, and ended up continuing to try to things that didn't work. However, Claude Code was able to successfully solve the problem; the first line marked with ">" was my prompt, and the remainder is Claude Code's output:
+There are plugins for `pytest` that can measure the duration of each test and order tests accordingly, but they don't seem to be very well maintained so I am avoiding them.
+However, with agentic AI coding tools we can have our AI system make the appropriate call to pytest to obtain the durations and then add the appropriate ordering markers.
+I tried this using the agentic chat window in VSCode (with Claude Sonnet 4).
+On the first pass, Claude immediately noticed that it could infer the completion times directly from the `sleep()` commands in the code.
+I asked it not to do this, and instead to use the outputs from `pytest --durations` but it had trouble waiting for the tests to finish, and ended up continuing to try to things that didn't work.
+However, Claude Code was able to successfully solve the problem; the first line marked with ">" was my prompt, and the remainder is Claude Code's output:
 
 ```
 > the file tests/ordering/test_duration.py contains several
@@ -1541,15 +1707,24 @@ This is a great example of how we can increasingly rely upon AI coding models to
 
 ### Using minimal mock datasets
 
-For code that performs data processing operations, the processing of full size datasets can often take a very long time.  One strategy in these cases is to generate minimal mock datasets that can exercise the functions without taking the full amount of time that a real dataset would. In the tests for `fMRIPrep`, we use fMRI datasets that have been reduced in length, and structural MRI datasets that have been downsampled to reduce their spatial resolution. The specific way to reduce the dataset will depend on the particular processes being run. For example, downsampling the data too much for MRI preprocessing would likely cause some operations to fail, so one needs to have a good intuition for the data requirements for the relevant code.
+For code that performs data processing operations, the processing of full size datasets can often take a very long time.
+One strategy in these cases is to generate minimal mock datasets that can exercise the functions without taking the full amount of time that a real dataset would.
+In the tests for `fMRIPrep`, we use fMRI datasets that have been reduced in length, and structural MRI datasets that have been downsampled to reduce their spatial resolution.
+The specific way to reduce the dataset will depend on the particular processes being run.
+For example, downsampling the data too much for MRI preprocessing would likely cause some operations to fail, so one needs to have a good intuition for the data requirements for the relevant code.
 
 ### Adding minimal processing modes for integration tests
 
-When the goal is to the test the integration of components rather than the function of each component, one way to minimize testing time is to provide configuration features that minimize execution time for the component. For example, in `fMRIPrep` there are a number of steps that involve optimization processes that take time to converge.  However, there the package has a "sloppy mode" configuration flag that one can turn on for testing, which provides a more lenient threshold for convergence of those operations, allowing them to finish faster.  Again, knowing where one can cut corners requires a good understanding of the specific requirements of the processing operations.
+When the goal is to the test the integration of components rather than the function of each component, one way to minimize testing time is to provide configuration features that minimize execution time for the component.
+For example, in `fMRIPrep` there are a number of steps that involve optimization processes that take time to converge.
+However, there the package has a "sloppy mode" configuration flag that one can turn on for testing, which provides a more lenient threshold for convergence of those operations, allowing them to finish faster.
+Again, knowing where one can cut corners requires a good understanding of the specific requirements of the processing operations.
 
 ### Parallelizing testing
 
-If we have written good tests, they should be able to run independently, and thus their execution should be parallelizable, assuming that we are using a system with multiple CPU cores.  If we are using `pytest` as our testing framework, then we can use the `pytest-xdist` extension to enable the parallel execution of tests in pytest.  For example, let's set up a parameterized test that includes a `time.sleep()` command so that execution will take a significant amount of time.
+If we have written good tests, they should be able to run independently, and thus their execution should be parallelizable, assuming that we are using a system with multiple CPU cores.
+If we are using `pytest` as our testing framework, then we can use the `pytest-xdist` extension to enable the parallel execution of tests in pytest.
+For example, let's set up a parameterized test that includes a `time.sleep()` command so that execution will take a significant amount of time.
 
 ```python
 import pytest
@@ -1584,5 +1759,8 @@ If we have installed `pytest-xdist` then we can add the `-n auto` flag which wil
 
 You can see that it detected the 16 cores in my laptop and ran the 10 tests in parallel, greatly reducing the testing time.
 
-[^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
-[^2]: As discussed in the earlier section on technical debt, I don't think it's generally a good policy to rely upon packages that one randomly finds on Pypi or GitHub. Before recommending `python-order` as a possible solution, I looked at its [GitHub page](https://github.com/pytest-dev/pytest-order), where I saw that it appears to be a well-maintained and currently active package, with recent commits and solid handling of issues.  Conversely, during the course of writing I came across a number of other packages that had been recommended on Stack Overflow to solve various problems, some of which had not seen commits in several years or had longstanding unaddressed issues.
+[^1]: This is slightly inaccurate, because a true positive control would contain the actual virus.
+It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
+[^2]: As discussed in the earlier section on technical debt, I don't think it's generally a good policy to rely upon packages that one randomly finds on Pypi or GitHub.
+Before recommending `python-order` as a possible solution, I looked at its [GitHub page](https://github.com/pytest-dev/pytest-order), where I saw that it appears to be a well-maintained and currently active package, with recent commits and solid handling of issues.
+Conversely, during the course of writing I came across a number of other packages that had been recommended on Stack Overflow to solve various problems, some of which had not seen commits in several years or had longstanding unaddressed issues.
