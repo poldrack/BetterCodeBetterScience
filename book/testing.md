@@ -1342,7 +1342,7 @@ tests/ordering/test_order.py::test_second PASSED                     [100%]
 
 This package also provides other useful ways to control execution order, such as relative markers like "before" or "last". 
 
-Note that while it might be tempting to use test ordering to ensure the proper executions of tests that relu upon one another, this is generally a bad practice. Instead, one should generate fixtures for any dependencies that are shared by tests.
+Note that while it might be tempting to use test ordering to ensure the proper executions of tests that rely upon one another, this is generally a bad practice. Instead, one should generate fixtures for any dependencies that are shared by tests.
 
 ### Only run failed tests, or run them first
 
@@ -1359,9 +1359,7 @@ addopts = "--ff"
 
 If we are writing short functions (which we are, right?), then our unit tests should usually run fairly quickly, whereas our integration tests (which integrate across a potentially large number of modules) may take much longer.  One thing we can do is to run only unit tests while we are developing, while having the integration tests run less frequently.  For example, we could have the unit tests run any time we commit our code (for example, by running them as pre-commit items), while having the integration tests run automatically on our CI system when the code is actually pushed to the GitHub repository.
 
-One way to accomplish this is to use pytest markers (as we saw earlier) to make 
-
-We first need to define our own custom markers in our `pyproject.toml` file:
+One way to accomplish this is to use pytest markers (as we saw earlier) to mark groups of tests. We first need to define our own custom markers in our `pyproject.toml` file:
 
 ```toml
 [tool.pytest.ini_options]
@@ -1371,7 +1369,7 @@ markers = [
 ]
 ```
 
-We can then generate two tests with these markers:
+We can then generate tests using these markers:
 
 ```python
 import pytest
@@ -1471,7 +1469,7 @@ tests/ordering/test_duration.py ...                                      [100%]
 
 Using the results of this, we could impose ordering on test execution so that the slowest ones are executed last, or add a `slow` marker that we could exclude from our regular testing.
 
-There are plugins for `pytest` that can measure the duration of each test and order tests accordingly, but they don't seem to be very well maintained. However, with agentic AI coding tools we can have our AI system make the appropriate call to pytest to obtain the durations and then add the appropriate ordering markers.  I tried this using the agentic chat window in VSCode (with Claude Sonnet 4).  On the first pass, Claude immediately noticed that it could infer the completion times directly from the `sleep()` commands in the code.  I asked it not to do this, and instead to use the outputs from `pytest --durations` but it had trouble waiting for the tests to finish, and ended up continuing to try to things that didn't work. However, Claude Code was able to successfully solve the problem'; the first line marked with ">" was my prompt, and the remainder is Claude Code's output:
+There are plugins for `pytest` that can measure the duration of each test and order tests accordingly, but they don't seem to be very well maintained so I am avoiding them. However, with agentic AI coding tools we can have our AI system make the appropriate call to pytest to obtain the durations and then add the appropriate ordering markers.  I tried this using the agentic chat window in VSCode (with Claude Sonnet 4).  On the first pass, Claude immediately noticed that it could infer the completion times directly from the `sleep()` commands in the code.  I asked it not to do this, and instead to use the outputs from `pytest --durations` but it had trouble waiting for the tests to finish, and ended up continuing to try to things that didn't work. However, Claude Code was able to successfully solve the problem; the first line marked with ">" was my prompt, and the remainder is Claude Code's output:
 
 ```
 > the file tests/ordering/test_duration.py contains several
@@ -1539,7 +1537,7 @@ fastest tests first.
 
 ```
 
-This is a great example of how we can increasingly rely upon AI coding tools to solve problems that would once have required specialized tools.
+This is a great example of how we can increasingly rely upon AI coding models to solve problems that would once have required specialized tools.
 
 ### Using minimal mock datasets
 
@@ -1562,7 +1560,7 @@ def test_parallel(x):
     assert x in range(10), f"Value {x} is not in the expected list."
     time.sleep(1) # wait for one second
 ```
-If we run this using the standard pytest command, we should see that it takes about ten seconds, given that there are ten tests:
+If we run this using the standard `pytest` command, we should see that it takes about ten seconds, given that there are ten tests:
 
 ```bash
 ❯ pytest tests/parallel/tests_parallel.py
@@ -1572,7 +1570,6 @@ collected 10 items
 tests/parallel/tests_parallel.py ..........                              [100%]
 
 ============================= 10 passed in 10.18s ==============================
-
 ```
 
 If we have installed `pytest-xdist` then we can add the `-n auto` flag which will automatically detect how manu CPU cores we have available and run the tests in parallel across those cores:
@@ -1588,4 +1585,4 @@ If we have installed `pytest-xdist` then we can add the `-n auto` flag which wil
 You can see that it detected the 16 cores in my laptop and ran the 10 tests in parallel, greatly reducing the testing time.
 
 [^1]: This is slightly inaccurate, because a true positive control would contain the actual virus. It would be more precise to call it a “procedural control” but these seem to be also referred to as “positive controls” so I am sticking with the more understandable terminology here.
-[^2]: As discussed in the earlier section on technical debt, I don't think it's generally a good policy to rely upon packages that one randomly finds on Pypi or GitHub. Before recommending `python-order` as a possible solution, I looked at its [GitHub page](https://github.com/pytest-dev/pytest-order), where I saw that it appears to be a well-maintained and currently active package, with recent commits and solid handling of issues.  Conversely, during the course of writing I came across a number of other packages that had been recommended on Staack Overflow to solve various problems, some of which had not seen commits in several years or had longstanding unaddressed issues.
+[^2]: As discussed in the earlier section on technical debt, I don't think it's generally a good policy to rely upon packages that one randomly finds on Pypi or GitHub. Before recommending `python-order` as a possible solution, I looked at its [GitHub page](https://github.com/pytest-dev/pytest-order), where I saw that it appears to be a well-maintained and currently active package, with recent commits and solid handling of issues.  Conversely, during the course of writing I came across a number of other packages that had been recommended on Stack Overflow to solve various problems, some of which had not seen commits in several years or had longstanding unaddressed issues.
