@@ -142,7 +142,7 @@ A framework that we like for this concept comes from the [Turing Way](https://bo
 This framework, shown in {numref}`Figure {number} <TuringWayReproducibility-fig>`, distinguishes between whether the data and analysis are either same or different between two analyses.
 
 :::{figure-md} TuringWayReproducibility-fig
-<img src="https://book.the-turing-way.org/build/reproducible-matrix-1f714c1d292747c95fe172a47d6a0937.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
+<img src="images/reproducible-matrix.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
 
 A schematic of the Turing Way framework for different concepts of reproducibility.
 Reproduced from The Turing Way under CC-BY.
