@@ -400,35 +400,5 @@ Why might we prefer one of these solutions to the other?  One reason has to do w
 
 It's also important to note that there is a point at which very long prompts may begin to degrade performance.  In particular, LLM researchers have identified a phenomenon that has come to be called *context rot*, in which performance of the model is degraded as the amount of information in context grows. [Analyses of performance as a function of context](https://research.trychroma.com/context-rot) have shown that model performance can begin to degrade on some benchmarks when the context extends beyond 1000 tokens and can sometimes degrade very badly as the context goes beyond 100,000 tokens.    Later in this chapter we will discuss *retrieval-augmented generation*, which is a method that can help alleviate the impact of context rot by focusing the context on the most relevant information for the task at hand.
 
-### Agentic coding tools
-
-The fourth approach uses tools that have *agentic* capabilities, which means that they can call upon other tools to help accomplish tasks.
-
-
-## Language model prompting
-
-The ability to leverage the power of language models for coding depends heavily on one's ability to effectively prompt them, whether using a chatbot or an integrated LLM assistant.  The most important aspect of prompting is to give the model sufficient context so that it can narrow its probability distribution over answers to the specific domain of interest.  Here are some basic prompting strategies that can enhance the effectiveness of AI-assisted coding; note that the development of prompting strategies rapidly developing, and that these may well outdated by the time of publication.
-
-- few-shot prompting with examples
-
-- prompt formatting with delimiters
-
-- chain of thought
-
-
-## Retrieval-augmented generation
-
-
-## AI-assisted development workflows
-
-
-## Leveraging LLM coding for reproducibility
-
-LLM-based chatbots can be very useful for solving many problems beyond coding.  For example, we recently worked on a paper with more than 100 authors, and needed to harmonize the affiliation listings across authors.  This would have been immensely tedious for a human, but working with an LLM we were able to solve the problem with only a few manual changes needed.  Other examples where we have used LLMs in the research process include data reformatting and summarization of text for meta-analyses.  However, as noted above, the use of chatbots in scientific research is challenging from the standpoint of reproducibility, since it is generally impossible to guarantee the ability to reproduce an LLM output; even if the random seed is fixed, the commercial models change regularly, without the ability to go back to a specific model version.  
-
-The ability to LLMs to write code to solve problems provides a solution to the reproducibility challenge: instead of simply using a chatbot to solve a problem, ask the chatbot to generate code to solve the problem, which makes the result testable and reproducible.  This is also a way to solve problems with information that you don't want to submit to the LLM for privacy reasons.
-
-For example, ...
-
 
 [^1]: Confusingly, the term "API" is used in two different ways in different contexts.  In this chapter we are using it to refer to an actual system that one can interact with to send and receive messages.  However, in other contexts the term is used to refer to a specification for how to interact with a system.  For example, many software packages present an "API Reference" (for example, [scikit-learn](https://scikit-learn.org/stable/api/index.html)), which specifies the interfaces to all of the classes and functions in the package.  It's important to distinguish these two uses of the term to avoid confusion.  
