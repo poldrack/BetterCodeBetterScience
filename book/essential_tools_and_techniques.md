@@ -571,7 +571,7 @@ Many of them are better described as "open weight" models (a term we will use th
 Despite these limitations, the availability of these open-ish models has given researchers the opportunity to work more closely with these models and see into their inner workings.
 They also allow users to perform further fine-tuning to augment model performance in particular domains.
 
-| Feature | Open-Weight LLMs | True Open-Source LLMs |
+| Feature | Open Weight LLMs | True Open-Source LLMs |
 |------------------|------------------|----------------------|
 | Model weights available? | ✅ Yes | ✅ Yes |
 | Training data available? | ❌ No | ✅ Yes |
@@ -579,7 +579,7 @@ They also allow users to perform further fine-tuning to augment model performanc
 | Can be fine-tuned? | ✅ Yes | ✅ Yes |
 
 Running large open source models with tens of billions of parameters (such as the well known Llama models released by Meta) can require significant GPU resources, but many of these models are also released in smaller versions that can be run with reasonable speed on a laptop with a GPU; for the examples in this book, all of the examples are run on a Macbook Pro M3 Max laptop.
-Users wishing to run the larger open-weight models can access them via service providers who provide API access to these models for a fee.
+Users wishing to run the larger open weight models can access them via service providers who provide API access to these models for a fee.
 We will discuss working with APIs in Chapter XXX.
 
 As an example of what we can do with open weight language models, suppose that we want to compare the output of models before and after instruction tuning.
