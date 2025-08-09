@@ -567,11 +567,11 @@ After this training, the model has a lot of knowledge but is often not very well
 The large commercial models such as GPT-4, Claude, and Gemini are truly "black boxes" in the sense that we have no access to how they work internally or how they were trained.
 However, in the last few years an ecosystem of "open source" language models has burgeoned, allowing researchers to run powerful pre-trained models on their own computing hardware and providing some degree of insight into the function of the model.
 It's important to point out that the label "open source" is in many cases a misnomer, since it's relatively rare for the authors of these models to give full access to all of the code and data that went into training the model.
-Many of them are better described as "open weight" models (a term we will use throughout this book), since the model weights and code necessary to perform inference are made openly available even if the training code and data are not.
+Many of them are better described as "open-weight" models (a term we will use throughout this book), since the model weights and code necessary to perform inference are made openly available even if the training code and data are not.
 Despite these limitations, the availability of these open-ish models has given researchers the opportunity to work more closely with these models and see into their inner workings.
 They also allow users to perform further fine-tuning to augment model performance in particular domains.
 
-| Feature | Open Weight LLMs | True Open Source LLMs |
+| Feature | Open-Weight LLMs | True Open Source LLMs |
 |------------------|------------------|----------------------|
 | Model weights available? | ✅ Yes | ✅ Yes |
 | Training data available? | ❌ No | ✅ Yes |
@@ -579,11 +579,11 @@ They also allow users to perform further fine-tuning to augment model performanc
 | Can be fine-tuned? | ✅ Yes | ✅ Yes |
 
 Running large open source models with tens of billions of parameters (such as the well known Llama models released by Meta) can require significant GPU resources, but many of these models are also released in smaller versions that can be run with reasonable speed on a laptop with a GPU; for the examples in this book, all of the examples are run on a Macbook Pro M3 Max laptop.
-Users wishing to run the larger open weight models can access them via service providers who provide API access to these models for a fee.
+Users wishing to run the larger open-weight models can access them via service providers who provide API access to these models for a fee.
 We will discuss working with APIs in Chapter XXX.
 
-As an example of what we can do with open weight language models, suppose that we want to compare the output of models before and after instruction tuning.
-While we can't access versions of commercial models such as GPT-4 prior to instruction tuning, there are a large number of open weight models for which both versions are available.
+As an example of what we can do with open-weight language models, suppose that we want to compare the output of models before and after instruction tuning.
+While we can't access versions of commercial models such as GPT-4 prior to instruction tuning, there are a large number of open-weight models for which both versions are available.
 We will show results from the Qwen1.5-0.5B model, which is very small and thus runs relatively quickly even on a laptop.
 
 To see the difference that this fine-tuning makes, we can give the same prompt to a model with and without instruction tuning: "What is the best way to relax after a long day of Python coding?"
@@ -652,6 +652,6 @@ These systems often default to a small degree of randomness (with temperature in
 The randomness of large language models is particularly important for researchers using them in contexts where reproducibilty is important.
 Research performed using commercial/closed large language models should be considered irreproducible in principle; even if one records the system fingerprint (uniquely specifying which model was run) and sets the random seed, there is no guarantee that these models will remain available.
 As an example, OpenAI has [deprecated a number of models](https://platform.openai.com/docs/deprecations), including the widely used `text-davinci-002` model, meaning that they are no longer available to users.
-Research performed on open weight models is in theory reproducible if the random seed is specified along with the specific model version used.
+Research performed on open-weight models is in theory reproducible if the random seed is specified along with the specific model version used.
 However, in many cases it is also important to ensure that any results obtained using LLMs are robust to the specific random seed chosen.
 One should *never* cherry pick scientific results by trying different random seeds and only reporting the results that are most consistent with the hypothesis being tested; we refer to this as "seed-hacking", on analogy to the commonly used term "p-hacking".
