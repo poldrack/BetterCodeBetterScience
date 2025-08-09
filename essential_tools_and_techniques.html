@@ -438,7 +438,7 @@ Here we briefly outline our motivation for these particular tools.</p>
 <p>For the coding examples in this book we will use the Python programming language.
 We have chosen Python first and foremost because it is a language that we know well, as well as being one of the most popular languages today in science.
 Python is a relatively high level programming language, which means that it can be understandable (if written correctly) even by someone with relatively little experience.
-It also free and open source, which means that anyone with a computer can download it and run it at no cost.
+It is also free and open source, which means that anyone with a computer can download it and run it at no cost.
 In addition, Python is a language that has exceptionally good support from AI coding assistants such as GitHub Copilot, which has been trained on a huge corpus of Python code (along with code from many other languages as well).
 Python also has a large and growing ecosystem of packages and tools that make it possible to solve many different problems easily.
 If you are interested in working on machine learning or AI, the tools in Python are especially good.</p>
@@ -456,7 +456,7 @@ In some cases we may use programming constructs that are specific to Python; if 
 This is still the case in domains such as biology where the work often involves manual experimentation at a lab bench.
 Many such labs have moved to using electronic lab notebooks, making it much easier to search and find relevant information.
 However, an increasing amount of scientific work is now computational, and for this work it would seem somewhat inefficient to record information about the software development process separately from the code that is being written.
-There is in fact a tool that can provide the computational researcher with an integrated way to record the history their work, known as <em>version control.</em> While there are many tools that can be used to perform version control, <a class="reference external" href="https://git-scm.com/">git</a> has become by far the most prevalent within the scientific computing ecosystem, largely due to the popularity of the <a class="reference external" href="http://github.com">GitHub</a> web site that enables the hosting and sharing of git repositories.</p>
+There is in fact a tool that can provide the computational researcher with an integrated way to record the history their work, known as <em>version control.</em> While there are many tools that can be used to perform version control, <a class="reference external" href="https://git-scm.com/">git</a> has become by far the most prevalent within the scientific computing ecosystem, largely due to the popularity of the <a class="reference external" href="http://github.com">GitHub</a> website that enables the hosting and sharing of git repositories.</p>
 <p>In this section we will assume that the researcher has a basic knowledge of the <code class="docutils literal notranslate"><span class="pre">git</span></code> software tool; for researchers looking to learn <code class="docutils literal notranslate"><span class="pre">git</span></code>, there are numerous resources online, which we will not duplicate; see the suggested resources at the end of this chapter.
 Here we will focus on the ways in which version control tools like <code class="docutils literal notranslate"><span class="pre">git</span></code> can serve as important tools to improve scientific coding.
 While there are numerous graphical user interfaces (GUIs) for git (including those offered by various IDEs), we will focus on its use via the command line interface (CLI).
@@ -482,7 +482,7 @@ We will create a test directory (outside of our current git repository) and init
 &gt;<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>git-test
 &gt;<span class="w"> </span>git<span class="w"> </span>init
 &gt;<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;test file&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>test_file.txt
-❯<span class="w"> </span>git<span class="w"> </span>status
+&gt;<span class="w"> </span>git<span class="w"> </span>status
 On<span class="w"> </span>branch<span class="w"> </span>main
 
 No<span class="w"> </span>commits<span class="w"> </span>yet
@@ -495,8 +495,8 @@ nothing<span class="w"> </span>added<span class="w"> </span>to<span class="w"> <
 </pre></div>
 </div>
 <p>So far our new file is not being tracked, but we can add it to the database:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>test_file.txt
-❯<span class="w"> </span>git<span class="w"> </span>status
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>test_file.txt
+&gt;<span class="w"> </span>git<span class="w"> </span>status
 On<span class="w"> </span>branch<span class="w"> </span>main
 
 No<span class="w"> </span>commits<span class="w"> </span>yet
@@ -507,16 +507,16 @@ Changes<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </sp
 </pre></div>
 </div>
 <p>It’s now in the staging area, but hasn’t yet been committed to the database, as we can see if we print the log:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>git<span class="w"> </span>log
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>git<span class="w"> </span>log
 fatal:<span class="w"> </span>your<span class="w"> </span>current<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;main&#39;</span><span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>have<span class="w"> </span>any<span class="w"> </span>commits<span class="w"> </span>yet
 </pre></div>
 </div>
 <p>We can commit the items in the staging area (in this case, just our single added file) to the database and provide a message that labels the commit:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="s2">&quot;initial add&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="s2">&quot;initial add&quot;</span>
 <span class="o">[</span>main<span class="w"> </span><span class="o">(</span>root-commit<span class="o">)</span><span class="w"> </span>752ca80<span class="o">]</span><span class="w"> </span>initial<span class="w"> </span>add
 <span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
 <span class="w"> </span>create<span class="w"> </span>mode<span class="w"> </span><span class="m">100644</span><span class="w"> </span>test_file.txt
-❯<span class="w"> </span>git<span class="w"> </span>status
+&gt;<span class="w"> </span>git<span class="w"> </span>status
 On<span class="w"> </span>branch<span class="w"> </span>main
 nothing<span class="w"> </span>to<span class="w"> </span>commit,<span class="w"> </span>working<span class="w"> </span>tree<span class="w"> </span>clean
 </pre></div>
@@ -538,7 +538,7 @@ The commit hash is the way that we refer to commits - for example, if we wanted 
 We usually don’t need to use the entire hash; the first ~8 letters are usually sufficient.</p>
 <p>The most important role for version control is to track changes in a file, along with notes about those changes.
 That is, it can serve as a digital version of a lab notebook! Let’s make a change to the file to see this in action:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;another line&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>test_file.txt<span class="w"> </span><span class="c1"># add another line of text</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;another line&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>test_file.txt<span class="w"> </span><span class="c1"># add another line of text</span>
 &gt;<span class="w"> </span>git<span class="w"> </span>diff<span class="w"> </span>test_file.txt
 diff<span class="w"> </span>--git<span class="w"> </span>a/test_file.txt<span class="w"> </span>b/test_file.txt
 index<span class="w"> </span>16b14f5..0db3737<span class="w"> </span><span class="m">100644</span>
@@ -551,11 +551,11 @@ index<span class="w"> </span>16b14f5..0db3737<span class="w"> </span><span class
 </div>
 <p>This provides us with a (somewhat cryptic) description of the changes to the file; the line starting with a “+” denotes the content that was added (in the console this would also be color-coded in green).
 We can then add and commit the file and then view the new commit in the log:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>test_file.txt
-❯<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="s2">&quot;added a second line&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>test_file.txt
+&gt;<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="s2">&quot;added a second line&quot;</span>
 <span class="o">[</span>main<span class="w"> </span>5e8c41a<span class="o">]</span><span class="w"> </span>added<span class="w"> </span>a<span class="w"> </span>second<span class="w"> </span>line
 <span class="w"> </span><span class="m">1</span><span class="w"> </span>file<span class="w"> </span>changed,<span class="w"> </span><span class="m">1</span><span class="w"> </span>insertion<span class="o">(</span>+<span class="o">)</span>
-❯<span class="w"> </span>git<span class="w"> </span>log
+&gt;<span class="w"> </span>git<span class="w"> </span>log
 
 commit<span class="w"> </span>5e8c41a075b2ab2d954d59cab6530d924c5e3e6a<span class="w"> </span><span class="o">(</span>HEAD<span class="w"> </span>-&gt;<span class="w"> </span>main<span class="o">)</span>
 Author:<span class="w"> </span>Russell<span class="w"> </span>Poldrack<span class="w"> </span>&lt;poldrack@gmail.com&gt;
@@ -700,7 +700,7 @@ For example, for our example above we might use “feature/swap-db-backend”.</
 <p>We can create a new branch and check it out (making it the current branch) using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>git<span class="w"> </span>branch
 *<span class="w"> </span>main
-❯<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/swap-db-backend
+&gt;<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/swap-db-backend
 Switched<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>branch<span class="w"> </span><span class="s1">&#39;feature/swap-db-backend&#39;</span>
 &gt;<span class="w"> </span>git<span class="w"> </span>branch
 *<span class="w"> </span>feature/swap-db-backend
@@ -753,9 +753,9 @@ We will focus on two solutions here (uv and conda), realizing that things will c
 <h3>Environment management using <em>uv</em><a class="headerlink" href="#environment-management-using-uv" title="Permalink to this heading">#</a></h3>
 <p><a class="reference external" href="https://docs.astral.sh/uv/">uv</a> is a relatively new package management tool that has quickly gained momentum in the Python community, in large part because of its speed (10-100x faster than older tools) and its efficient use of disk space.
 To start, we simply initialize a new project, marking it as a package so that it will create the appropriate code structure:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>init<span class="w"> </span>--package<span class="w"> </span>uv_example
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>uv<span class="w"> </span>init<span class="w"> </span>--package<span class="w"> </span>uv_example
 Initialized<span class="w"> </span>project<span class="w"> </span><span class="sb">`</span>uv-example<span class="sb">`</span><span class="w"> </span>at<span class="w"> </span><span class="sb">`</span>/private/tmp/uvtest/uv_example<span class="sb">`</span>
-❯<span class="w"> </span>tree<span class="w"> </span>uv_example
+&gt;<span class="w"> </span>tree<span class="w"> </span>uv_example
 uv_example
 ├──<span class="w"> </span>pyproject.toml
 ├──<span class="w"> </span>README.md
@@ -766,12 +766,12 @@ uv_example
 </div>
 <p>We can then create a new virtual environment using the command <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">venv</span></code>.
 This is stored within the directory <code class="docutils literal notranslate"><span class="pre">.venv</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>uv_example
-❯<span class="w"> </span>uv<span class="w"> </span>venv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>uv_example
+&gt;<span class="w"> </span>uv<span class="w"> </span>venv
 Using<span class="w"> </span>CPython<span class="w"> </span><span class="m">3</span>.13.1
 Creating<span class="w"> </span>virtual<span class="w"> </span>environment<span class="w"> </span>at:<span class="w"> </span>.venv
 Activate<span class="w"> </span>with:<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-❯<span class="w"> </span>tree<span class="w"> </span>.venv
+&gt;<span class="w"> </span>tree<span class="w"> </span>.venv
 .venv
 ├──<span class="w"> </span>bin
 │<span class="w">   </span>├──<span class="w"> </span>activate
@@ -798,15 +798,15 @@ Activate<span class="w"> </span>with:<span class="w"> </span><span class="nb">so
 <p>One thing to note here is that the <code class="docutils literal notranslate"><span class="pre">python</span></code> executable is actually a symbolic link to a version that is in a central location (under <code class="docutils literal notranslate"><span class="pre">.local/share/uv</span></code>).
 This means that we can create numerous virtual environments, but there will only be one copy of that particular version of Python, saving space on disk.</p>
 <p>We can activate the environment by running its activation script, after which we see that the system path will point to the virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>which<span class="w"> </span>python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>which<span class="w"> </span>python
 python<span class="w"> </span>not<span class="w"> </span>found
-❯<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-❯<span class="w"> </span>which<span class="w"> </span>python
+&gt;<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+&gt;<span class="w"> </span>which<span class="w"> </span>python
 python<span class="w"> </span>is<span class="w"> </span>/private/tmp/uvtest/uv_example/.venv/bin/python
 </pre></div>
 </div>
 <p>If we wish to add dependencies, we can simply do this using <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">add</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>add<span class="w"> </span>numpy
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>uv<span class="w"> </span>add<span class="w"> </span>numpy
 Resolved<span class="w"> </span><span class="m">2</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>394ms
 <span class="w">   </span>Built<span class="w"> </span>uv-example<span class="w"> </span>@<span class="w"> </span>file:///private/tmp/uvtest/uv_example
 Prepared<span class="w"> </span><span class="m">2</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>431ms
@@ -816,7 +816,7 @@ Installed<span class="w"> </span><span class="m">2</span><span class="w"> </span
 </pre></div>
 </div>
 <p>Here again, if we load this module within Python we will see that it is located within the virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>python
 Python<span class="w"> </span><span class="m">3</span>.13.1<span class="w"> </span><span class="o">(</span>main,<span class="w"> </span>Dec<span class="w"> </span><span class="m">19</span><span class="w"> </span><span class="m">2024</span>,<span class="w"> </span><span class="m">14</span>:22:59<span class="o">)</span><span class="w"> </span><span class="o">[</span>Clang<span class="w"> </span><span class="m">18</span>.1.8<span class="w"> </span><span class="o">]</span><span class="w"> </span>on<span class="w"> </span>darwin
 Type<span class="w"> </span><span class="s2">&quot;help&quot;</span>,<span class="w"> </span><span class="s2">&quot;copyright&quot;</span>,<span class="w"> </span><span class="s2">&quot;credits&quot;</span><span class="w"> </span>or<span class="w"> </span><span class="s2">&quot;license&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information.
 &gt;&gt;&gt;<span class="w"> </span>import<span class="w"> </span>numpy
@@ -826,26 +826,26 @@ Type<span class="w"> </span><span class="s2">&quot;help&quot;</span>,<span class
 </div>
 <p>The details regarding the package are stored within a file called “pyproject.toml” in the main project directory.
 Looking inside this file we can see that it contains details about the packages that have been added, including the specific version:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>❯ more pyproject.toml
-[project]
-name = &quot;uv-example&quot;
-version = &quot;0.1.0&quot;
-description = &quot;Add your description here&quot;
-readme = &quot;README.md&quot;
-authors = [
-    { name = &quot;Russell Poldrack&quot;, email = &quot;poldrack@gmail.com&quot; }
-]
-requires-python = &quot;&gt;=3.13&quot;
-dependencies = [
-    &quot;numpy&gt;=2.2.3&quot;,
-]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">more</span> <span class="n">pyproject</span><span class="o">.</span><span class="n">toml</span>
+<span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;uv-example&quot;</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Add your description here&quot;</span>
+<span class="n">readme</span> <span class="o">=</span> <span class="s2">&quot;README.md&quot;</span>
+<span class="n">authors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Russell Poldrack&quot;</span><span class="p">,</span> <span class="n">email</span> <span class="o">=</span> <span class="s2">&quot;poldrack@gmail.com&quot;</span> <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">requires</span><span class="o">-</span><span class="n">python</span> <span class="o">=</span> <span class="s2">&quot;&gt;=3.13&quot;</span>
+<span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;numpy&gt;=2.2.3&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
-[project.scripts]
-uv-example = &quot;uv_example:main&quot;
+<span class="p">[</span><span class="n">project</span><span class="o">.</span><span class="n">scripts</span><span class="p">]</span>
+<span class="n">uv</span><span class="o">-</span><span class="n">example</span> <span class="o">=</span> <span class="s2">&quot;uv_example:main&quot;</span>
 
-[build-system]
-requires = [&quot;hatchling&quot;]
-build-backend = &quot;hatchling.build&quot;
+<span class="p">[</span><span class="n">build</span><span class="o">-</span><span class="n">system</span><span class="p">]</span>
+<span class="n">requires</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hatchling&quot;</span><span class="p">]</span>
+<span class="n">build</span><span class="o">-</span><span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;hatchling.build&quot;</span>
 </pre></div>
 </div>
 <p>This file allows one to specify many other details about a Python package.
@@ -856,7 +856,7 @@ It not only stores dependencies but also metadata about the project, making it u
 If you look at the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file you will see that it doesn’t specify exact versions for Python or the dependencies; instead, it specifies a lower bound; i.e. “numpy&gt;=<strong>DECIMAL_0</strong>.3” means that the numpy version should be at least <strong>DECIMAL_0</strong>.3, but could be higher if a newer version became available.
 This is often fine, but for purposes of reproducibility we often wish to record the exact package versions that were used for a particular analysis.
 This is commonly done using a <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file, and <code class="docutils literal notranslate"><span class="pre">uv</span></code> allows exporting the current environment to such a file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>❯<span class="w"> </span>uv<span class="w"> </span>pip<span class="w"> </span>compile<span class="w"> </span>pyproject.toml<span class="w"> </span>-o<span class="w"> </span>requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>uv<span class="w"> </span>pip<span class="w"> </span>compile<span class="w"> </span>pyproject.toml<span class="w"> </span>-o<span class="w"> </span>requirements.txt
 Resolved<span class="w"> </span><span class="m">1</span><span class="w"> </span>package<span class="w"> </span><span class="k">in</span><span class="w"> </span>78ms
 <span class="c1"># This file was autogenerated by uv via the following command:</span>
 <span class="c1">#    uv pip compile pyproject.toml</span>
