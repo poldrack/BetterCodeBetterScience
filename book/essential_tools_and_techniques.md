@@ -578,7 +578,7 @@ They also allow users to perform further fine-tuning to augment model performanc
 | Training code available? | ❌ No | ✅ Yes |
 | Can be fine-tuned? | ✅ Yes | ✅ Yes |
 
-Running large open source models with tens of billions of parameters (such as the well known Llama modelsreleased by Meta) can require significant GPU resources, but many of these models are also released in smaller versions that can be run with reasonable speed on a laptop with a GPU; for the examples in this book, all of the examples are run on a Macbook Pro M3 Max laptop.
+Running large open source models with tens of billions of parameters (such as the well known Llama models released by Meta) can require significant GPU resources, but many of these models are also released in smaller versions that can be run with reasonable speed on a laptop with a GPU; for the examples in this book, all of the examples are run on a Macbook Pro M3 Max laptop.
 Users wishing to run the larger open-weight models can access them via service providers who provide API access to these models for a fee.
 We will discuss working with APIs in Chapter XXX.
 
