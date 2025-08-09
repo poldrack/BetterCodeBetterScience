@@ -10,7 +10,7 @@ Here we briefly outline our motivation for these particular tools.
 For the coding examples in this book we will use the Python programming language.
 We have chosen Python first and foremost because it is a language that we know well, as well as being one of the most popular languages today in science.
 Python is a relatively high level programming language, which means that it can be understandable (if written correctly) even by someone with relatively little experience.
-It also free and open source, which means that anyone with a computer can download it and run it at no cost.
+It is also free and open source, which means that anyone with a computer can download it and run it at no cost.
 In addition, Python is a language that has exceptionally good support from AI coding assistants such as GitHub Copilot, which has been trained on a huge corpus of Python code (along with code from many other languages as well).
 Python also has a large and growing ecosystem of packages and tools that make it possible to solve many different problems easily.
 If you are interested in working on machine learning or AI, the tools in Python are especially good.
