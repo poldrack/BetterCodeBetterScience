@@ -10,7 +10,7 @@ Here we briefly outline our motivation for these particular tools.
 For the coding examples in this book we will use the Python programming language.
 We have chosen Python first and foremost because it is a language that we know well, as well as being one of the most popular languages today in science.
 Python is a relatively high level programming language, which means that it can be understandable (if written correctly) even by someone with relatively little experience.
-It also free and open source, which means that anyone with a computer can download it and run it at no cost.
+It is also free and open source, which means that anyone with a computer can download it and run it at no cost.
 In addition, Python is a language that has exceptionally good support from AI coding assistants such as GitHub Copilot, which has been trained on a huge corpus of Python code (along with code from many other languages as well).
 Python also has a large and growing ecosystem of packages and tools that make it possible to solve many different problems easily.
 If you are interested in working on machine learning or AI, the tools in Python are especially good.
@@ -30,7 +30,7 @@ Scientists in many fields have traditionally kept a *lab notebook* to record the
 This is still the case in domains such as biology where the work often involves manual experimentation at a lab bench.
 Many such labs have moved to using electronic lab notebooks, making it much easier to search and find relevant information.
 However, an increasing amount of scientific work is now computational, and for this work it would seem somewhat inefficient to record information about the software development process separately from the code that is being written.
-There is in fact a tool that can provide the computational researcher with an integrated way to record the history their work, known as *version control.* While there are many tools that can be used to perform version control, [git](https://git-scm.com/) has become by far the most prevalent within the scientific computing ecosystem, largely due to the popularity of the [GitHub](http://github.com) web site that enables the hosting and sharing of git repositories.
+There is in fact a tool that can provide the computational researcher with an integrated way to record the history their work, known as *version control.* While there are many tools that can be used to perform version control, [git](https://git-scm.com/) has become by far the most prevalent within the scientific computing ecosystem, largely due to the popularity of the [GitHub](http://github.com) website that enables the hosting and sharing of git repositories.
 
 In this section we will assume that the researcher has a basic knowledge of the `git` software tool; for researchers looking to learn `git`, there are numerous resources online, which we will not duplicate; see the suggested resources at the end of this chapter.
 Here we will focus on the ways in which version control tools like `git` can serve as important tools to improve scientific coding.
@@ -63,7 +63,7 @@ We will create a test directory (outside of our current git repository) and init
 > cd git-test
 > git init
 > echo "test file" > test_file.txt
-❯ git status
+> git status
 On branch main
 
 No commits yet
@@ -79,8 +79,8 @@ nothing added to commit but untracked files present (use "git add" to track)
 So far our new file is not being tracked, but we can add it to the database:
 
 ```bash
-❯ git add test_file.txt
-❯ git status
+> git add test_file.txt
+> git status
 On branch main
 
 No commits yet
@@ -95,7 +95,7 @@ Changes to be committed:
 It's now in the staging area, but hasn't yet been committed to the database, as we can see if we print the log:
 
 ```bash
-❯ git log
+> git log
 fatal: your current branch 'main' does not have any commits yet
 
 ```
@@ -103,11 +103,11 @@ fatal: your current branch 'main' does not have any commits yet
 We can commit the items in the staging area (in this case, just our single added file) to the database and provide a message that labels the commit:
 
 ```bash
-❯ git commit -m"initial add"
+> git commit -m"initial add"
 [main (root-commit) 752ca80] initial add
  1 file changed, 1 insertion(+)
  create mode 100644 test_file.txt
-❯ git status
+> git status
 On branch main
 nothing to commit, working tree clean
 ```
@@ -135,7 +135,7 @@ The most important role for version control is to track changes in a file, along
 That is, it can serve as a digital version of a lab notebook! Let's make a change to the file to see this in action:
 
 ```bash
-❯ echo "another line" >> test_file.txt # add another line of text
+> echo "another line" >> test_file.txt # add another line of text
 > git diff test_file.txt
 diff --git a/test_file.txt b/test_file.txt
 index 16b14f5..0db3737 100644
@@ -151,11 +151,11 @@ This provides us with a (somewhat cryptic) description of the changes to the fil
 We can then add and commit the file and then view the new commit in the log:
 
 ```bash
-❯ git add test_file.txt
-❯ git commit -m"added a second line"
+> git add test_file.txt
+> git commit -m"added a second line"
 [main 5e8c41a] added a second line
  1 file changed, 1 insertion(+)
-❯ git log
+> git log
 
 commit 5e8c41a075b2ab2d954d59cab6530d924c5e3e6a (HEAD -> main)
 Author: Russell Poldrack <poldrack@gmail.com>
@@ -321,7 +321,7 @@ We can create a new branch and check it out (making it the current branch) using
 ```bash
 > git branch
 * main
-❯ git checkout -b feature/swap-db-backend
+> git checkout -b feature/swap-db-backend
 Switched to a new branch 'feature/swap-db-backend'
 > git branch
 * feature/swap-db-backend
@@ -380,9 +380,9 @@ We will focus on two solutions here (uv and conda), realizing that things will c
 To start, we simply initialize a new project, marking it as a package so that it will create the appropriate code structure:
 
 ```bash
-❯ uv init --package uv_example
+> uv init --package uv_example
 Initialized project `uv-example` at `/private/tmp/uvtest/uv_example`
-❯ tree uv_example
+> tree uv_example
 uv_example
 ├── pyproject.toml
 ├── README.md
@@ -395,12 +395,12 @@ We can then create a new virtual environment using the command `uv venv`.
 This is stored within the directory `.venv`.
 
 ```bash
-❯ cd uv_example
-❯ uv venv
+> cd uv_example
+> uv venv
 Using CPython 3.13.1
 Creating virtual environment at: .venv
 Activate with: source .venv/bin/activate
-❯ tree .venv
+> tree .venv
 .venv
 ├── bin
 │   ├── activate
@@ -430,17 +430,17 @@ This means that we can create numerous virtual environments, but there will only
 We can activate the environment by running its activation script, after which we see that the system path will point to the virtual environment:
 
 ```bash
-❯ which python
+> which python
 python not found
-❯ source .venv/bin/activate
-❯ which python
+> source .venv/bin/activate
+> which python
 python is /private/tmp/uvtest/uv_example/.venv/bin/python
 ```
 
 If we wish to add dependencies, we can simply do this using `uv add`:
 
 ```bash
-❯ uv add numpy
+> uv add numpy
 Resolved 2 packages in 394ms
    Built uv-example @ file:///private/tmp/uvtest/uv_example
 Prepared 2 packages in 431ms
@@ -453,7 +453,7 @@ Installed 2 packages in 8ms
 Here again, if we load this module within Python we will see that it is located within the virtual environment:
 
 ```bash
-❯ python
+> python
 Python 3.13.1 (main, Dec 19 2024, 14:22:59) [Clang 18.1.8 ] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import numpy
@@ -465,7 +465,7 @@ The details regarding the package are stored within a file called "pyproject.tom
 Looking inside this file we can see that it contains details about the packages that have been added, including the specific version:
 
 ```
-❯ more pyproject.toml
+> more pyproject.toml
 [project]
 name = "uv-example"
 version = "0.1.0"
@@ -498,7 +498,7 @@ This is often fine, but for purposes of reproducibility we often wish to record 
 This is commonly done using a `requirements.txt` file, and `uv` allows exporting the current environment to such a file:
 
 ```bash
-❯ uv pip compile pyproject.toml -o requirements.txt
+> uv pip compile pyproject.toml -o requirements.txt
 Resolved 1 package in 78ms
 # This file was autogenerated by uv via the following command:
 #    uv pip compile pyproject.toml
