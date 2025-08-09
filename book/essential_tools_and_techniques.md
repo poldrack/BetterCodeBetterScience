@@ -571,7 +571,7 @@ Many of them are better described as "open weight" models (a term we will use th
 Despite these limitations, the availability of these open-ish models has given researchers the opportunity to work more closely with these models and see into their inner workings.
 They also allow users to perform further fine-tuning to augment model performance in particular domains.
 
-| Feature | Open Weight LLMs | True Open-Source LLMs |
+| Feature | Open Weight LLMs | True Open Source LLMs |
 |------------------|------------------|----------------------|
 | Model weights available? | ✅ Yes | ✅ Yes |
 | Training data available? | ❌ No | ✅ Yes |
