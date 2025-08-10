@@ -36,7 +36,10 @@ A rendered version of the complete book is available at [https://poldrack.github
     - [Part 6: Parameterized testing](https://russpoldrack.substack.com/p/parameterized-testing?r=1n86gc)
     - [Part 7: Property-based testing](https://russpoldrack.substack.com/p/property-based-testing?r=1n86gc)
     - [Part 8: Automated testing with GitHub Actions](https://russpoldrack.substack.com/p/automated-testing-with-github-actions?r=1n86gc)
+    - Part 9: Optimizing the testing workflow
 - Coding with AI
+    - Using AI coding assistants
+    - AI-assisted coding approaches
 - Project Structure and Management
 - Validating Scientific Analyses
 - Optimizing Performance
