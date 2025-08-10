@@ -1,7 +1,8 @@
 ## Better Code, Better Science
 An open-source book on building better code for science using AI.  
 
-Authors: [Russ Poldrack](http://poldrack.github.io), others TBD.
+Author: [Russ Poldrack](http://poldrack.github.io)
+Contributors: @giorgioarcara, @yarikoptic
 
 Content will be posted on [Substack](https://russpoldrack.substack.com/p/better-code-better-science) and added here as it is released. 
 
