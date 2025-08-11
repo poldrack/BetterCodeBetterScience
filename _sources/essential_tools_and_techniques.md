@@ -548,7 +548,7 @@ These methods, together with the realization that graphical processing units (GP
 
 ### How LLMs are built and trained
 
-The LLMs that are most prominent today, such as GPT-4, Claude, and Google Gemini, are based on a specific neural network architecture known as a *transformer*, which was first introduced in 2017{cite:p}`Vaswani:2017aa`.
+The LLMs that are most prominent today, such as GPT-4, Claude, and Google Gemini, are based on a specific neural network architecture known as a *transformer*, which was first introduced in 2017 {cite:p}`Vaswani:2017aa`.
 Transformers were developed in order to effectively learn how to map one sequence to another sequence, such as in the case of translating from a sentence in one language to a sentence in another.
 However, large transformers trained on massive datasets have since shown themselves to be able to adapt to many different types of problems that they were never explicitly trained to perform.
 For this reason, these models (along with other kinds of large pre-trained models) have been referred to as *foundation models* {cite:p}`Bommasani:2022aa`.
