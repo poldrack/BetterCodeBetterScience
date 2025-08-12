@@ -19,7 +19,7 @@ Thus, an understanding of the software development process will remain essential
 
 Software development processes may be less important for small one-off projects written by a single developer, but they become essential once a project becomes large and involves multiple developers.
 Coordination costs can quickly eat into the added benefit of more developers on a project, particularly if there is not a strong development process in place.
-And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineering codebase can just be too large.
+And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineered codebase can just be too large.
 Similarly, poorly written code can result in a high "bus factor" (i.e., what happens if your lead developer gets hit by a bus?), which can be major risk for groups that rely heavily upon a particular software project for their work.
 
 
