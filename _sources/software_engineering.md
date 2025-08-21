@@ -268,7 +268,7 @@ For many programmers, the term "documentation" is largely synonymous with code c
 On the other hand, one of the most consistent messages from the software engineering literature is that comments are far too often used as a "magic balm" over bad code:
 
 - "Don’t comment bad code — rewrite it" (Kernighan & Plaugher)
-- "Clear and expressive code with few comments is far superior to cluttered and complex code with lots of comments"”" (Robert Martin, Clean Code)
+- "Clear and expressive code with few comments is far superior to cluttered and complex code with lots of comments" (Robert Martin, Clean Code)
 - "comments aren’t a bad smell; indeed they are a sweet smell. The reason we mention comments here is that comments are often used as a deodorant. It’s surprising how often you look at thickly commented code and notice that the comments are there because the code is bad." (Fowler, Refactoring)
 
 The overall goal of code comments should be to help the reader know as much as the writer knows about the code.
