@@ -393,7 +393,7 @@ n_replicates = 500
 There are two related concepts that are used to describe the appearance of potentially problematic code The “anti-pattern” is a riff on the concept of a *design pattern*, which is a recommended solution (i.e. a "best practice") for a common programming problem {cite:p}`Gamma:1995aa`.
 An anti-pattern is conversely a commonly used but bad solution (i.e. a "worst practice") for a common programming problem.
 In the Python world these are well known from the [The Little Book of Python Anti-Patterns](https://docs.quantifiedcode.com/python-anti-patterns/), which lays out many different anti-patterns common in Python coding.
-The second idea, that of the "code smell", has been popularized by Martin Fowler in his well-known book *Refactoring: Improving The Design of Existing Code*{cite:p}`Fowler:1999aa`.
+The second idea, that of the "code smell", has been popularized by Martin Fowler in his well-known book *Refactoring: Improving The Design of Existing Code *{cite:p}`Fowler:1999aa`.
 Just as a bad smell from food can give us an intuitive sense that the good might be spoiled, code smells are intuitive reactions to code that suggest that there might be a problem that could be a target for refactoring.
 
 Here we outline several bad smells and anti-patterns commonly found in our experience with scientific code.
@@ -555,7 +555,7 @@ random_sample = stats.vonmises.rvs(2, loc=10, size=1000)
 
 Another key to making a system understandable is to make it *modular*, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.
 Complex modular systems are also usually *hierarchical*, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.
-In a 1962 paper entitled *The Architecture of Complexity*{cite:p}`Simon:1962aa`, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the *near-decomposability* that arises in systems where the different modules are insulated from each other except through specific interfaces.
+In a 1962 paper entitled *The Architecture of Complexity *{cite:p}`Simon:1962aa`, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the *near-decomposability* that arises in systems where the different modules are insulated from each other except through specific interfaces.
 The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas {cite:p}`Parnas:1972aa`, who pointed out that decomposing code based on the concept of "information hiding" can make code much easier to modify than a decomposition based on the logical "flowchart" of the problem being solved.
 
 A common expression of the idea of modularity in software development is the *Single Responsibility Principle*, which states that a function or class should only have one reason to change.
