@@ -400,5 +400,483 @@ Why might we prefer one of these solutions to the other?  One reason has to do w
 
 It's also important to note that there is a point at which very long prompts may begin to degrade performance.  In particular, LLM researchers have identified a phenomenon that has come to be called *context rot*, in which performance of the model is degraded as the amount of information in context grows. [Analyses of performance as a function of context](https://research.trychroma.com/context-rot) have shown that model performance can begin to degrade on some benchmarks when the context extends beyond 1000 tokens and can sometimes degrade very badly as the context goes beyond 100,000 tokens.    Later in this chapter we will discuss *retrieval-augmented generation*, which is a method that can help alleviate the impact of context rot by focusing the context on the most relevant information for the task at hand.
 
+### Agentic coding tools
+
+The fourth approach uses tools that have *agentic* capabilities, which means that they have larger goals and can call upon other tools to help accomplish those goals.  Rather than simply using a language model to generate code based on a prompt, a coding agent is a language model (usually a *thinking* model) that can take in information (including direct prompts, files, web searches, and input from other tools), synthesize that information to figure out how to solve a goal, and then execute on that plan.  The landscape of agentic coding tools is developing very rapidly, so anything I say here will likely be outdated very soon, but hopefully the general points will remain relevant for some time.  In this chapter I will use [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), which is at the time of writing of one of the most popular and powerful agentic coding tools.  I will only scratch the surface of its capabilities, but this discussion should noentheless should give you a good feel for how these tools can be used.
+
+Claude Code works through the command line interface (CLI), which makes it very different from the tools that are accessed via IDEs or web interfaces:
+
+![Claude Code startup screen](images/claudecode_1.png)
+
+However, Claude Code can also integrate with IDEs such as VSCode.  Shortcuts in Claude Code begin with a forward slash ("/"); when we type a forward slash, we receive a listing of selected shortcuts:
+
+![Claude Code shortcuts](images/claudecode_2.png)
+
+### Using Claude Code: An example
+
+The best way to learn how Claude Code works is to see it in action, so here I will walk through an example of using it to create a new application.  As we work through the example I'll highlight important best practices for using coding agents.  An important note: If you follow along and perform all of the same commands, you will not necessarily see the same results, given the stochastic nature of large language models.
+
+In this example, we will build an application that computes column-wise correlations between two matrices using an optimized approach based on the Einstein summation notation and leveraging GPU acceleration when possible.  This is a problem that one would often encounter when trying to compute correlations between a large number of recordings. While standard methods for computing correlations are fine for small numbers of variables, these methods can become very slow for large correlation matrices.  
+
+#### Initializing the project
+
+We will use `uv` to manage dependencies for this project, so we first create the project with `uv init --package einsumcorr` and then create and load the virtual environment (from within the new directory) with `uv venv` and `source .venv/bin/activate`.  I also like to remove the default contents of the `__init__.py` file created by `uv` and replace it with an empty file, using:
+
+`rm src/einsumcorr/__init__.py; touch src/einsumcorr/__init__.py`
+
+We also initialize a new Git repository and add several files:
+
+```
+> git init
+> git add pyproject.toml README.md src/einsumcorr/__init__.py
+> git commit -m"initial add"
+```
+
+#### Initializing the Claude Code project
+
+We can now run `claude` within the project directory and run the `/init` command which will generate a skeletal `CLAUDE.md` file for us. At this point we exit Claude Code and edit the `CLAUDE.md` file to include our specifications and development preferences. You can see the full file [here](https://github.com/poldrack/einsumcorr/blob/main/CLAUDE.md).
+
+#### Guiding Claude through the development process
+
+Now that we have the project defined, we can have Claude read the updated specs and present a plan for development:
+
+```
+User: Look at the updated CLAUDE.md and present me with a development plan.
+
+⏺ I'll analyze the updated CLAUDE.md file and create a development plan for
+   the einsumcorr package.
+
+⏺ Development Plan for einsumcorr
+
+  Based on the CLAUDE.md specifications, here's the development plan
+  following TDD principles:
+
+  Phase 1: Setup & Dependencies
+
+  - Install required packages: opt_einsum, PyTorch, numpy, pytest
+  - Configure pyproject.toml with all dependencies
+
+  Phase 2: Test Development (TDD)
+
+  - Create comprehensive test suite covering:
+    - Single matrix correlation (self-correlation)
+    - Two matrix cross-correlation
+    - Edge cases (empty matrices, single columns)
+    - GPU acceleration verification
+    - Comparison with standard numpy correlations
+    - Smoke test for main() function
+
+  Phase 3: Core Implementation
+
+  - Implement optcorr function using einsum notation
+  - Handle single vs dual matrix inputs
+  - Ensure proper matrix centering and normalization
+  - Use opt_einsum with PyTorch backend
+
+  Phase 4: GPU Acceleration
+
+  - Auto-detect CUDA or MPS availability
+  - Implement automatic device selection
+  - Handle fallback to CPU if GPU unavailable
+
+  Phase 5: CLI & Entry Point
+
+  - Create main() function for command-line usage
+  - Set up entry point in pyproject.toml
+  - Add basic argument parsing
+
+  Phase 6: Validation
+
+  - Run all tests to ensure functionality
+  - Verify results match standard correlation methods
+  - Test package installation and CLI entry point
+
+  The key technical challenges will be:
+  1. Correctly implementing correlation using einsum notation
+  2. Ensuring numerical stability and accuracy
+  3. Efficient GPU utilization when available
+  4. Maintaining compatibility with standard numpy correlation results
+```
+
+This looks like a very reasonable plan, so we will have Claude get started with the first setup step:
+
+`User: Please perform Phase 1: Setup & Dependencies`
+
+After approving several commands, we get the following message:
+
+```
+⏺ Phase 1 completed successfully. Dependencies installed:
+  - PyTorch 2.8.0
+  - opt-einsum 3.4.0
+  - NumPy 2.3.2
+  - pytest 8.4.1 & pytest-cov 6.2.1 (dev dependencies)
+
+  MPS (Metal Performance Shaders) GPU acceleration is available on this
+  system.
+```
+
+Claude successfully identified the MPS acceleration on my Apple M3 laptop. Before moving to the first coding step, we will commit all of the changes so far, by simply giving the command `commit` and then approving its actions.
+
+#### Test development
+
+We can now have it proceed with the test development phase. I prefer to perform each step within its own `git` branch, so that it's easier to revert to a clean state if needed.  We can ask Claude to do this using `check out a new branch called dev/phase2` which creates and checks out a new branch.  We can now ask it to perform the test development phase:
+
+```
+User: perform Phase 2: Test Development (TDD)
+
+... (lots of interim output deleted)
+
+⏺ Phase 2 completed. Created comprehensive test suite with:
+
+  - test_optcorr.py: 17 tests covering:
+    - Shape validation for single and dual matrix inputs
+    - Self-correlation properties (diagonal ones, symmetry)
+    - Correlation value range [-1, 1]
+    - Edge cases (single column, empty matrix, mismatched rows)
+    - NaN handling
+    - Comparison with numpy.corrcoef
+    - GPU acceleration verification
+    - Deterministic results
+  - test_main.py: 6 tests for CLI functionality:
+    - Smoke test for main function
+    - Command-line argument handling
+    - File I/O operations
+    - Error handling
+
+  All 21 tests are currently failing with NotImplementedError as expected
+  in TDD approach.
+```
+
+#### Core implementation
+
+Looking at the tests that were generated by Claude, they all seem to be fairly reasonable and together they seem to cover most of the cases that one would want to test.  Thus, we can move forward with the next phase, which implements the core routines.  We first merge our development branch into main, using the Claude command `merge branch into main` and then ask it to create a new branch for the next phase using `check out a new branch called dev/phase3`.
+
+```
+User: Proceed with Phase 3: Core Implementation
+
+... (lots of interim output deleted)
+
+⏺ Phase 3 completed successfully!
+
+  Implementation Summary
+
+  ✅ Core optcorr function implemented with:
+  - Einstein summation notation using opt_einsum
+  - PyTorch backend for efficient computation
+  - Automatic GPU detection (CUDA/MPS)
+  - Float32/64 handling for device compatibility
+  - Full input validation and error handling
+
+  ✅ CLI interface created with:
+  - Argument parsing for single/dual matrix input
+  - CSV file I/O support
+  - Configurable output options
+  - Help documentation
+
+  ✅ All 21 tests passing:
+  - Shape validation
+  - Correlation properties
+  - Comparison with numpy.corrcoef
+  - GPU acceleration support
+  - CLI functionality
+
+  The package now provides efficient columnwise correlation computation
+  using Einstein summation with automatic GPU acceleration when available.
+```
+
+All of the tests now run!  Examination of the primary function shows that seems like very reasonable code.  It's a good idea to check and make sure that any changes to the tests don't seem to be problematic:
+
+```
+> git diff tests/test_optcorr.py
+
+ def test_comparison_with_numpy_large_matrix(large_matrix):
+     """Test that optcorr matches numpy.corrcoef for larger matrices."""
+-    compare_with_numpy_corrcoef(large_matrix)
++    # Use slightly higher tolerance for larger matrices with float32 on MPS
++    compare_with_numpy_corrcoef(large_matrix, rtol=5e-4)
+```
+
+Here it seems that it had to slightly loosen the tolerance for the comparison between our new method and the numpy method, which seems fine.
+
+While the initial plan had originally separated out the addition of GPU support into a separate fourth phase, it seems that Claude included it in Phase 3. We can ask it to make sure:
+
+```
+User: It seems that you have already completed the remaining phases. Please provide an updated plan for any remaining work to be done, before we proceed any further
+
+⏺ Updated Plan
+
+  Minor Tasks Remaining:
+
+  1. Fix code warning: Remove unused dtype variable in optcorr.py
+  2. Add performance benchmark: Create a simple benchmark comparing einsum
+  vs standard correlation
+  3. Update README: Add usage examples and documentation
+  4. Final cleanup: Commit all changes
+
+  These are minor refinements - the core implementation is complete and
+  fully functional. Would you like me to proceed with these cleanup tasks?
+```
+
+We can ask it to complete the remaining tasks:
+
+```
+User: complete remaining tasks
+
+... (lots of interim output deleted)
+
+⏺ All remaining tasks completed successfully!
+
+  Summary of completed work:
+
+  ✅ Fixed code warning - Removed unused dtype variable
+  ✅ Added performance benchmarks - Created test_performance.py with timing
+   comparisons
+  ✅ Updated README - Added comprehensive documentation with usage examples
+  ✅ Final commit - All changes committed to dev/phase3 branch
+
+  The einsumcorr package is now fully implemented with:
+  - Efficient Einstein summation correlation computation
+  - Automatic GPU acceleration (MPS detected on this system)
+  - Complete test coverage (25 tests passing)
+  - CLI tool with file I/O support
+  - Comprehensive documentation
+```
+
+Based on this, we can commit and merge this branch to main using `commit, then merge into main`.
+
+#### Performance testing
+
+Even though we didn't ask for it, Claude added a set of performance tests to compare our new method to `numpy.corrcoef()`.  In its first pass, it seems that our method is very slow compared to `numpy`:
+
+```
+> uv run pytest tests/test_performance.py -v -s
+============================= test session starts ==============================
+
+tests/test_performance.py::test_performance_comparison[size0]
+Matrix size (100, 10): optcorr=0.0472s, numpy=0.0001s, speedup=0.00x
+PASSED
+tests/test_performance.py::test_performance_comparison[size1]
+Matrix size (500, 20): optcorr=0.0130s, numpy=0.0001s, speedup=0.01x
+PASSED
+tests/test_performance.py::test_performance_comparison[size2]
+Matrix size (1000, 30): optcorr=0.0112s, numpy=0.0001s, speedup=0.01x
+PASSED
+tests/test_performance.py::test_gpu_speedup_if_available
+Large matrix (2000x50) correlation computed in 0.0120s
+PASSED
+
+============================== 4 passed in 0.53s ===============================
+```
+
+In general, there is some overhead for using the Einstein summation notation method, so it will probably only help when the size of the matrix (particularly the number of columns) is large.  To explore this, let's ask Claude to generate a Jupyter notebook where we can look at how performance changes as a function of the matrix size.
+
+```
+User: Generate a Jupyter notebook that I can use to explore the relationship between matrix size and performance.  It seems that the number of columns matters more than the number of rows for performance, so generate performance values for a range of column dimensionality up to 2000, and plot timing as a function of column dimensionality.
+
+⏺ I've created a comprehensive Jupyter notebook performance_analysis.ipynb
+  that explores the relationship between matrix dimensions and performance.
+   The notebook includes:
+
+  Key Features:
+
+  1. Systematic Testing:
+    - Column dimensionality: 5 to 2000 columns (fixed at 1000 rows)
+    - Row dimensionality: 100 to 10,000 rows (fixed at 100 columns)
+  2. Performance Metrics:
+    - Timing comparisons between optcorr and numpy.corrcoef
+    - Speedup calculations
+    - Accuracy verification
+  3. Visualizations:
+    - Performance vs column/row dimensions
+    - Speedup analysis
+    - Computational complexity scaling
+    - Log-scale plots for better trend visibility
+  4. Analysis:
+    - Empirical confirmation of O(n_cols²) scaling
+    - GPU acceleration effectiveness across problem sizes
+    - Detailed performance tables and summary statistics
+
+  The notebook will help you understand:
+  - How column dimensionality quadratically affects performance
+  - When GPU acceleration provides benefits vs overhead costs
+  - Scaling characteristics of Einstein summation vs standard methods
+  - Numerical accuracy across all tested dimensions
+
+  To run it, you'll need to install additional dependencies:
+  uv add matplotlib pandas seaborn jupyter
+
+  Then launch with:
+  jupyter notebook performance_analysis.ipynb
+```
+
+The (resulting notebook)[performance_analysis.ipynb] provides a nice exploration of the performance of our function, showing that it only provides speedup for datasets with more than about 2500 columns, with a relatively minimal impact of the number of rows.  Based on this, we can have our function default to using `numpy` if there are are fewer than 2500 rows (modifiable by an argument):
+
+```
+User: It seems that our optimization only helps if there are more than about 2500 columns in the dataset.  So, let's add an argument to the function that specifies a minimum number of columns, under which the function will default to using numpy.
+
+... (lots of interim output deleted)
+
+⏺ Excellent! All tests pass. Now let's add a test to verify the new parameter works correctly:
+
+... (lots of interim output deleted)
+
+⏺ Summary
+
+  I've successfully added adaptive backend selection to the einsumcorr
+  function:
+
+  Key Changes:
+
+  1. New Parameter: Added min_cols_for_gpu=2500 parameter to optcorr()
+  function
+  2. Automatic Backend Selection:
+    - Uses numpy.corrcoef for matrices with < 2500 total columns
+    - Uses GPU/einsum for larger matrices
+    - User can customize the threshold
+  3. CLI Integration: Added --min-cols-for-gpu option to command-line
+  interface
+  4. Bug Fixes: Fixed single-column matrix handling in numpy backend
+  5. Testing: Added comprehensive test for the new functionality
+
+  Benefits:
+
+  - Better Performance: Small matrices now use the faster numpy
+  implementation
+  - Flexible: Users can adjust the threshold based on their specific
+  hardware/use case
+  - Backward Compatible: Default behavior preserved with sensible defaults
+  - Transparent: Same API, automatic optimization under the hood
+
+  The function now automatically chooses the best backend based on matrix
+  size, providing optimal performance across different use cases while
+  maintaining the same interface.
+
+```
+
+The code that it generated for this looked reasonable, but running the notebook with the new code I didn't actually see the expected change in performance for smaller matrices. In looking at the code, I saw a couple of issues that I asked Claude to fix:
+
+```
+User: There are a couple of issues with the code from the last round. First  the cutoff is currently being based on the sum of the number of columns in the two matrices, when it should really be based on the maximum of the two column numbers. Second, if the total cols is less than the the min_cols_for_gpu and only one matrix was provided, then the call to _numpy_corrcoef should only include x.
+
+⏺ You're absolutely right! Let me fix both issues:
+
+  1. The cutoff should be based on the maximum number of columns, not the
+  sum
+  2. When falling back to numpy with a single matrix, we should only pass x\
+
+... (lots of interim output deleted)
+
+⏺ Summary
+
+  I've successfully fixed both issues you identified:
+
+  ✅ Issue 1: Column Count Logic
+
+  - Before: Used total_cols = x.shape[1] + (0 if y is x else y.shape[1])
+  (sum)
+  - After: Uses max_cols = max(x.shape[1], y.shape[1]) (maximum)
+  - Rationale: The maximum column count determines computational
+  complexity, not the sum
+
+  ✅ Issue 2: Single Matrix Case
+
+  - Before: Always passed both x and y to _numpy_corrcoef(x, y)
+  - After: Only passes x when y is x: _numpy_corrcoef(x) vs
+  _numpy_corrcoef(x, y)
+  - Rationale: Avoids redundant parameters and ensures correct
+  numpy.corrcoef behavior
+
+  ✅ Additional Improvements
+
+  - Updated docstring to clarify max column behavior
+  - Added comprehensive test test_min_cols_for_gpu_uses_max_columns() to
+  verify the max logic
+  - All 27 tests passing
+
+  Example Behavior
+
+  # Two matrices: 20 columns vs 5 columns
+  # Uses max(20, 5) = 20 for threshold comparison
+  x = np.random.randn(100, 20)  # 20 columns
+  y = np.random.randn(100, 5)   # 5 columns
+
+  # threshold=15: 20 > 15 → uses GPU
+  # threshold=25: 20 < 25 → uses numpy
+
+  The adaptive backend selection now works correctly and efficiently
+  chooses the optimal implementation based on the largest matrix dimension.
+
+```
+
+This works, but the results from our function still don't match the numpy function for smaller matrices.  Let's see if Claude can figure out what's up:
+
+
+```
+User: Something odd is happening.  When I run the performance tests in the notebook I expect to see that performance of optcorr() should be basically identical to performance of numpy_corrcoef for matrices below the threshold size.  However, the optcorr() results are still much slower for the smaller matrices, just as they were before we added the adaptive backend selelction.  Can you figure out what's going on here?
+
+
+⏺ You're absolutely right! There's definitely something wrong if optcorr()
+  is still slow for small matrices when it should be using the numpy
+  backend. Let me investigate what's happening.
+
+...
+
+⏺ I see a small overhead but let me check if there's an issue with the
+  logic. Let me trace through what's actually happening:
+
+...
+
+⏺ The logic looks correct. Let me check if the issue is with import
+  overhead or the way we're calling it. Let me look at what might be
+  causing the performance difference:
+
+...
+
+⏺ I found part of the issue! There's overhead in the _numpy_corrcoef
+  function. Let me check what's causing it:
+
+...
+
+⏺ The overhead is from the additional checks in _numpy_corrcoef. But
+  there's another issue - let me trace through the actual optcorr function
+  to see what's happening:
+
+...
+
+⏺ Good! This shows the adaptive backend is working correctly:
+  - GPU path: 3222x slower (as expected for small matrices)
+  - Numpy path: only 1.66x slower (reasonable overhead)
+
+  The 1.66x overhead for the numpy path is from the input validation and
+  wrapper function calls. This is actually pretty good!
+
+  But let me check if there's something wrong in your notebook. The issue
+  might be that the performance tests are inadvertently using the GPU path.
+   Let me check the notebook logic:
+
+...
+
+ The adaptive selection is working perfectly! The small overhead (1.3-2x
+  slower) for small matrices is expected due to:
+
+  1. Function call overhead from the wrapper
+  2. Input validation (type checking, NaN detection, shape validation)
+  3. Reshaping logic for 1D arrays
+  4. Additional checks in _numpy_corrcoef
+
+  This ~1.5-2x overhead is actually quite reasonable for the benefits of
+  having a unified API with automatic optimization. The key insight is that
+   at 3000+ columns, the GPU version becomes 1.78x-5.5x faster than numpy,
+  which is exactly what we want!
+
+  The adaptive backend is working correctly! The "much slower" behavior you
+   were seeing before was likely when all matrices were using the GPU path.
+   Now small matrices use numpy (with reasonable overhead) and large
+  matrices use GPU acceleration.
+```
+
+In this case, Claude seems to think that the difference for the smaller matrices is due to additional checking that happens in our function, which seems like a reasonable explanation.  
+
+In summary, this example provided an overview of the power of agentic coding tools like Claude Code, as well as highlighting the level of code analysis that the current models are capable of achieving.
 
 [^1]: Confusingly, the term "API" is used in two different ways in different contexts.  In this chapter we are using it to refer to an actual system that one can interact with to send and receive messages.  However, in other contexts the term is used to refer to a specification for how to interact with a system.  For example, many software packages present an "API Reference" (for example, [scikit-learn](https://scikit-learn.org/stable/api/index.html)), which specifies the interfaces to all of the classes and functions in the package.  It's important to distinguish these two uses of the term to avoid confusion.  
