@@ -525,6 +525,11 @@ config = LLMConfig(
 run_llm_prompt(config)
 ```
 
+There are several reasons why using a configuration object is desirable.
+One key advantage is consistency: if the function is called multiple times in different parts of the code, using the same configuration object guarantees that the same parameters are applied everywhere. This reduces the risk of subtle bugs caused by mismatched arguments.
+Another benefit is maintainability: adding or removing parameters becomes easier, since you only update the configuration object rather than every function call. This enforces a stronger degree of modularity and makes the codebase more resilient to change.
+
+
 #### Wild-card imports
 
 This is a Python-specific anti-pattern that is commonly seen in software written by researchers.
