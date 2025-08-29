@@ -1,5 +1,8 @@
 # Principles of software engineering
 
+```{contents}
+```
+
 Just as mechanical engineering is the science of building physical things like airports or engines, software engineering is the science of building software.
 Its goal is to identify the principles and practices that allow building of software that is robust, efficient, and maintainable.
 Just as a person can build a table at home without any formal knowledge of mechanical engineering, one can build software without knowing any of the principles of software engineering.

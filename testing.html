@@ -430,7 +430,63 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="software-testing">
-<h1>Software testing<a class="headerlink" href="#software-testing" title="Permalink to this heading">#</a></h1>
+<h1><a class="toc-backref" href="#id6">Software testing</a><a class="headerlink" href="#software-testing" title="Permalink to this heading">#</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#software-testing" id="id6">Software testing</a></p>
+<ul>
+<li><p><a class="reference internal" href="#why-use-software-tests" id="id7">Why use software tests?</a></p></li>
+<li><p><a class="reference internal" href="#types-of-tests" id="id8">Types of tests</a></p>
+<ul>
+<li><p><a class="reference internal" href="#unit-tests" id="id9">Unit tests</a></p></li>
+<li><p><a class="reference internal" href="#integration-tests" id="id10">Integration tests</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#the-anatomy-of-a-test" id="id11">The anatomy of a test</a></p></li>
+<li><p><a class="reference internal" href="#when-to-write-tests" id="id12">When to write tests</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test" id="id13">Bug-driven testing: Any time you encounter a bug, write a test</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#the-structure-of-a-good-test" id="id14">The structure of a good test</a></p>
+<ul>
+<li><p><a class="reference internal" href="#test-against-the-interface-not-the-implementation" id="id15">Test against the interface, not the implementation</a></p></li>
+<li><p><a class="reference internal" href="#tests-should-be-independent" id="id16">Tests should be independent</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#testing-frameworks" id="id17">Testing frameworks</a></p>
+<ul>
+<li><p><a class="reference internal" href="#potential-problems-with-ai-generated-tests" id="id18">Potential problems with AI-generated tests</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#test-driven-development-and-ai-assisted-coding" id="id19">Test-driven development and AI-assisted coding</a></p></li>
+<li><p><a class="reference internal" href="#test-coverage" id="id20">Test coverage</a></p></li>
+<li><p><a class="reference internal" href="#test-fixtures" id="id21">Test fixtures</a></p></li>
+<li><p><a class="reference internal" href="#mocking" id="id22">Mocking</a></p></li>
+<li><p><a class="reference internal" href="#parametrized-tests" id="id23">Parametrized tests</a></p></li>
+<li><p><a class="reference internal" href="#property-based-testing" id="id24">Property-based testing</a></p></li>
+<li><p><a class="reference internal" href="#automated-testing-and-continuous-integration" id="id25">Automated testing and continuous integration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-github-actions" id="id26">Using GitHub Actions</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#optimizing-the-testing-workflow" id="id27">Optimizing the testing workflow</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cherry-picking-specific-tests" id="id28">Cherry-picking specific tests</a></p></li>
+<li><p><a class="reference internal" href="#controlling-test-execution-order" id="id29">Controlling test execution order</a></p></li>
+<li><p><a class="reference internal" href="#only-run-failed-tests-or-run-them-first" id="id30">Only run failed tests, or run them first</a></p></li>
+<li><p><a class="reference internal" href="#separate-unit-tests-from-longer-running-tests" id="id31">Separate unit tests from longer-running tests</a></p></li>
+<li><p><a class="reference internal" href="#longest-tests-last" id="id32">Longest tests last</a></p></li>
+<li><p><a class="reference internal" href="#using-minimal-mock-datasets" id="id33">Using minimal mock datasets</a></p></li>
+<li><p><a class="reference internal" href="#adding-minimal-processing-modes-for-integration-tests" id="id34">Adding minimal processing modes for integration tests</a></p></li>
+<li><p><a class="reference internal" href="#parallelizing-testing" id="id35">Parallelizing testing</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 <p>Tests define the expected behavior of code, and detect when the code doesn’t match that expected behavior.</p>
 <p>One useful analogy for software testing comes from the biosciences.
 Think for a moment about the rapid COVID-19 tests that we all came to know during the pandemic.
@@ -441,7 +497,7 @@ Other tests also include <em>negative controls</em>, which ensure that the test 
 A positive test assesses whether, given a particular valid input, the component returns the correct output.
 A negative test assesses whether, in the absence of valid input, the component correctly returns the appropriate error message or null result.</p>
 <section id="why-use-software-tests">
-<h2>Why use software tests?<a class="headerlink" href="#why-use-software-tests" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id7">Why use software tests?</a><a class="headerlink" href="#why-use-software-tests" title="Permalink to this heading">#</a></h2>
 <p>The most obvious reason to write tests for code is to make sure that the answers that the code gives you are correct.
 This becomes increasingly important as AI assistants write more of the code, to the degree that testing is becoming <em>more important</em> than code generation as a skill for generating good scientific code.
 But creating correct code is far from the only reason for writing tests.</p>
@@ -459,9 +515,9 @@ Tests can provide you with the comfort you need to make changes, knowing that yo
 This includes refactoring, where the changes are not meant to modify the function but simply to make the code more robust and readable.</p>
 </section>
 <section id="types-of-tests">
-<h2>Types of tests<a class="headerlink" href="#types-of-tests" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id8">Types of tests</a><a class="headerlink" href="#types-of-tests" title="Permalink to this heading">#</a></h2>
 <section id="unit-tests">
-<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id9">Unit tests</a><a class="headerlink" href="#unit-tests" title="Permalink to this heading">#</a></h3>
 <p>Unit tests are the bread and butter of software testing.
 They are meant to assess whether individual software components (in the case of Python, functions, classes, and methods) perform as expected.
 This includes both assessing whether the component performs as it is supposed to perform given a particular input, but also assessing whether it performs correctly under boundary conditions or problematic conditions, where the correct response is often to raise an exception.
@@ -471,7 +527,7 @@ In this case, we would want to test to make sure that if the function is provide
 That is, we want to aim for “garbage in, exception out” behavior.</p>
 </section>
 <section id="integration-tests">
-<h3>Integration tests<a class="headerlink" href="#integration-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id10">Integration tests</a><a class="headerlink" href="#integration-tests" title="Permalink to this heading">#</a></h3>
 <p>As the name suggests, an integration test assesses whether the entire application works as it should, integrating all of the components that were tested via unit testing.</p>
 <p>One simple type of integration test is a “smoke test”.
 This name <a class="reference external" href="https://learn.microsoft.com/en-us/previous-versions/ms182613(v=vs.80)">apparently</a> derives from the computer hardware industry, where one often performs an initial sanity test on an electronic component by plugging it in and seeing if it smokes.
@@ -485,7 +541,7 @@ Just as with unit tests, we want integration tests that both confirm proper oper
 </section>
 </section>
 <section id="the-anatomy-of-a-test">
-<h2>The anatomy of a test<a class="headerlink" href="#the-anatomy-of-a-test" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id11">The anatomy of a test</a><a class="headerlink" href="#the-anatomy-of-a-test" title="Permalink to this heading">#</a></h2>
 <p>A test is generally structured as a function that executes without raising an exception as long as the code behaves in an expected way.
 Let’s say that we want to generate a function that returns the escape velocity of a planet:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
@@ -589,12 +645,12 @@ To do this we can use a feature of the <code class="docutils literal notranslate
 </div>
 </section>
 <section id="when-to-write-tests">
-<h2>When to write tests<a class="headerlink" href="#when-to-write-tests" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id12">When to write tests</a><a class="headerlink" href="#when-to-write-tests" title="Permalink to this heading">#</a></h2>
 <p>Too often researchers decide to write tests after they have written an entire codebase.
 Having any tests is certainly better than having no tests, but integrating testing into ones development workflow from the start can help improve the development experience and ultimately lead to better and more maintainable software.
 In Chapter 1 we mentioned the idea of <em>test-driven development</em>, which we outline in more detail below, but we first discuss a simple approach to introducing testing into the development process.</p>
 <section id="bug-driven-testing-any-time-you-encounter-a-bug-write-a-test">
-<h3>Bug-driven testing: Any time you encounter a bug, write a test<a class="headerlink" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id13">Bug-driven testing: Any time you encounter a bug, write a test</a><a class="headerlink" href="#bug-driven-testing-any-time-you-encounter-a-bug-write-a-test" title="Permalink to this heading">#</a></h3>
 <p>An easy way to introduce testing into the development process is to write a new test any time one encounters a bug, which we refer to as <em>bug-driven testing</em>.
 This makes it easy to then work on fixing the bug, since the test will determine when the bug has been fixed.
 In addition, the test will detect if future changes reintroduce the bug.</p>
@@ -754,7 +810,7 @@ src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
 </section>
 </section>
 <section id="the-structure-of-a-good-test">
-<h2>The structure of a good test<a class="headerlink" href="#the-structure-of-a-good-test" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id14">The structure of a good test</a><a class="headerlink" href="#the-structure-of-a-good-test" title="Permalink to this heading">#</a></h2>
 <p>A commonly used scheme for writing a test is “given/when/then”:</p>
 <ul class="simple">
 <li><p>given some particular situation as background</p></li>
@@ -772,7 +828,7 @@ You can see this in the test for zero standard deviation that we generated in th
 <li><p><em>behavioral test</em>: Sometimes the best we can do is to run the code repeatedly and ensure that it behaves as expected on average.  For example, if a function outputs a numerical value and we know the expected distribution of that value given a particular input, we can ensure that the result matches that distribution with a high probability.  Such <em>probabilistic tests</em> are not optimal in the sense that they can occasionally fail even when the code is correct, but they are sometimes the best we can do.</p></li>
 </ul>
 <section id="test-against-the-interface-not-the-implementation">
-<h3>Test against the interface, not the implementation<a class="headerlink" href="#test-against-the-interface-not-the-implementation" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id15">Test against the interface, not the implementation</a><a class="headerlink" href="#test-against-the-interface-not-the-implementation" title="Permalink to this heading">#</a></h3>
 <p>A good test shouldn’t know about the internal implementation details of the function that it is testing, and changes in the internal code that do not modify the input-output relationship should not affect the test.
 That is, from the standpoint of the test, a function should be a “black box”.</p>
 <p>The most common way in which a test can violate this principle is by accessing the internal variables of a class that it is testing.
@@ -823,7 +879,7 @@ However, if we were to change the way that the transformation is performed (for 
 In general we should only interact with a function or class via its explicit interfaces.</p>
 </section>
 <section id="tests-should-be-independent">
-<h3>Tests should be independent<a class="headerlink" href="#tests-should-be-independent" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id16">Tests should be independent</a><a class="headerlink" href="#tests-should-be-independent" title="Permalink to this heading">#</a></h3>
 <p>In scientific computing it’s common to compose many different operations into a workflow.
 If we want to test the workflow, then the tests of later steps in the workflow must necessarily rely upon earlier steps.
 We could in theory write a set of tests that operate on a shared object, but the tests would fail if executed in an incorrect order, even if the code was correct.
@@ -879,7 +935,7 @@ In a later section we will discuss the use of <em>fixtures</em> which allow this
 </section>
 </section>
 <section id="testing-frameworks">
-<h2>Testing frameworks<a class="headerlink" href="#testing-frameworks" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id17">Testing frameworks</a><a class="headerlink" href="#testing-frameworks" title="Permalink to this heading">#</a></h2>
 <p>One could write tests without the help of any specialized packages, but we generally use a testing framework to help automate the activities of testing.
 There are several testing frameworks for Python; we will focus on the popular and flexible <code class="docutils literal notranslate"><span class="pre">pytest</span></code> framework.</p>
 <p>We will start with a very simple example: a function that generates the Euclidean distance between two points.
@@ -943,7 +999,7 @@ src/codingforscience/simple_testing/test_distance.py<span class="w"> </span>.<sp
 </pre></div>
 </div>
 <section id="potential-problems-with-ai-generated-tests">
-<h3>Potential problems with AI-generated tests<a class="headerlink" href="#potential-problems-with-ai-generated-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id18">Potential problems with AI-generated tests</a><a class="headerlink" href="#potential-problems-with-ai-generated-tests" title="Permalink to this heading">#</a></h3>
 <p>If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.
 One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong.</p>
 <p>In our early project that examined the performance of GPT-4 for coding <span id="id2">[<a class="reference internal" href="bibliography.html#id17" title="Russell A Poldrack, Thomas Lu, and Gašper Beguš. Ai-assisted coding: experiments with gpt-4. 2023. URL: https://arxiv.org/abs/2304.13187, arXiv:2304.13187.">Poldrack <em>et al.</em>, 2023</a>]</span>, one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.
@@ -1019,7 +1075,7 @@ This example highlights the importance of understanding and checking the tests t
 </section>
 </section>
 <section id="test-driven-development-and-ai-assisted-coding">
-<h2>Test-driven development and AI-assisted coding<a class="headerlink" href="#test-driven-development-and-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id19">Test-driven development and AI-assisted coding</a><a class="headerlink" href="#test-driven-development-and-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
 <p>Here we will dive into a more realistic example of an application that one might develop using AI assistance, specifically looking at how we could develop the application using a test-driven development (TDD) approach.
 We will develop a Python application that takes in a query for the PubMed database and returns a data frame containing the number of database records matching that query for each year.
 We start by decomposing the problem and sketching out the main set of functions that we will need to develop, with understandable names for each:</p>
@@ -1153,7 +1209,7 @@ Assuming that our tests cover all possible outcomes of interest, we can consider
 We can also add additional tests to cover additional functions that we generated; we won’t go into the details here, but you can see them on the Github repo.</p>
 </section>
 <section id="test-coverage">
-<h2>Test coverage<a class="headerlink" href="#test-coverage" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id20">Test coverage</a><a class="headerlink" href="#test-coverage" title="Permalink to this heading">#</a></h2>
 <p>It can be useful to know if there are any portions of our code that are not being exercised by our tests, which is known as <em>code coverage</em>.
 The <code class="docutils literal notranslate"><span class="pre">pytest-cov</span></code> extension for the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing package can provide us with a report of test coverage for these tests:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>----------<span class="w"> </span>coverage:<span class="w"> </span>platform<span class="w"> </span>darwin,<span class="w"> </span>python<span class="w"> </span><span class="m">3</span>.12.0-final-0<span class="w"> </span>----------
@@ -1191,7 +1247,7 @@ Just because you have 100% coverage doesn’t mean that your code is perfectly t
 And spending too much time testing for unlikely problems can divert your efforts from other most useful activities.</p>
 </section>
 <section id="test-fixtures">
-<h2>Test fixtures<a class="headerlink" href="#test-fixtures" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id21">Test fixtures</a><a class="headerlink" href="#test-fixtures" title="Permalink to this heading">#</a></h2>
 <p>Sometimes we need to use a the same data for multiple tests.
 Rather than duplicating potentially time-consuming processes across each of the tests, it is often preferable to create a single instance of the object that can be used across multiple tests, which is known as a <em>test fixture</em>.
 This also helps maintain isolation between tests, since the order of tests shouldn’t matter if an appropriate fixture is generated as soon as it’s needed.</p>
@@ -1219,7 +1275,7 @@ We could prevent this by removing the <code class="docutils literal notranslate"
 If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g. <code class="docutils literal notranslate"><span class="pre">my_ids</span> <span class="pre">=</span> <span class="pre">ids.copy()</span></code>) so that the global fixture object won’t be modified.</p>
 </section>
 <section id="mocking">
-<h2>Mocking<a class="headerlink" href="#mocking" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id22">Mocking</a><a class="headerlink" href="#mocking" title="Permalink to this heading">#</a></h2>
 <p>Sometimes tests require infrastructure that is outside of the control of the tester.
 In the example above, we are assuming that the Pubmed API is working correctly for our tests to run; if we were to try to run these tests without an internet connection, they would fail.
 In other cases, code may rely upon a database system that may or may not exist on a particular system.
@@ -1304,7 +1360,7 @@ A better approach (recommended by Gemini) is move the function execution out of 
 In fact, it’s always a good idea to have tests that specifically assess the usage of the external service and the system’s response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).</p>
 </section>
 <section id="parametrized-tests">
-<h2>Parametrized tests<a class="headerlink" href="#parametrized-tests" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id23">Parametrized tests</a><a class="headerlink" href="#parametrized-tests" title="Permalink to this heading">#</a></h2>
 <p>Often a function needs to accept a range of inputs that can result in different behavior, and we want to test each of the possible inputs to ensure that the function works correctly across the range.
 When the different inputs are known, one way to achieve this is to use a <em>parameterized test</em>, in which the test is repeatedly run across combinations of different possible values.</p>
 <p>For our example, let’s move forward and develop the function <code class="docutils literal notranslate"><span class="pre">parse_year_from_Pubmed_record</span></code> to extract the year from Pubmed records, which can differ in their structure.
@@ -1423,7 +1479,7 @@ tests/textmining/test_textmining.py::test_parse_year_from_pmid_parametric<span c
 It would be more efficient to mock the <code class="docutils literal notranslate"><span class="pre">get_record_from_PubmedID</span></code> function to avoid dependency on the live API, but for our simple purposes it’s fine to use the live API.</p>
 </section>
 <section id="property-based-testing">
-<h2>Property-based testing<a class="headerlink" href="#property-based-testing" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id24">Property-based testing</a><a class="headerlink" href="#property-based-testing" title="Permalink to this heading">#</a></h2>
 <p>Parameterized testing can be useful when we have specific values that we want to test, but sometimes we wish to test a large range of possible values drawn from some sort of distribution.
 One approach to doing this is known as <em>property-based testing</em>, and basically involves generating random values that match some specification and testing the code against those.</p>
 <p>Property-based testing can be particularly useful for testing mathematical code, so we will develop another simple example to show how to use the <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> module in Python to perform property-based testing.
@@ -1600,7 +1656,7 @@ Note that we restricted the range of the values generated by the test to <code c
 We decided to restrict the test values to a range that is within the usual range of input data; if one were planning to work with very small or very large numbers, they would want to possibly test the input over a wider range and understand the nature and magnitude of differences in results between the methods.</p>
 </section>
 <section id="automated-testing-and-continuous-integration">
-<h2>Automated testing and continuous integration<a class="headerlink" href="#automated-testing-and-continuous-integration" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id25">Automated testing and continuous integration</a><a class="headerlink" href="#automated-testing-and-continuous-integration" title="Permalink to this heading">#</a></h2>
 <p>Once we have a set of tests for a project, it’s important to integrate them into our workflow so that we ensure that new changes to the code don’t break the existing code (known as a <em>regression</em>).</p>
 <p>One useful way to ensure that the tests are run regularly is to run them automatically every time changes are pushed to version control.
 This is known as “continuous integration” (CI for short), referring to the fact that it allows changes to be continuously integrated into the main code branch once they are confirmed to pass all of the tests.
@@ -1608,7 +1664,7 @@ There are a number of different platforms one can use for CI; we will focus on <
 Testing using CI also has a useful side effect: Since the CI system uses a virtual machine to run the tests, the use of CI for testing ensures that the code can run on a separate machine from the one where it was developed.
 Because setting up the CI system also requires understanding all of the dependencies that are required for the code to run, the CI setup provides a recipe to run the code on any other system.</p>
 <section id="using-github-actions">
-<h3>Using GitHub Actions<a class="headerlink" href="#using-github-actions" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id26">Using GitHub Actions</a><a class="headerlink" href="#using-github-actions" title="Permalink to this heading">#</a></h3>
 <p>GitHub Actions is a system that allows one to automatically execute workflows in response to events related to any GitHub repository.
 At the time of writing, Github Actions are free and unlimited for public repositories when using the standard GitHub-based workflow runners.</p>
 <p>When setting up an automated action using GitHub Actions, there are two primary decisions to specify:</p>
@@ -1678,14 +1734,14 @@ If we got to the Actions tab in the repository, we will see that the tests faile
 </section>
 </section>
 <section id="optimizing-the-testing-workflow">
-<h2>Optimizing the testing workflow<a class="headerlink" href="#optimizing-the-testing-workflow" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id27">Optimizing the testing workflow</a><a class="headerlink" href="#optimizing-the-testing-workflow" title="Permalink to this heading">#</a></h2>
 <p>As a project becomes larger and more complex, the tests will necessarily take longer to run - and whenever the tests take too long, it’s likely that you won’t run them as often.
 This is particularly the case for data analysis tools, where testing the code on real data can take a very long time.
 As an example, our lab develops a tool for fMRI data preprocessing called <a class="reference external" href="https://fmriprep.org/en/stable/">fMRIPrep</a> that performs a large set of operations on functional MRI datasets.
 Without optimization, running the full test suite with real data would take roughly two hours, whereas with optimization we can complete it in 10-15 minutes.</p>
 <p>There are a number of strategies to optimize one’s testing workflows.</p>
 <section id="cherry-picking-specific-tests">
-<h3>Cherry-picking specific tests<a class="headerlink" href="#cherry-picking-specific-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id28">Cherry-picking specific tests</a><a class="headerlink" href="#cherry-picking-specific-tests" title="Permalink to this heading">#</a></h3>
 <p>When developing a new function, it’s usually sufficient to run only the tests that directly address that function rather than running the entire test suite.
 If all of the tests for a specific function are located within a single test file, then one can simply call <code class="docutils literal notranslate"><span class="pre">pytest</span></code> with that file.
 It’s also possible to run a specific test within a file by referring to a specific class or function using a double-colon marker:</p>
@@ -1701,7 +1757,7 @@ tests/textmining/test_textmining.py<span class="w"> </span>.<span class="w">    
 <p>This allows one to focus on the tests that are immediately relevant to a specific development task.</p>
 </section>
 <section id="controlling-test-execution-order">
-<h3>Controlling test execution order<a class="headerlink" href="#controlling-test-execution-order" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id29">Controlling test execution order</a><a class="headerlink" href="#controlling-test-execution-order" title="Permalink to this heading">#</a></h3>
 <p>Several of the strategies described below require the ability to execute tests in specific orders.
 There are several strategies one can use to do this.</p>
 <p>One strategy that <em>will not</em> work reliably is to place the tests in a specific order in the test file.
@@ -1758,7 +1814,7 @@ tests/ordering/test_order.py::test_second<span class="w"> </span>PASSED<span cla
 Instead, one should generate fixtures for any dependencies that are shared by tests.</p>
 </section>
 <section id="only-run-failed-tests-or-run-them-first">
-<h3>Only run failed tests, or run them first<a class="headerlink" href="#only-run-failed-tests-or-run-them-first" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id30">Only run failed tests, or run them first</a><a class="headerlink" href="#only-run-failed-tests-or-run-them-first" title="Permalink to this heading">#</a></h3>
 <p>Pytest has a set of features that allow one to focus testing on those tests that have most recently failed, which can be useful in the context of test-driven development.
 The first command, <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">--lf</span></code> (short for <code class="docutils literal notranslate"><span class="pre">--last-failed</span></code>) will check the cache of the most recent test run results, and only run those tests that failed in the most recent run.
 It’s important to realize that if one introduces a condition that would cause a previously passed test to fail, it may not be caught, such that one could run a string of tests using the <code class="docutils literal notranslate"><span class="pre">--lf</span></code> flag, get to the point where the tests all seem to pass, but then find that some tests that had passed earlier will fail due to conditions introduced when fixing the later tests.</p>
@@ -1772,7 +1828,7 @@ In our case, this would be <code class="docutils literal notranslate"><span clas
 </div>
 </section>
 <section id="separate-unit-tests-from-longer-running-tests">
-<h3>Separate unit tests from longer-running tests<a class="headerlink" href="#separate-unit-tests-from-longer-running-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id31">Separate unit tests from longer-running tests</a><a class="headerlink" href="#separate-unit-tests-from-longer-running-tests" title="Permalink to this heading">#</a></h3>
 <p>If we are writing short functions (which we are, right?), then our unit tests should usually run fairly quickly, whereas our integration tests (which integrate across a potentially large number of modules) may take much longer.
 One thing we can do is to run only unit tests while we are developing, while having the integration tests run less frequently.
 For example, we could have the unit tests run any time we commit our code (for example, by running them as pre-commit items), while having the integration tests run automatically on our CI system when the code is actually pushed to the GitHub repository.</p>
@@ -1836,7 +1892,7 @@ tests/markers/test_markers.py::test_integration<span class="w"> </span>PASSED<sp
 </div>
 </section>
 <section id="longest-tests-last">
-<h3>Longest tests last<a class="headerlink" href="#longest-tests-last" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id32">Longest tests last</a><a class="headerlink" href="#longest-tests-last" title="Permalink to this heading">#</a></h3>
 <p>Another simple strategy that can help optimize the testing workflow is to run tests in order to the time for completion.
 This ensures that one doesn’t end up waiting a long time for long-running tests to complete, only to find that a quick test fails.</p>
 <p>We can use pytest’s <code class="docutils literal notranslate"><span class="pre">--durations</span></code> flag to get the durations for each test.
@@ -1946,7 +2002,7 @@ fastest tests first.
 <p>This is a great example of how we can increasingly rely upon AI coding models to solve problems that would once have required specialized tools.</p>
 </section>
 <section id="using-minimal-mock-datasets">
-<h3>Using minimal mock datasets<a class="headerlink" href="#using-minimal-mock-datasets" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id33">Using minimal mock datasets</a><a class="headerlink" href="#using-minimal-mock-datasets" title="Permalink to this heading">#</a></h3>
 <p>For code that performs data processing operations, the processing of full size datasets can often take a very long time.
 One strategy in these cases is to generate minimal mock datasets that can exercise the functions without taking the full amount of time that a real dataset would.
 In the tests for <code class="docutils literal notranslate"><span class="pre">fMRIPrep</span></code>, we use fMRI datasets that have been reduced in length, and structural MRI datasets that have been downsampled to reduce their spatial resolution.
@@ -1954,14 +2010,14 @@ The specific way to reduce the dataset will depend on the particular processes b
 For example, downsampling the data too much for MRI preprocessing would likely cause some operations to fail, so one needs to have a good intuition for the data requirements for the relevant code.</p>
 </section>
 <section id="adding-minimal-processing-modes-for-integration-tests">
-<h3>Adding minimal processing modes for integration tests<a class="headerlink" href="#adding-minimal-processing-modes-for-integration-tests" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id34">Adding minimal processing modes for integration tests</a><a class="headerlink" href="#adding-minimal-processing-modes-for-integration-tests" title="Permalink to this heading">#</a></h3>
 <p>When the goal is to the test the integration of components rather than the function of each component, one way to minimize testing time is to provide configuration features that minimize execution time for the component.
 For example, in <code class="docutils literal notranslate"><span class="pre">fMRIPrep</span></code> there are a number of steps that involve optimization processes that take time to converge.
 However, there the package has a “sloppy mode” configuration flag that one can turn on for testing, which provides a more lenient threshold for convergence of those operations, allowing them to finish faster.
 Again, knowing where one can cut corners requires a good understanding of the specific requirements of the processing operations.</p>
 </section>
 <section id="parallelizing-testing">
-<h3>Parallelizing testing<a class="headerlink" href="#parallelizing-testing" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id35">Parallelizing testing</a><a class="headerlink" href="#parallelizing-testing" title="Permalink to this heading">#</a></h3>
 <p>If we have written good tests, they should be able to run independently, and thus their execution should be parallelizable, assuming that we are using a system with multiple CPU cores.
 If we are using <code class="docutils literal notranslate"><span class="pre">pytest</span></code> as our testing framework, then we can use the <code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code> extension to enable the parallel execution of tests in pytest.
 For example, let’s set up a parameterized test that includes a <code class="docutils literal notranslate"><span class="pre">time.sleep()</span></code> command so that execution will take a significant amount of time.</p>
