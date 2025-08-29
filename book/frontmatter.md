@@ -7,11 +7,14 @@ Making science more reproducible and transparent is key to improving public trus
 
 The book is licensed according to the [Creative Commons Attribution-NonCommercial 4.0 Generic (CC BY-NC 4.0) License](https://creativecommons.org/licenses/by-nc/4.0/). Please see the terms of that license for more details.
 
+
+## Table of Contents
+
+```{tableofcontents}
+```
+
 ### Contributing to the book
 
 This book is meant to be a living open-source document, with the source available online at https://github.com/poldrack/BetterCodeBetterScience. If you find any errors in the book or want to make a suggestion for how to improve it, please open an issue on the GitHub site. Even better, submit a pull request with your suggested changes!
 
 See the [Contributors' Guide](https://github.com/poldrack/BetterCodeBetterScience/blob/main/CONTRIBUTING.md) on GitHub for more details about contributing to the book.
-
-```{tableofcontents}
-```
