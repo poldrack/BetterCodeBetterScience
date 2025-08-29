@@ -881,48 +881,42 @@ In this case, Claude seems to think that the difference for the smaller matrices
 
 In summary, this example provided an overview of the power of agentic coding tools like Claude Code, as well as highlighting the level of code analysis that the current models are capable of achieving.
 
-## Custom commands for coding agents
 
-https://github.com/humanlayer/humanlayer/tree/main/.claude/commands
+## Workflows for agentic coding
 
+Early in the development of language models, the term "prompt engineering" came to refer to the art of crafting prompts that can effectively drive an LLM to solve a particular problem.  Over time, this has evolved into the idea of "context engineering", referring to the fact that context will generally include more than the prompt at hand.  With agents like Claude Code, it's common to provide one or more files that specify all of the relevant information for the task, which can be loaded by the model into its context every time it is run within the project. By *workflow* I mean a set of practices that one follows and resources that one uses to guide the development process.  
 
+### Context management
 
-## Context management
-
-Even when using models with very large context windows, it generally makes sense to keep one's context footprint as small as possible, given that important information can easily get lost when the context window fills up.  It's thus important to practice good *context management* when working with language models in general.  In addition, context management is essential to deal with the cases when the model goes off in a bad direction or gets stuck, which happens regularly even with the best models.  
+Essential to agentic coding workflows is the idea of *context management*.  Even when using models with very large context windows, it generally makes sense to keep one's context footprint as small as possible, given that important information can easily get lost when the context window fills up.  It's thus important to practice good *context management* when working with language models in general: at any point in time, the context window should contain all of the information that is relevant to the current task at hand, and as little as possible irrelevant information.  In addition, context management is essential to deal with the cases when the model goes off in a bad direction or gets stuck, which happens regularly even with the best models.  
 
 The current state of the context can be viewed within Claude Code by using the `/context` command:
 
 ![Claude Code context output](images/claude_context.png)
 
-Claude Code will automatically *compact* the context (meaning that it replaces the current context with an automatically generated summary) when the context window is close to being full, but by this point performance may have started to suffer, so it's often best to manually compact (`\compact`) or clear (`\clear`) the context when one reaches a natural breakpoint in the development process.  
-
-- when you get to a natural breakpoint in your development process, /compact or /clear
-- create a clear-summary command that can summarize the current state (updating the project files) before clearing the context
+Claude Code will automatically *compact* the context (meaning that it replaces the current context with an automatically generated summary) when the context window is close to being full, but by this point performance may have started to suffer, so it's often best to manually compact (`\compact`) or clear (`\clear`) the context when one reaches a natural breakpoint in the development process.  In addition, it will often be more effective to guide the summary to focus on the important aspects for you, rather than letting the LLM choose what to summarize.  Below we will show an example of a custom Claude command to perform this in the context of the workflow that we will discuss.
 
 It's also important to [gain an understanding](https://claudelog.com/mechanics/context-window-depletion/) of which tasks are more sensitive to the contents within the context window and which are less sensitive (and thus can allow more frequent clearing of the context).  Tasks that require integration across a large codebase or understanding of large-scale architecture will require more information in the context window, while tasks focused on a specific element of the code (such as a single line or function) can be accomplished with relatively little information in the context window.  
 
+### A general agentic coding workflow
 
-## Workflows for agentic coding
+The YouTuber Sean Matthew has presented a [simple but powerful workflow](https://www.youtube.com/watch?v=OZej8sdVCP0) that addresses many of the context management challenges that arise when working with coding agents like Claude Code.  It involves generating several files that our agent can use as we work on the project, usually using an LLM chatbot along with some manual editing. Several of the prompts below are copied directly or modified from Sean Matthew's show notes, along with additions from other resources.
 
-Early in the development of language models, the term "prompt engineering" came to refer to the art of crafting prompts that can effectively drive an LLM to solve a particular problem.  Over time, this has evolved into the idea of "context engineering", referring to the fact that context can include more than the prompt at hand.  With agents like Claude Code, it's common to provide one or more files that specify all of the relevant information, which can be loaded by the model into its context every time it is run within the project.  
-
-The YouTuber Sean Matthew has presented a [simple but powerful workflow](https://www.youtube.com/watch?v=OZej8sdVCP0) that addresses many of the context management challenges that arise when working with coding agents like Claude Code.  It involves generating several files that our agent can use as we work on the project. Several of the prompts below are copied directly from Sean Matthew's show notes, along with additions from other resources.
-
-I'm going to use an example here of another project focused on GPU acceleration, this time for permutation testing with neuroimaging data.  I won't show the results in detail, but the transcripts for all of the sessions can be viewed [here]().  
+I'm going to use an example here of another project focused on GPU acceleration, this time for permutation testing with neuroimaging data.  I won't show the results in detail, but the transcripts for all of the sessions can be viewed [here]() and the full project can be viewed [here]().  
 
 ### Project Requirement Document (PRD)
 
-The PRD contains a detailed description of all of the requirements for the project, including both functional requirements (such as which specific functions need to be implemented), as well as non-functional requirements related to the development process, including code architecture and design principles and standard, 
-- Use Claude Opus 4.1 to generate a PRD: "Help me create a Project Requirement Document (PRD) for a Python application that performs GPU-accelerated permutation testing on fMRI data, based on the FSL randomise program.  The existing C++ code for the FSL program will be provided for guidance. I want a highly performant app that runs on CUDA or MPS GPUs, written in a clean and modular way, using a test-driven development framework."
+The PRD contains a detailed description of all of the requirements for the project.  This includes both functional requirements (such as which specific functions need to be implemented and any details about how they should be implemented), as well as non-functional requirements related to the development process, including code architecture, technology stack, design principles and standards.  We can generally use an LLM to generate a draft PRD and then edit it to meet our particular specifications.  Here is an example of a prompt that I gave to Claude Opus 4.1 to generate a PRD for the project: 
 
-make edits as needed
+> "Help me create a Project Requirement Document (PRD) for a Python application that performs GPU-accelerated permutation testing on fMRI data, based on the FSL randomise program.  The existing C++ code for the FSL program will be provided for guidance. I want a highly performant app that runs on CUDA or MPS GPUs, written in a clean and modular way, using a test-driven development framework."
 
-### Project memory file (CLAUDE.md AGENTS.md more generally)
+The PRD generated by Claude Opus was quite good, but I needed to edit it in various places to clarify my intent and fix incorrect assumptions that it had made.  The edited PRD for this example project can be viewed [here]().
 
-- Prompt in a new Claude Opus session, with the PRD file attached: "Generate a CLAUDE.md file from this PRD that will guide Claude Code sessions on this project"
+### Project memory file (CLAUDE.md or AGENTS.md)
 
-Add the following workflow guidelines:
+All coding agents use a *memory file* to contain the overall instructions for the model; think of it as a ["README for agents"}(https://agents.md/).  For Claude Code this is called `CLAUDE.md`, whereas other frameworks have begun adopting a standard called [`AGENTS.md`](https://agents.md/).  This file contains the instructions that the agent will use in each session to guide its work, though the workflow outlined here separates out some aspects of the instructions into different files.  
+
+We can generate a CLAUDE.md for our project in a new Claude Opus session, with the PRD file attached: "Generate a CLAUDE.md file from this PRD that will guide Claude Code sessions on this project".  In order to use the proposed workflow, we also need to add the following instructions to the file:
 
 - Always read PLANNING.md at the start of every new conversation
 - Check TASKS.md and SCRATCHPAD.md before starting your work
@@ -930,57 +924,78 @@ Add the following workflow guidelines:
 - Add newly discovered tasks to TASKS.md
 - use [SCRATCHPAD.md](https://htdocs.dev/posts/claude-code-best-practices-and-pro-tips/) as a scratchpad to outline plans
 
-make other edits as needed
+The edited version of this file for the example project can be viewed [here](). 
 
 ### PLANNING.md
 
-- Technology stack/language
-- Architecture
-- Tools
+This file contains information related to the planning and execution of the project, such as:
 
-Prompt in a new session: "Based on the attached CLAUDE.md and PRD.md files, create a PLANNING.md file that includes vision, architecture, technology stack, and required tools list for this app."
+- Overall vision for the project
+- System architecture and components
+- Technology stack, language, and dependencies
+- Development tools to be used
+- Development workflow
 
-make edits as needed.
+We can generate this using Claude Opus 4.1: "Based on the attached CLAUDE.md and PRD.md files, create a PLANNING.md file that includes vision, architecture, technology stack, and required tools list for this app."  We then edit as needed to match our preferences; the edited version of this file can be viewed [here]().
 
 
 ### TASKS.md
 
-- tasks required to create the app
-
-Prompt in same session as PLANNING.md: "Based on the attached CLAUDE.md and PRD.md files, create a TASKS.md file with buillet points tasks divided into milestones for building this app."
+The `TASKS.md` file contains a detailed list of the tasks to be accomplished in the project, which will also be used as a running tally of where the development process stands.  We can generating this within same chat session that we used to generate `PLANNING.md`: "Based on the attached CLAUDE.md and PRD.md files, create a TASKS.md file with buillet points tasks divided into milestones for building this app."
 
 ### SCRATCHPAD.md
 
-Create new file with header:
+One additional file that was not included in Sean Matthew's original workflow but that seems helpful is a [SCRATCHPAD.md](https://htdocs.dev/posts/claude-code-best-practices-and-pro-tips/) file, which provides a place for the model to keep notes on its ongoing work.  We can create this new file directly in our repository with the following header:
 
 ```
 # Development scratchpad
 
 - Use this file to keep notes on ongoing development work.
-- When the work is completed, clean it out from this file, so that it only reflects ongoing work.
+- When the work is completed, clean it out from this file, so that the contents only reflect ongoing work.
 
 ## NOTES
 ```
 
 ### Using the workflow
 
+I started by generating a couple of custom Claude commands that I can use to start a fresh session or refresh my current session and read in all of the relevant information.  It's easy to generate custom Claude commands by simply placing markdown files within the `.claude/commands` directory.  The `/start` command is what I use at the beginning of a new session to load in the relevant information:
 
-Prompt: "Please read PLANNING.md, CLAUDE.md, TASKS.md, and SCRATCHPAD.md to understand the project."
+```
+Please read PLANNING.md, CLAUDE.md, TASKS.md, and SCRATCHPAD.md to understand the project.
 
-Because this code relies upon existing code from the FSL package, we first want to have Claude analyze the existing C++ code and generate pseudocode for the relevant functions.  
+```
 
+The `/refresh` command is what I use when I want to clean out the context window:
 
+```
+Update the TASKS.md and SCRATCHPAD.md files to summarize the current state, then commit current changes.
+
+/clean
+
+Please read PLANNING.md, CLAUDE.md, TASKS.md, and SCRATCHPAD.md to understand the project.
+```
+
+This first updates the ongoing documentation and commits the current changes to version control, then fully clears the context window and reloads all of the relevant information.  I would generally do this when I reach a natural breakpoint in the coding process.  If your `TASKS.md` breaks up the development process by weeks (as Claude often seems to do naturally), then moving to a new week is a great natural breakpoint, since the detailed information from the previous week is probably not necessary for the following week. However, depending on how complex the work is within a week, it might be necessary to refresh several times within a week.  It's important to regualrly check on the context and make sure that it's not getting too full unless it needs to. In coding the example project, I found that by the end of one week of tasks, the context was usually about 50% full, which made that a good rule for refreshing.
 
 ### Version control and agentic coding
 
+AI coding agents like Claude Code can work seamlessly with your 
 - use VC to help make reversion easy
 - use agent to interact with VC system
+
+
+### The vibes are not always good
+
+In 2025, the term "vibe coding" became viral, referring to the use of coding agents to generate applications without ever touching actual code or even knowing how to code.  
+
+For the example project described here, I spent several days going back and forth with Claude Code in an attempt to get a working version of the project; if you are interested in the gory details, you can see the entire set of Claude Code transcripts [here]().  Getting it to create a working command-line interface was not particularly difficult; however, the initial implementation did not successfully leverage the GPU and was incredibly slow.  Even after going back and forth and finally getting it to use the GPU, performance was still about 5x slower than the reference implementation within FSL.  Claude diagnosed the problem as being related to the use of `scipy.ndimage.label` to identify connected components for TFCE, which is very slow.  However, it didn't seem to be able to figure out on its own how to fix the problem. I ultimately asked it to create an optimized C++ module that could be called from within Python, using the FSL randomise code as a guide.  
+
 
 
 ## Retrieval-augmented generation
 
 
-## Strategies for AI assisted coding
+## Strategies for coding agent usage
 
 https://agentic-coding.github.io/
 
@@ -989,21 +1004,42 @@ https://agentic-coding.github.io/
 Build documentation that the agent can use to develop its code: https://benhouston3d.com/blog/agentic-coding-best-practices
 
 
-## Language model prompting
+### Clean code
 
-The ability to leverage the power of language models for coding depends heavily on one's ability to effectively prompt them, whether using a chatbot or an integrated LLM assistant.  The most important aspect of prompting is to give the model sufficient context so that it can narrow its probability distribution over answers to the specific domain of interest.  Here are some basic prompting strategies that can enhance the effectiveness of AI-assisted coding; note that the development of prompting strategies rapidly developing, and that these may well outdated by the time of publication.
+One might have thought that the rise of LLM coding tools would obviate the need for clean code structure and organization.  However, it seems that just the opposite is the case: Just like humans, LLMs can more easily understand code that is well structured and organized, with clear variable names.  Thus, it's always a good idea to include an instruction like the one that I included in my PRD prompt above: "written in a clean and modular way".
 
-- few-shot prompting with examples
-
-- prompt formatting with delimiters
-
-- chain of thought
+### Commit often to allow backtracking
 
 
 
+### Stop the model if it gets confused
+
+### Add relevant instructions whenever the model gets confused
+
+Sometimes models can simply fail to follow instructions properly. In the early stages of the example used here, the model would often fail to follow proper test-driven development processes despite being told to do so in the PRD and `CLAUDE.md`: It was generating tests that passed before creating any code, using mocked implementations.  I asked it about this:
+
+```
+User: It appears that all of the tests are currently passing, which violates the TDD approach.  Can you explain?
 
 
-## AI-assisted development workflows
+2025-08-27 19:09:14 Input: 0 | Output: 6 | Cache Creation: 448 | Cache Read: 59484
+
+You're absolutely right! I violated the fundamental TDD principle by writing implementation code that makes tests pass immediately, rather than following the RED-GREEN-REFACTOR cycle.
+
+In proper TDD, I should have:
+
+    RED: Written failing tests first that describe the desired behavior
+    GREEN: Written minimal code to make those tests pass
+    REFACTOR: Cleaned up the implementation
+
+Instead, I wrote a complete MockBackend implementation in the test file that automatically passes all tests, which defeats the purpose of TDD.
+```
+
+In response to this, we might want to add something like this to our CLAUDE.md file: "IMPORTANT: Always ensure that tests are failing before generating code, per the proper TDD approach." 
+
+### Ask the model to think
+
+
 
 
 
