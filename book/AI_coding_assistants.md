@@ -1,5 +1,8 @@
 # Coding with AI
 
+```{contents}
+```
+
 ## Using AI coding assistants
 
 The advent of AI coding assistants based on large language models (LLMs) has fundamentally changed the landscape of computer programming.  Until Github released its Copilot AI assistant in 2021, most coders leaned heavily on internet searches, and at some point there was a meme that computer programming would be officially renamed "Googling Stack Overflow" (a popular question-and-answer site for programming questions).  With integrated AI coding assistants, the language model (which has ingested large amounts of text including Stack Overflow) can synthesize answers much more quickly than one could find them by searching online. 

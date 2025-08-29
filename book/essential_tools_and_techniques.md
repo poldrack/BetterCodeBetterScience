@@ -1,5 +1,8 @@
 # Essential tools and techniques
 
+```{contents}
+```
+
 ## The tools and why we use them
 
 We hope that the principles and strategies outlined in this book will transcend any particular software platform or programming language, but for the purposes of explication we will focus on a particular language (Python) and a particular set of tools for software development/engineering and AI coding assistance.

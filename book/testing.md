@@ -1,5 +1,8 @@
 # Software testing
 
+```{contents}
+```
+
 Tests define the expected behavior of code, and detect when the code doesn't match that expected behavior.
 
 One useful analogy for software testing comes from the biosciences.
