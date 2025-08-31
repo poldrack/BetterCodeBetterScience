@@ -1,5 +1,8 @@
 # Coding with AI
 
+```{contents}
+```
+
 ## Using AI coding assistants
 
 The advent of AI coding assistants based on large language models (LLMs) has fundamentally changed the landscape of computer programming.  Until Github released its Copilot AI assistant in 2021, most coders leaned heavily on internet searches, and at some point there was a meme that computer programming would be officially renamed "Googling Stack Overflow" (a popular question-and-answer site for programming questions).  With integrated AI coding assistants, the language model (which has ingested large amounts of text including Stack Overflow) can synthesize answers much more quickly than one could find them by searching online. 
@@ -324,7 +327,8 @@ result_dict
 The output is now in a standard Python dictionary format.  We can easily use this pattern to expand to multiple calls to the API.  Let's say that we wanted to get the capitals for ten different countries. There are two ways that we might do this.  First, we might loop through ten API calls with each country individually:
 
 ```python
-countries = ["France", "Germany", "Spain", "Italy", "Portugal", "Netherlands", "Belgium", "Sweden", "Norway", "Finland"]
+countries = ["France", "Germany", "Spain", "Italy", "Portugal", 
+             "Netherlands", "Belgium", "Sweden", "Norway", "Finland"]
 
 for country in countries:
     json_prompt = f"""
@@ -372,7 +376,10 @@ result_all, ntokens_prompt = send_prompt_to_claude(
 The output was not exactly what I was looking for, as it included extra text that caused the JSON conversion to fail:
 
 ```bash
-'Here\'s the JSON object with the countries and their respective capital cities:\n\n{\n    "France": "Paris",\n    "Germany": "Berlin",\n    "Spain": "Madrid",\n    "Italy": "Rome",\n    "Portugal": "Lisbon",\n    "Netherlands": "Amsterdam",\n    "Belgium": "Brussels",\n    "Sweden": "Stockholm",\n    "Norway": "Oslo",\n    "Finland": "Helsinki"\n}'
+'Here\'s the JSON object with the countries and their respective capital cities:\n\n{\n    "France": "Paris",\n    "Germany": "Berlin",\n    "Spain": "Madrid",\n 
+  "Italy": "Rome",\n    "Portugal": "Lisbon",\n    "Netherlands": "Amsterdam",\n
+  "Belgium": "Brussels",\n    "Sweden": "Stockholm",\n    "Norway": "Oslo",\n
+  "Finland": "Helsinki"\n}'
 ```
 
 This highlights an important aspect of prompting: One must often be much more explicit and detailed than you expect.  As the folks at Anthropic said in their [guide to best practices for coding using Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices?curius=2107) (a product discussed further below): "Claude can infer intent, but it can't read minds. Specificity leads to better alignment with expectations."  In this case, we change the prompt to include an explicit directive to only return the JSON object:
@@ -393,7 +400,10 @@ result_all, ntokens_prompt = send_prompt_to_claude(
 ```
 
 ```python
-'{\n    "France": "Paris",\n    "Germany": "Berlin",\n    "Spain": "Madrid",\n    "Italy": "Rome",\n    "Portugal": "Lisbon",\n    "Netherlands": "Amsterdam",\n    "Belgium": "Brussels",\n    "Sweden": "Stockholm",\n    "Norway": "Oslo",\n    "Finland": "Helsinki"\n}'
+'{\n    "France": "Paris",\n    "Germany": "Berlin",\n    "Spain": "Madrid",\n
+  "Italy": "Rome",\n    "Portugal": "Lisbon",\n    "Netherlands": "Amsterdam",\n
+  "Belgium": "Brussels",\n    "Sweden": "Stockholm",\n    "Norway": "Oslo",\n
+  "Finland": "Helsinki"\n}'
 ```
 
 Why might we prefer one of these solutions to the other?  One reason has to do with the amount of LLM resources required by each. If you look back at the full output of the client above, you will see that it includes fields called `input_tokens` and `output_tokens` that quantify the amount of information fed into and out of the model.  Because LLM costs are generally based on the number of tokens used, we would like to minimize this.  If we add these up, we see that the looping solution uses a total of 832 tokens, while the single-prompt solution uses only 172 tokens. At this scale this wouldn't make a difference, but for large analyses this could result in major cost differences for the two analyses.  Note, however, that the difference between these models in part reflects the short nature of the prompt, which means that most of the tokens being passed are what one might consider to be overhead tokens which are required for any prompt (such as the system prompt).  As the length of the user prompt increases, the proportional difference between looping and a single compound prompt will decrease.
@@ -603,7 +613,9 @@ Here it seems that it had to slightly loosen the tolerance for the comparison be
 While the initial plan had originally separated out the addition of GPU support into a separate fourth phase, it seems that Claude included it in Phase 3. We can ask it to make sure:
 
 ```
-User: It seems that you have already completed the remaining phases. Please provide an updated plan for any remaining work to be done, before we proceed any further
+User: It seems that you have already completed the remaining phases. 
+Please provide an updated plan for any remaining work to be done, 
+before we proceed any further
 
 ⏺ Updated Plan
 
@@ -673,7 +685,11 @@ PASSED
 In general, there is some overhead for using the Einstein summation notation method, so it will probably only help when the size of the matrix (particularly the number of columns) is large.  To explore this, let's ask Claude to generate a Jupyter notebook where we can look at how performance changes as a function of the matrix size.
 
 ```
-User: Generate a Jupyter notebook that I can use to explore the relationship between matrix size and performance.  It seems that the number of columns matters more than the number of rows for performance, so generate performance values for a range of column dimensionality up to 2000, and plot timing as a function of column dimensionality.
+User: Generate a Jupyter notebook that I can use to explore the relationship 
+between matrix size and performance.  It seems that the number of columns 
+matters more than the number of rows for performance, so generate performance 
+values for a range of column dimensionality up to 2000, and plot timing as 
+a function of column dimensionality.
 
 ⏺ I've created a comprehensive Jupyter notebook performance_analysis.ipynb
   that explores the relationship between matrix dimensions and performance.
@@ -711,14 +727,17 @@ User: Generate a Jupyter notebook that I can use to explore the relationship bet
   jupyter notebook performance_analysis.ipynb
 ```
 
-The (resulting notebook)[performance_analysis.ipynb] provides a nice exploration of the performance of our function, showing that it only provides speedup for datasets with more than about 2500 columns, with a relatively minimal impact of the number of rows.  Based on this, we can have our function default to using `numpy` if there are are fewer than 2500 rows (modifiable by an argument):
+The [resulting notebook](performance_analysis.ipynb) provides a nice exploration of the performance of our function, showing that it only provides speedup for datasets with more than about 2500 columns, with a relatively minimal impact of the number of rows.  Based on this, we can have our function default to using `numpy` if there are are fewer than 2500 rows (modifiable by an argument):
 
 ```
-User: It seems that our optimization only helps if there are more than about 2500 columns in the dataset.  So, let's add an argument to the function that specifies a minimum number of columns, under which the function will default to using numpy.
+User: It seems that our optimization only helps if there are more than about 2500 
+columns in the dataset.  So, let's add an argument to the function that specifies 
+a minimum number of columns, under which the function will default to using numpy.
 
 ... (lots of interim output deleted)
 
-⏺ Excellent! All tests pass. Now let's add a test to verify the new parameter works correctly:
+⏺ Excellent! All tests pass. Now let's add a test to verify the new parameter 
+works correctly:
 
 ... (lots of interim output deleted)
 
@@ -758,7 +777,11 @@ User: It seems that our optimization only helps if there are more than about 250
 The code that it generated for this looked reasonable, but running the notebook with the new code I didn't actually see the expected change in performance for smaller matrices. In looking at the code, I saw a couple of issues that I asked Claude to fix:
 
 ```
-User: There are a couple of issues with the code from the last round. First  the cutoff is currently being based on the sum of the number of columns in the two matrices, when it should really be based on the maximum of the two column numbers. Second, if the total cols is less than the the min_cols_for_gpu and only one matrix was provided, then the call to _numpy_corrcoef should only include x.
+User: There are a couple of issues with the code from the last round. First,  the cutoff
+is currently being based on the sum of the number of columns in the two matrices, 
+when it should really be based on the maximum of the two column numbers. Second, 
+if the total cols is less than the the min_cols_for_gpu and only one matrix was 
+provided, then the call to _numpy_corrcoef should only include x.
 
 ⏺ You're absolutely right! Let me fix both issues:
 
@@ -814,7 +837,12 @@ This works, but the results from our function still don't match the numpy functi
 
 
 ```
-User: Something odd is happening.  When I run the performance tests in the notebook I expect to see that performance of optcorr() should be basically identical to performance of numpy_corrcoef for matrices below the threshold size.  However, the optcorr() results are still much slower for the smaller matrices, just as they were before we added the adaptive backend selelction.  Can you figure out what's going on here?
+User: Something odd is happening.  When I run the performance tests in the 
+notebook I expect to see that performance of optcorr() should be basically 
+identical to performance of numpy_corrcoef for matrices below the threshold 
+size.  However, the optcorr() results are still much slower for the smaller 
+matrices, just as they were before we added the adaptive backend selelction.  
+Can you figure out what's going on here?
 
 
 ⏺ You're absolutely right! There's definitely something wrong if optcorr()
@@ -880,7 +908,6 @@ User: Something odd is happening.  When I run the performance tests in the noteb
 In this case, Claude seems to think that the difference for the smaller matrices is due to additional checking that happens in our function, which seems like a reasonable explanation.  
 
 In summary, this example provided an overview of the power of agentic coding tools like Claude Code, as well as highlighting the level of code analysis that the current models are capable of achieving.
-
 
 ## Workflows for agentic coding
 
@@ -1189,6 +1216,5 @@ LLM-based chatbots can be very useful for solving many problems beyond coding.  
 The ability to LLMs to write code to solve problems provides a solution to the reproducibility challenge: instead of simply using a chatbot to solve a problem, ask the chatbot to generate code to solve the problem, which makes the result testable and reproducible.  This is also a way to solve problems with information that you don't want to submit to the LLM for privacy reasons.
 
 For example, ...
-
 
 [^1]: Confusingly, the term "API" is used in two different ways in different contexts.  In this chapter we are using it to refer to an actual system that one can interact with to send and receive messages.  However, in other contexts the term is used to refer to a specification for how to interact with a system.  For example, many software packages present an "API Reference" (for example, [scikit-learn](https://scikit-learn.org/stable/api/index.html)), which specifies the interfaces to all of the classes and functions in the package.  It's important to distinguish these two uses of the term to avoid confusion.  

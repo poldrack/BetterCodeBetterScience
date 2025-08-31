@@ -1,5 +1,8 @@
 # Principles of software engineering
 
+```{contents}
+```
+
 Just as mechanical engineering is the science of building physical things like airports or engines, software engineering is the science of building software.
 Its goal is to identify the principles and practices that allow building of software that is robust, efficient, and maintainable.
 Just as a person can build a table at home without any formal knowledge of mechanical engineering, one can build software without knowing any of the principles of software engineering.
@@ -19,7 +22,7 @@ Thus, an understanding of the software development process will remain essential
 
 Software development processes may be less important for small one-off projects written by a single developer, but they become essential once a project becomes large and involves multiple developers.
 Coordination costs can quickly eat into the added benefit of more developers on a project, particularly if there is not a strong development process in place.
-And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineering codebase can just be too large.
+And writing good, clean code is essential to help bring new developers into a project; otherwise, the startup costs for a developer to get their head around a poorly engineered codebase can just be too large.
 Similarly, poorly written code can result in a high "bus factor" (i.e., what happens if your lead developer gets hit by a bus?), which can be major risk for groups that rely heavily upon a particular software project for their work.
 
 
@@ -268,7 +271,7 @@ For many programmers, the term "documentation" is largely synonymous with code c
 On the other hand, one of the most consistent messages from the software engineering literature is that comments are far too often used as a "magic balm" over bad code:
 
 - "Don’t comment bad code — rewrite it" (Kernighan & Plaugher)
-- "Clear and expressive code with few comments is far superior to cluttered and complex code with lots of comments"”" (Robert Martin, Clean Code)
+- "Clear and expressive code with few comments is far superior to cluttered and complex code with lots of comments" (Robert Martin, Clean Code)
 - "comments aren’t a bad smell; indeed they are a sweet smell. The reason we mention comments here is that comments are often used as a deodorant. It’s surprising how often you look at thickly commented code and notice that the comments are there because the code is bad." (Fowler, Refactoring)
 
 The overall goal of code comments should be to help the reader know as much as the writer knows about the code.
@@ -393,7 +396,7 @@ n_replicates = 500
 There are two related concepts that are used to describe the appearance of potentially problematic code The “anti-pattern” is a riff on the concept of a *design pattern*, which is a recommended solution (i.e. a "best practice") for a common programming problem {cite:p}`Gamma:1995aa`.
 An anti-pattern is conversely a commonly used but bad solution (i.e. a "worst practice") for a common programming problem.
 In the Python world these are well known from the [The Little Book of Python Anti-Patterns](https://docs.quantifiedcode.com/python-anti-patterns/), which lays out many different anti-patterns common in Python coding.
-The second idea, that of the "code smell", has been popularized by Martin Fowler in his well-known book *Refactoring: Improving The Design of Existing Code*{cite:p}`Fowler:1999aa`.
+The second idea, that of the "code smell", has been popularized by Martin Fowler in his well-known book *Refactoring: Improving The Design of Existing Code *{cite:p}`Fowler:1999aa`.
 Just as a bad smell from food can give us an intuitive sense that the good might be spoiled, code smells are intuitive reactions to code that suggest that there might be a problem that could be a target for refactoring.
 
 Here we outline several bad smells and anti-patterns commonly found in our experience with scientific code.
@@ -525,6 +528,11 @@ config = LLMConfig(
 run_llm_prompt(config)
 ```
 
+There are several reasons why using a configuration object is desirable.
+One key advantage is consistency: if the function is called multiple times in different parts of the code, using the same configuration object guarantees that the same parameters are applied everywhere. This reduces the risk of subtle bugs caused by mismatched arguments.
+Another benefit is maintainability: adding or removing parameters becomes easier, since you only update the configuration object rather than every function call. This enforces a stronger degree of modularity and makes the codebase more resilient to change.
+
+
 #### Wild-card imports
 
 This is a Python-specific anti-pattern that is commonly seen in software written by researchers.
@@ -555,7 +563,7 @@ random_sample = stats.vonmises.rvs(2, loc=10, size=1000)
 
 Another key to making a system understandable is to make it *modular*, meaning that its functions can be decomposed into separate components that interact with one another only through defined interfaces.
 Complex modular systems are also usually *hierarchical*, in the sense that they have multiple levels of organization and each component at one level can be broken down into a set of components at a lower level.
-In a 1962 paper entitled *The Architecture of Complexity*{cite:p}`Simon:1962aa`, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the *near-decomposability* that arises in systems where the different modules are insulated from each other except through specific interfaces.
+In a 1962 paper entitled *The Architecture of Complexity *{cite:p}`Simon:1962aa`, Herbert Simon argued that our ability to understand many different types of complex systems (physical, biological, and social) relies heavily on the *near-decomposability* that arises in systems where the different modules are insulated from each other except through specific interfaces.
 The importance of insulating different modules in computer programming was introduced in 1972 by David Parnas {cite:p}`Parnas:1972aa`, who pointed out that decomposing code based on the concept of "information hiding" can make code much easier to modify than a decomposition based on the logical "flowchart" of the problem being solved.
 
 A common expression of the idea of modularity in software development is the *Single Responsibility Principle*, which states that a function or class should only have one reason to change.

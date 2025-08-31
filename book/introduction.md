@@ -1,5 +1,8 @@
 # Introduction
 
+```{contents}
+```
+
 There was a time when becoming a scientist meant developing and honing a set of very specific laboratory skills: a cell biologist would learn to culture cells and perform assays, a materials scientist would learn to use high-powered microscopes, and a sociologist would learn to develop surveys.
 Each might also perform data analysis during the course of their research, but in most cases this was done using software packages that allowed them to enter their data and specify their analyses using a graphical user interface.
 While many researchers knew how to program a computer, and for some fields it was necessary (e.g. to control recording instruments or run computer simulations), it was relatively uncommon for most scientists to spend a significant proportion of their day writing code.
@@ -142,7 +145,7 @@ A framework that we like for this concept comes from the [Turing Way](https://bo
 This framework, shown in {numref}`Figure {number} <TuringWayReproducibility-fig>`, distinguishes between whether the data and analysis are either same or different between two analyses.
 
 :::{figure-md} TuringWayReproducibility-fig
-<img src="https://book.the-turing-way.org/build/reproducible-matrix-1f714c1d292747c95fe172a47d6a0937.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
+<img src="images/reproducible-matrix.jpg" alt="Schematic of Turing Way reproducibility framework" width="500px">
 
 A schematic of the Turing Way framework for different concepts of reproducibility.
 Reproduced from The Turing Way under CC-BY.
@@ -197,13 +200,13 @@ Image copyright Jorge Cham; Permission to reproduce pending.
 :::
 
 There are multiple apparent examples of bug-hacking in the literature.
-On example was identified by Mark Styczynski and his colleagues {cite:p}`Styczynski:2008aa` when they examined a set of substitution matrices known as the BLOSUM family that are comionly used in bioinformatics analyses.
+On example was identified by Mark Styczynski and his colleagues {cite:p}`Styczynski:2008aa` when they examined a set of substitution matrices known as the BLOSUM family that are commonly used in bioinformatics analyses.
 A set of these matrices were initially created and shared in 1992 and widely used in the field for 15 years before Styczynski et al. discovered that they were in error.
 These errors appeared to have significant impact on results, but interestingly the incorrect matrices actually performed *better* than the correct matrices in terms of the number of errors in biological sequence alignments.
 It seems highly likely that a bug that had substantially reduced performance would have been identified much earlier.
 
 Another example comes from our own field of neuroimaging.
-A typical neuroimaging study collects data from hundreds of thousands of three-dimensional volumetric pixels (know as *voxels*) within the brain, and then performs statsitical tests at each of those locations.
+A typical neuroimaging study collects data from hundreds of thousands of three-dimensional volumetric pixels (know as *voxels*) within the brain, and then performs statistical tests at each of those locations.
 This requires a correction for multiple tests to prevent the statistical error rate from skyrocketing simply due to the large number of tests.
 There are a number of different methods that are implemented in different software packages, some of which rely upon mathematical theory and others of which rely upon resampling or simulation.
 One of the commonly used open source software packages, AFNI, provided a tool called *3DClustSim* that used simulation to estimate a statistical correction for multiple comparisons.
