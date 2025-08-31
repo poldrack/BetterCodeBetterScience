@@ -22,6 +22,9 @@ bibtex_bibfiles:
 sphinx:
   config:
     bibtex_reference_style: author_year
+    # Copy transcript files to build directory
+    html_extra_path:
+      - transcripts
 
 # Information about where the book exists on the web
 repository:
