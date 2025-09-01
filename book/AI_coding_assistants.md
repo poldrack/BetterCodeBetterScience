@@ -1058,7 +1058,7 @@ Thank you for catching this! This is a great reminder that TDD is about the disc
 
 After this it mostly seemed to follow TDD practices, so I stopped complaining and just let it do its job.
 
-As the process went along, I use `/context` commands to monitor context usage, and whenever I saw that it was getting above 50% usage I would issue a `/refresh` command when the code reached a natural break point.  If your `TASKS.md` breaks up the development process by weekly milestones (as Claude often seems to do naturally), then moving to a new milestone is a great natural breakpoint, since the detailed information from the previous milestone is probably not necessary for the following one. However, depending on how complex the work is within a milestone, it might be necessary to refresh several times within a milestone. 
+As the process went along, I use `/context` commands to monitor context usage, and whenever I saw that it was getting above 50% usage I would issue a my refresh commands (`/summ+commit`, `/clear`, and `/freshstart`) when the code reached a natural break point.  If your `TASKS.md` breaks up the development process by weekly milestones (as Claude often seems to do naturally), then moving to a new milestone is a great natural breakpoint, since the detailed information from the previous milestone is probably not necessary for the following one. However, depending on how complex the work is within a milestone, it might be necessary to refresh several times within a milestone. 
 
 After a few hours of occasional interaction, I had a working command line tool.  It didn't work as promised on the first try, and I had to do some exploration to find a few issues that needed to be fixed.  But by the end of the day I had a fully working tool that could solve my problem, without ever touching any Python code. I think that this is an example of the kind of project that has a high likelihood of success using agentic coding tools; in particular, it leverages tools with good documentation and is similar enough to problems that are commonly solved on Github.  As I will discuss below, this level of success is not always possible.
 
@@ -1167,6 +1167,8 @@ python -c "import torch.profiler; ..."
 xcrun xctrace record --template 'Metal System Trace' --launch python script.py
 ```
 ````
+
+You can also provide Claude Code with access to tools that it can use directly via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).  This is a protocol that you can think of as an API for tool use, providing a consistent way for AI agents to interact with tools; or, as the [MCP documentation](https://modelcontextprotocol.io/docs/getting-started/intro) says, "Think of MCP like a USB-C port for AI applications".  As an example, one particularly useful tool if you are developing a project with a web interface is the [Playwright MCP](https://developer.microsoft.com/blog/the-complete-playwright-end-to-end-story-tools-ai-and-real-world-workflows), which allows Claude Code to interactively test the web application using a browser autonomously.  This can greatly speed up development for these kinds of projects because it allows the agent to do things that would previously have required human intervention.
 
 ### Provide examples
 
