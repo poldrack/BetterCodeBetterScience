@@ -1012,17 +1012,14 @@ Please read PLANNING.md, CLAUDE.md, TASKS.md, and SCRATCHPAD.md to understand th
 
 ```
 
-The `/refresh` command is what I use when I want to clean out the context window:
+The `/summ+commit` command is what I use when I want to summarize the current state before cleaning out the context window:
 
 ```
 Update the TASKS.md and SCRATCHPAD.md files to summarize the current state, then commit current changes.
 
-/clean
-
-Please read PLANNING.md, CLAUDE.md, TASKS.md, and SCRATCHPAD.md to understand the project.
 ```
 
-This first updates the ongoing documentation and commits the current changes to version control, then fully clears the context window and reloads all of the relevant information.  
+This updates the ongoing documentation and commits the current changes to version control. I then run the `/clear` command to clear the context window, and reload the relevant info using `/freshstart`.
 
 ### Using the workflow
 
