@@ -207,7 +207,7 @@ sorted_planets = one_moon_planets.sort_values(by='distance')
 print(sorted_planets)
 ```
 
-Because the chat window has access to the code file, it was able to generate code that uses the same variable names as those in the existing code, saving time and prevent potential errors in renaming of variables.
+Because the chat window has access to the code file, it was able to generate code that uses the same variable names as those in the existing code, saving time and preventing potential errors in renaming of variables.
 
 When working with an existing codebase, the autocompletion feature of AI assistants provides yet another way that one can leverage their power seamlessly within the IDE.  In my experience, these tools are particularly good at autocompleting code for common coding problems where the code to be written is obvious but will take a bit of time for the coder to complete accurately.  In this way, these tools can remove some of the drudgery of coding, allowing the programmer to focus on more thoughtful aspects of coding.  They do of course make mistakes on occasion, so it's always important to closely examine the autocompleted code and apply the relevant tests.  Personally I have found myself using autocompletion less and less often, as the chat tools built into the IDE have become increasingly powerful. I also find them rather visually cluttery and distracting when I am coding.
 
