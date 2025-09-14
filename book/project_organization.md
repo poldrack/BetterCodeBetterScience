@@ -1,83 +1,24 @@
 # Project structure and management
 
-One of the keys to efficient software development is good project organization.  Above all else, using a consistent organizational scheme makes development easier because it allows one to rely upon defaults rather than making decisions, and to rely upon assumptions rather than asking questions. In this chapter we will talk about various aspects of project organization and management, starting from the management of files within a project and then moving to the management of packages and environments.  We will also discuss the use of computational notebooks and ways to make them more amenable to a reproducible analysis workflow.
+```{contents}
+```
+
+One of the keys to efficient software development is good project organization.  Above all else, using a consistent organizational scheme makes development easier because it allows one to rely upon defaults rather than making decisions, and to rely upon assumptions rather than asking questions. In this chapter we will talk about various aspects of project organization and management.  In particular, we will discuss the use of computational notebooks and ways to make them more amenable to a reproducible computational workflow.
 
 ## Project organization
 
 - most important thing is consistency of organization
 
 
+
 ### Tools for project creation
 
-
-
-## Python modules
-
-While Python has native access to a small number of functions, much of the functionality of Python comes from *modules*, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as `os` or `math`) or external packages (such as `numpy` or `pytorch`). It's also possible to create one's own modules simply by putting functions into a file.
-
-Let's say that we have a set of functions that do specific operations on text, saved to a file called `textfuncs.py` in our working directory:
-
-```
-def reverse(text):
-    return text[::-1]
-
-def capitalize(text):
-    return text.capitalize()
-
-def lowercase(text):
-    return text.lower()
-```
-
-If we wish to use those functions within another script ('mytext.py'), we can simply import the module and then run them:
-
-```
-import textfuncs
-
-def main():
-    mytext = "Hello World"
-    print(mytext)
-    print(textfuncs.reverse(mytext))
-    print(textfuncs.capitalize(mytext))
-    print(textfuncs.lowercase(mytext))
-
-if __name__ == "__main__":
-    main()
-```
-
-Giving the results:
-
-```
-❯ python mytext.py
-Hello World
-dlroW olleH
-Hello world
-hello world
-```
-
-```{admonition} Antipattern
-It's not uncommon to see Python programmers use *wildcard imports*, such as `from mytext import *`.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It's better practice to explicitly import all objects from a module, or to use fully specified paths within the module.
-```
-
-
-
-## Python packages
-
-One of the most attractive features of Python is the immense ecosystem of *packages* that have grown up around it.  For nearly any field of scientific research one can find packages that provide access to specialized functions for that field.  *EXAMPLES?*
-
-### What is a Python package?
-
-### Creating a new Python package
-
-### Submitting a package to PYPI
-
-### Editable packages for local development
-
-- workflow for developing a package using editable package + autoreload
+- cookiecutter
 
 
 ## Computational notebooks
 
-The advent of the Jupyter notebook has fundamentally changed the way that many scientists do their computational work.  By allowing the mixing together of code, text, and graphics, Project Jupyter has taken Donald Knuth's vision of "literate programming"{cite:p}`Knuth:1992aa` and made it powerfully available to users of [many supported languages](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels), including Python, R, Julia, and many more.  Many scientists now do the majority of their computing within these notebooks.
+The advent of the Jupyter notebook has fundamentally changed the way that many scientists do their computational work.  By allowing the mixing together of code, text, and graphics, Project Jupyter has taken Donald Knuth's vision of "literate programming"{cite:p}`Knuth:1992aa` and made it available in a powerful way to users of [many supported languages](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels), including Python, R, Julia, and more.  Many scientists now do the majority of their computing within these notebooks.
 
 The exploding prevalence of Jupyter notebooks is unsurprising, given their many useful features. They match the way that many scientists interactively work to explore and process their data, and provide a way to visualize results next to the code and text that generates them. They also provide an easy way to share results with other researchers. At the same time, they come with some particular software development challenges, which we discuss further below.
 
@@ -229,6 +170,89 @@ repos:
 ```
 
 The first section will automatically run jupytext and generate a pure Python version of the notebook before the commit is completed.  The second section will unstage the `ipynb` files before committing, so that they will not be committed to the git repository (only the Python files will). This will keep the Python and Jupyter notebook files synced while only committing the Python files to the git repository.  
+
+
+## Python modules
+
+While Python has native access to a small number of functions, much of the functionality of Python comes from *modules*, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as `os` or `math`) or external packages (such as `numpy` or `pytorch`). It's also possible to create one's own modules simply by putting functions into a file.
+
+Let's say that we have a set of functions that do specific operations on text, saved to a file called `textfuncs.py` in our working directory:
+
+```
+def reverse(text):
+    return text[::-1]
+
+def capitalize(text):
+    return text.capitalize()
+
+def lowercase(text):
+    return text.lower()
+```
+
+If we wish to use those functions within another script ('mytext.py'), we can simply import the module and then run them:
+
+```
+import textfuncs
+
+def main():
+    mytext = "Hello World"
+    print(mytext)
+    print(textfuncs.reverse(mytext))
+    print(textfuncs.capitalize(mytext))
+    print(textfuncs.lowercase(mytext))
+
+if __name__ == "__main__":
+    main()
+```
+
+Giving the results:
+
+```
+❯ python mytext.py
+Hello World
+dlroW olleH
+Hello world
+hello world
+```
+
+```{admonition} Antipattern
+It's not uncommon to see Python programmers use *wildcard imports*, such as `from mytext import *`.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It's better practice to explicitly import all objects from a module, or to use fully specified paths within the module.
+
+R users might notice that this antipattern is built into the way that library functions are usually imported in R: In general, when one imports a library the functions are made available directly in the global namespace.  For example, if we load the `dplyr` library we will see several errors regarding objects being masked:
+
+````
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+````
+
+This means that if we call `filter()` it will now refer to `dplyr::filter()` rather than the default reference to `stats::filter()`.  This can cause major problems when one adds library imports during the development process, since those later additions can mask functions that had worked without disambiguation before.  For this reason, when coding in R it's always good to use the full disambiguated function call for any functions with generic names like "select" or "filter".
+
+```
+
+
+
+## Python packages
+
+One of the most attractive features of Python is the immense ecosystem of *packages* that have grown up around it.  For nearly any field of scientific research one can find packages that provide access to specialized functions for that field.  *EXAMPLES?*
+
+### What is a Python package?
+
+### Creating a new Python package
+
+### Submitting a package to PYPI
+
+### Editable packages for local development
+
+- workflow for developing a package using editable package + autoreload
 
 
 
