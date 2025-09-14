@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>for Intro &#8212; Better Code, Better Science</title>
+    <title>Data Organization and Management &#8212; Better Code, Better Science</title>
   
   
   
@@ -59,7 +59,7 @@
     <script src="_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'extras';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'data_management';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -253,7 +253,7 @@
       
       
       
-      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Fextras.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Fdata_management.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -283,7 +283,7 @@
       
       
       
-      <li><a href="_sources/extras.md" target="_blank"
+      <li><a href="_sources/data_management.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -367,7 +367,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>for Intro</h1>
+    <h1>Data Organization and Management</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -377,14 +377,16 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">for Intro</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#from-ai-assisted-coding-chapter">from AI-assisted coding chapter</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#github-spec-kit">github spec kit</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-on-mcp">More on MCP?</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ai-human-pair-programming">AI-human pair programming</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-llm-coding-for-reproducibility">Leveraging LLM coding for reproducibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-organization">Data organization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-structures">Data structures</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-formats-and-file-types">Data formats and file types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#metadata">Metadata</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-file-naming-conventions-and-organization">Data file naming conventions and organization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-storage">Data storage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#big-data">Big data</a></li>
 </ul>
-
+</li>
+</ul>
             </nav>
         </div>
     </div>
@@ -395,30 +397,68 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="for-intro">
-<h1>for Intro<a class="headerlink" href="#for-intro" title="Permalink to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="data-organization-and-management">
+<h1><a class="toc-backref" href="#id1">Data Organization and Management</a><a class="headerlink" href="#data-organization-and-management" title="Permalink to this heading">#</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p>discuss Naur, “Programming as theory building”</p></li>
+<li><p><a class="reference internal" href="#data-organization-and-management" id="id1">Data Organization and Management</a></p>
+<ul>
+<li><p><a class="reference internal" href="#data-organization" id="id2">Data organization</a></p></li>
+<li><p><a class="reference internal" href="#data-structures" id="id3">Data structures</a></p></li>
+<li><p><a class="reference internal" href="#data-formats-and-file-types" id="id4">Data formats and file types</a></p>
+<ul>
+<li><p><a class="reference internal" href="#metadata" id="id5">Metadata</a></p></li>
+<li><p><a class="reference internal" href="#data-file-naming-conventions-and-organization" id="id6">Data file naming conventions and organization</a></p></li>
+<li><p><a class="reference internal" href="#data-storage" id="id7">Data storage</a></p></li>
+<li><p><a class="reference internal" href="#big-data" id="id8">Big data</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<ul class="simple">
+<li><p>talk about Potti case - <a class="reference external" href="https://www.nature.com/articles/nm0610-618a">https://www.nature.com/articles/nm0610-618a</a></p></li>
+<li><p>and/or Sudhof</p></li>
+</ul>
+<p>TODO: this is a bit of a mess now.  need to think more about how to organize it.</p>
+<section id="data-organization">
+<h2><a class="toc-backref" href="#id2">Data organization</a><a class="headerlink" href="#data-organization" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>use a standard scheme if it exists</p></li>
+<li><p>everything should be machine readable</p></li>
+<li><p>make raw data immutable</p></li>
 </ul>
 </section>
-<section id="from-ai-assisted-coding-chapter">
-<h1>from AI-assisted coding chapter<a class="headerlink" href="#from-ai-assisted-coding-chapter" title="Permalink to this heading">#</a></h1>
+<section id="data-structures">
+<h2><a class="toc-backref" href="#id3">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>base structures vs data frames</p></li>
+</ul>
 </section>
-<section id="github-spec-kit">
-<h1>github spec kit<a class="headerlink" href="#github-spec-kit" title="Permalink to this heading">#</a></h1>
+<section id="data-formats-and-file-types">
+<h2><a class="toc-backref" href="#id4">Data formats and file types</a><a class="headerlink" href="#data-formats-and-file-types" title="Permalink to this heading">#</a></h2>
+<section id="metadata">
+<h3><a class="toc-backref" href="#id5">Metadata</a><a class="headerlink" href="#metadata" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>include provenance</p></li>
+</ul>
 </section>
-<section id="more-on-mcp">
-<h1>More on MCP?<a class="headerlink" href="#more-on-mcp" title="Permalink to this heading">#</a></h1>
+<section id="data-file-naming-conventions-and-organization">
+<h3><a class="toc-backref" href="#id6">Data file naming conventions and organization</a><a class="headerlink" href="#data-file-naming-conventions-and-organization" title="Permalink to this heading">#</a></h3>
 </section>
-<section id="ai-human-pair-programming">
-<h1>AI-human pair programming<a class="headerlink" href="#ai-human-pair-programming" title="Permalink to this heading">#</a></h1>
-<p>We often view AI coding agents as autonomous</p>
+<section id="data-storage">
+<h3><a class="toc-backref" href="#id7">Data storage</a><a class="headerlink" href="#data-storage" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>files vs database systems</p></li>
+<li><p>don’t store raw data in the database - link to raw data</p></li>
+</ul>
 </section>
-<section id="leveraging-llm-coding-for-reproducibility">
-<h1>Leveraging LLM coding for reproducibility<a class="headerlink" href="#leveraging-llm-coding-for-reproducibility" title="Permalink to this heading">#</a></h1>
-<p>LLM-based chatbots can be very useful for solving many problems beyond coding.  For example, we recently worked on a paper with more than 100 authors, and needed to harmonize the affiliation listings across authors.  This would have been immensely tedious for a human, but working with an LLM we were able to solve the problem with only a few manual changes needed.  Other examples where we have used LLMs in the research process include data reformatting and summarization of text for meta-analyses.  However, as noted above, the use of chatbots in scientific research is challenging from the standpoint of reproducibility, since it is generally impossible to guarantee the ability to reproduce an LLM output; even if the random seed is fixed, the commercial models change regularly, without the ability to go back to a specific model version.</p>
-<p>The ability to LLMs to write code to solve problems provides a solution to the reproducibility challenge: instead of simply using a chatbot to solve a problem, ask the chatbot to generate code to solve the problem, which makes the result testable and reproducible.  This is also a way to solve problems with information that you don’t want to submit to the LLM for privacy reasons.</p>
-<p>For example, …</p>
+<section id="big-data">
+<h3><a class="toc-backref" href="#id8">Big data</a><a class="headerlink" href="#big-data" title="Permalink to this heading">#</a></h3>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -467,14 +507,16 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">for Intro</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#from-ai-assisted-coding-chapter">from AI-assisted coding chapter</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#github-spec-kit">github spec kit</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-on-mcp">More on MCP?</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ai-human-pair-programming">AI-human pair programming</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-llm-coding-for-reproducibility">Leveraging LLM coding for reproducibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-organization">Data organization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-structures">Data structures</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-formats-and-file-types">Data formats and file types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#metadata">Metadata</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-file-naming-conventions-and-organization">Data file naming conventions and organization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-storage">Data storage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#big-data">Big data</a></li>
 </ul>
-
+</li>
+</ul>
   </nav></div>
 
 </div></div>

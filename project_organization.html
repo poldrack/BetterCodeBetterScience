@@ -381,14 +381,6 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tools-for-project-creation">Tools for project creation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-packages">Python packages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-python-package">What is a Python package?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-new-python-package">Creating a new Python package</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-a-package-to-pypi">Submitting a package to PYPI</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#editable-packages-for-local-development">Editable packages for local development</a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-notebooks">Computational notebooks</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflows-for-jupyter-notebook-development">Workflows for Jupyter notebook development</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-jupyter-notebooks-with-ides">Using Jupyter notebooks with IDEs</a><ul class="nav section-nav flex-column">
@@ -402,8 +394,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#containers">Containers</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logging">Logging</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
 </ul>
             </nav>
         </div>
@@ -416,89 +407,63 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="project-structure-and-management">
-<h1>Project structure and management<a class="headerlink" href="#project-structure-and-management" title="Permalink to this heading">#</a></h1>
-<p>One of the keys to efficient software development is good project organization.  Above all else, using a consistent organizational scheme makes development easier because it allows one to rely upon defaults rather than making decisions, and to rely upon assumptions rather than asking questions. In this chapter we will talk about various aspects of project organization and management, starting from the management of files within a project and then moving to the management of packages and environments.  We will also discuss the use of computational notebooks and ways to make them more amenable to a reproducible analysis workflow.</p>
+<h1><a class="toc-backref" href="#id2">Project structure and management</a><a class="headerlink" href="#project-structure-and-management" title="Permalink to this heading">#</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#project-structure-and-management" id="id2">Project structure and management</a></p>
+<ul>
+<li><p><a class="reference internal" href="#project-organization" id="id3">Project organization</a></p>
+<ul>
+<li><p><a class="reference internal" href="#tools-for-project-creation" id="id4">Tools for project creation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#computational-notebooks" id="id5">Computational notebooks</a></p>
+<ul>
+<li><p><a class="reference internal" href="#workflows-for-jupyter-notebook-development" id="id6">Workflows for Jupyter notebook development</a></p></li>
+<li><p><a class="reference internal" href="#using-jupyter-notebooks-with-ides" id="id7">Using Jupyter notebooks with IDEs</a></p>
+<ul>
+<li><p><a class="reference internal" href="#extracting-functions-from-jupyter-notebooks-into-modules" id="id8">Extracting functions from Jupyter notebooks into modules</a></p></li>
+<li><p><a class="reference internal" href="#version-control-with-jupyter-notebooks" id="id9">Version control with Jupyter notebooks</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#converting-notebooks-to-pure-python" id="id10">Converting notebooks to pure Python</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-jupytext-as-a-pre-commit-hook" id="id11">Using jupytext as a pre-commit hook</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#python-modules" id="id12">Python modules</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>One of the keys to efficient software development is good project organization.  Above all else, using a consistent organizational scheme makes development easier because it allows one to rely upon defaults rather than making decisions, and to rely upon assumptions rather than asking questions. In this chapter we will talk about various aspects of project organization and management.  In particular, we will discuss the use of computational notebooks and ways to make them more amenable to a reproducible computational workflow.</p>
 <section id="project-organization">
-<h2>Project organization<a class="headerlink" href="#project-organization" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id3">Project organization</a><a class="headerlink" href="#project-organization" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>most important thing is consistency of organization</p></li>
 </ul>
 <section id="tools-for-project-creation">
-<h3>Tools for project creation<a class="headerlink" href="#tools-for-project-creation" title="Permalink to this heading">#</a></h3>
-</section>
-</section>
-<section id="python-modules">
-<h2>Python modules<a class="headerlink" href="#python-modules" title="Permalink to this heading">#</a></h2>
-<p>While Python has native access to a small number of functions, much of the functionality of Python comes from <em>modules</em>, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as <code class="docutils literal notranslate"><span class="pre">os</span></code> or <code class="docutils literal notranslate"><span class="pre">math</span></code>) or external packages (such as <code class="docutils literal notranslate"><span class="pre">numpy</span></code> or <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>). It’s also possible to create one’s own modules simply by putting functions into a file.</p>
-<p>Let’s say that we have a set of functions that do specific operations on text, saved to a file called <code class="docutils literal notranslate"><span class="pre">textfuncs.py</span></code> in our working directory:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">text</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="k">def</span> <span class="nf">capitalize</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">lowercase</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>If we wish to use those functions within another script (’<a class="reference external" href="http://mytext.py">mytext.py</a>’), we can simply import the module and then run them:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">textfuncs</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">mytext</span> <span class="o">=</span> <span class="s2">&quot;Hello World&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">mytext</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">lowercase</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Giving the results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>❯ python mytext.py
-Hello World
-dlroW olleH
-Hello world
-hello world
-</pre></div>
-</div>
-<div class="admonition-antipattern admonition">
-<p class="admonition-title">Antipattern</p>
-<p>It’s not uncommon to see Python programmers use <em>wildcard imports</em>, such as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">mytext</span> <span class="pre">import</span> <span class="pre">*</span></code>.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It’s better practice to explicitly import all objects from a module, or to use fully specified paths within the module.</p>
-</div>
-</section>
-<section id="python-packages">
-<h2>Python packages<a class="headerlink" href="#python-packages" title="Permalink to this heading">#</a></h2>
-<p>One of the most attractive features of Python is the immense ecosystem of <em>packages</em> that have grown up around it.  For nearly any field of scientific research one can find packages that provide access to specialized functions for that field.  <em>EXAMPLES?</em></p>
-<section id="what-is-a-python-package">
-<h3>What is a Python package?<a class="headerlink" href="#what-is-a-python-package" title="Permalink to this heading">#</a></h3>
-</section>
-<section id="creating-a-new-python-package">
-<h3>Creating a new Python package<a class="headerlink" href="#creating-a-new-python-package" title="Permalink to this heading">#</a></h3>
-</section>
-<section id="submitting-a-package-to-pypi">
-<h3>Submitting a package to PYPI<a class="headerlink" href="#submitting-a-package-to-pypi" title="Permalink to this heading">#</a></h3>
-</section>
-<section id="editable-packages-for-local-development">
-<h3>Editable packages for local development<a class="headerlink" href="#editable-packages-for-local-development" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id4">Tools for project creation</a><a class="headerlink" href="#tools-for-project-creation" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>workflow for developing a package using editable package + autoreload</p></li>
+<li><p>cookiecutter</p></li>
 </ul>
 </section>
 </section>
 <section id="computational-notebooks">
-<h2>Computational notebooks<a class="headerlink" href="#computational-notebooks" title="Permalink to this heading">#</a></h2>
-<p>The advent of the Jupyter notebook has fundamentally changed the way that many scientists do their computational work.  By allowing the mixing together of code, text, and graphics, Project Jupyter has taken Donald Knuth’s vision of “literate programming”<span id="id1">[<a class="reference internal" href="bibliography.html#id3" title="Donald Ervin Knuth. Literate programming. Volume no. 27. Center for the Study of Language and Information, 1992. ISBN 0937073806 (paper). URL: http://www.loc.gov/catdir/description/cam024/91039510.html.">Knuth, 1992</a>]</span> and made it powerfully available to users of <a class="reference external" href="https://github.com/jupyter/jupyter/wiki/Jupyter-kernels">many supported languages</a>, including Python, R, Julia, and many more.  Many scientists now do the majority of their computing within these notebooks.</p>
+<h2><a class="toc-backref" href="#id5">Computational notebooks</a><a class="headerlink" href="#computational-notebooks" title="Permalink to this heading">#</a></h2>
+<p>The advent of the Jupyter notebook has fundamentally changed the way that many scientists do their computational work.  By allowing the mixing together of code, text, and graphics, Project Jupyter has taken Donald Knuth’s vision of “literate programming”<span id="id1">[<a class="reference internal" href="bibliography.html#id3" title="Donald Ervin Knuth. Literate programming. Volume no. 27. Center for the Study of Language and Information, 1992. ISBN 0937073806 (paper). URL: http://www.loc.gov/catdir/description/cam024/91039510.html.">Knuth, 1992</a>]</span> and made it available in a powerful way to users of <a class="reference external" href="https://github.com/jupyter/jupyter/wiki/Jupyter-kernels">many supported languages</a>, including Python, R, Julia, and more.  Many scientists now do the majority of their computing within these notebooks.</p>
 <p>The exploding prevalence of Jupyter notebooks is unsurprising, given their many useful features. They match the way that many scientists interactively work to explore and process their data, and provide a way to visualize results next to the code and text that generates them. They also provide an easy way to share results with other researchers. At the same time, they come with some particular software development challenges, which we discuss further below.</p>
 <section id="workflows-for-jupyter-notebook-development">
-<h3>Workflows for Jupyter notebook development<a class="headerlink" href="#workflows-for-jupyter-notebook-development" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id6">Workflows for Jupyter notebook development</a><a class="headerlink" href="#workflows-for-jupyter-notebook-development" title="Permalink to this heading">#</a></h3>
 </section>
 <section id="using-jupyter-notebooks-with-ides">
-<h3>Using Jupyter notebooks with IDEs<a class="headerlink" href="#using-jupyter-notebooks-with-ides" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id7">Using Jupyter notebooks with IDEs</a><a class="headerlink" href="#using-jupyter-notebooks-with-ides" title="Permalink to this heading">#</a></h3>
 <p>Many users of Jupyter notebooks edit them via the default Jupyter Lab interface within the a web browser. However, other editors (including VSCode and PyCharm) provide support for the editing and execution of Jupyter notebooks.  The main reason that we generally use a standalone editor is that these editors allow seamless integration of AI coding assistants.  While there are tools that attempt to integrate these assistants within the native Jupyter interface, they are at present nowhere near the level of the commercial IDEs like VSCode.  In addition, these IDEs provide easy access to many other essential coding features, such as code formatting and automated linting.</p>
 <section id="extracting-functions-from-jupyter-notebooks-into-modules">
-<h4>Extracting functions from Jupyter notebooks into modules<a class="headerlink" href="#extracting-functions-from-jupyter-notebooks-into-modules" title="Permalink to this heading">#</a></h4>
+<h4><a class="toc-backref" href="#id8">Extracting functions from Jupyter notebooks into modules</a><a class="headerlink" href="#extracting-functions-from-jupyter-notebooks-into-modules" title="Permalink to this heading">#</a></h4>
 <p>It’s common for users of Jupyter notebooks to define functions within their notebook in order to modularize their code. This is of course a good practice, but suggest that these functions be moved to a module outside of jupyter and imported, rather than being defined within the Jupyter notebook. The reason has to do with the fact that the variables defined in all of the cells within a Jupyter notebook have a global scope.  As we discussed in Chapter Three, global variables are generally frowned upon because they can make it very difficult to debug problems.  In the case of Jupyter notebooks, we have on more than one occasioned been flummoxed by a difficult debugging problem, only to realize that it was due to our use of a global variable within a function.  If a function is defined within the notebook then variables within the global scope are accessible within the function, whereas if a function is imported from another module those global variables are not accessible within the function.  As an example, if we execute the following code within a Jupyter notebook cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="k">def</span> <span class="nf">myfunc</span><span class="p">():</span>
@@ -536,7 +501,7 @@ hello world
 <p>Extracting functions from notebooks into a Python module not only helps prevent problems due to the inadvertent use of global variables; it also makes those functions easier to test.  And as we learned in Chapter XXX, testing is the best way to keep our code base working and to make it easy to change when we need to.  Extracting functions also helps keep the notebook clean and readable, abstracting away the details of the functions and showing primarily the results.</p>
 </section>
 <section id="version-control-with-jupyter-notebooks">
-<h4>Version control with Jupyter notebooks<a class="headerlink" href="#version-control-with-jupyter-notebooks" title="Permalink to this heading">#</a></h4>
+<h4><a class="toc-backref" href="#id9">Version control with Jupyter notebooks</a><a class="headerlink" href="#version-control-with-jupyter-notebooks" title="Permalink to this heading">#</a></h4>
 <p>While notebooks have understandably gained wide traction, they also have some important limitations.  Foremost, the structure of the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file makes them problematic for use in version control systems like git. The file itself is stored as a JSON (JavaScript Object Notation) object, which in Python translates into a dictionary.  As an example, we created a very simple notebook and saved it to our computer.  We can open it as a json file, where we see the following contents:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;cells&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;cell_type&#39;</span><span class="p">:</span> <span class="s1">&#39;markdown&#39;</span><span class="p">,</span>
    <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{},</span>
@@ -561,7 +526,7 @@ hello world
 </section>
 </section>
 <section id="converting-notebooks-to-pure-python">
-<h3>Converting notebooks to pure Python<a class="headerlink" href="#converting-notebooks-to-pure-python" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id10">Converting notebooks to pure Python</a><a class="headerlink" href="#converting-notebooks-to-pure-python" title="Permalink to this heading">#</a></h3>
 <p>One alternative that we like is to convert our notebooks to pure Python files using the <code class="docutils literal notranslate"><span class="pre">jupytext</span></code> tool.  Jupytext supports several formats that can encode the metadata from a notebook into comments within a python file, allowing direct conversion in both directions between a Jupyter notebook and a pure Python file. We like the <code class="docutils literal notranslate"><span class="pre">py:percent</span></code> format, which places a specific marker (<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%%</span></code>) above each cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># %% [markdown]</span>
 <span class="c1"># ### Example notebook</span>
@@ -594,7 +559,7 @@ hello world
 </pre></div>
 </div>
 <section id="using-jupytext-as-a-pre-commit-hook">
-<h4>Using jupytext as a pre-commit hook<a class="headerlink" href="#using-jupytext-as-a-pre-commit-hook" title="Permalink to this heading">#</a></h4>
+<h4><a class="toc-backref" href="#id11">Using jupytext as a pre-commit hook</a><a class="headerlink" href="#using-jupytext-as-a-pre-commit-hook" title="Permalink to this heading">#</a></h4>
 <p>If one wants to edit code using Jupyter notebooks while still maintaining the advantages of the pure Python format for version control (assuming one is using Git), one option is to apply Jupytext as part of a <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">hook</span></code>, which is a git feature that allows commands to be executed automatically prior to the execution of a commit.  This takes advantage of the syncing function described above.  Automatic syncing can be enabled within a git repository by creating a file called <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> within the main repository directory, with the <a class="reference external" href="https://github.com/mwouts/jupytext/blob/v1.9.1/docs/using-pre-commit.md">following contents</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repos</span><span class="p">:</span>
   <span class="o">-</span>
@@ -618,15 +583,92 @@ hello world
 </section>
 </section>
 </section>
-<section id="containers">
-<h2>Containers<a class="headerlink" href="#containers" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Donoho quote</p></li>
-</ul>
-</section>
-<section id="logging">
-<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this heading">#</a></h2>
-<p><em>NOTE:</em> Not sure where this should actually go but we should talk about it somewhere.  Leaving as a placeholder here for now.</p>
+<section id="python-modules">
+<h2><a class="toc-backref" href="#id12">Python modules</a><a class="headerlink" href="#python-modules" title="Permalink to this heading">#</a></h2>
+<p>While Python has native access to a small number of functions, much of the functionality of Python comes from <em>modules</em>, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as <code class="docutils literal notranslate"><span class="pre">os</span></code> or <code class="docutils literal notranslate"><span class="pre">math</span></code>) or external packages (such as <code class="docutils literal notranslate"><span class="pre">numpy</span></code> or <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>). It’s also possible to create one’s own modules simply by putting functions into a file.</p>
+<p>Let’s say that we have a set of functions that do specific operations on text, saved to a file called <code class="docutils literal notranslate"><span class="pre">textfuncs.py</span></code> in our working directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">capitalize</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">lowercase</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If we wish to use those functions within another script (’<a class="reference external" href="http://mytext.py">mytext.py</a>’), we can simply import the module and then run them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">textfuncs</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">mytext</span> <span class="o">=</span> <span class="s2">&quot;Hello World&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mytext</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">lowercase</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Giving the results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>❯ python mytext.py
+Hello World
+dlroW olleH
+Hello world
+hello world
+</pre></div>
+</div>
+<div class="admonition-antipattern admonition">
+<p class="admonition-title">Antipattern</p>
+<p>It’s not uncommon to see Python programmers use <em>wildcard imports</em>, such as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">mytext</span> <span class="pre">import</span> <span class="pre">*</span></code>.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It’s better practice to explicitly import all objects from a module, or to use fully specified paths within the module.</p>
+<p>R users might notice that this antipattern is built into the way that library functions are usually imported in R: In general, when one imports a library the functions are made available directly in the global namespace.  For example, if we load the <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> library we will see several errors regarding objects being masked:</p>
+</div>
+<blockquote>
+<div><p>library(dplyr)</p>
+</div></blockquote>
+<p>Attaching package: ‘dplyr’</p>
+<p>The following objects are masked from ‘package:stats’:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>filter, lag
+</pre></div>
+</div>
+<p>The following objects are masked from ‘package:base’:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>intersect, setdiff, setequal, union
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+This means that if we call `filter()` it will now refer to `dplyr::filter()` rather than the default reference to `stats::filter()`.  This can cause major problems when one adds library imports during the development process, since those later additions can mask functions that had worked without disambiguation before.  For this reason, when coding in R it&#39;s always good to use the full disambiguated function call for any functions with generic names like &quot;select&quot; or &quot;filter&quot;.
+
+```
+
+
+
+## Python packages
+
+One of the most attractive features of Python is the immense ecosystem of *packages* that have grown up around it.  For nearly any field of scientific research one can find packages that provide access to specialized functions for that field.  *EXAMPLES?*
+
+### What is a Python package?
+
+### Creating a new Python package
+
+### Submitting a package to PYPI
+
+### Editable packages for local development
+
+- workflow for developing a package using editable package + autoreload
+
+
+
+## Containers
+
+- Donoho quote
+
+
+## Logging
+
+*NOTE:* Not sure where this should actually go but we should talk about it somewhere.  Leaving as a placeholder here for now.
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -680,14 +722,6 @@ hello world
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tools-for-project-creation">Tools for project creation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-packages">Python packages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-python-package">What is a Python package?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-new-python-package">Creating a new Python package</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-a-package-to-pypi">Submitting a package to PYPI</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#editable-packages-for-local-development">Editable packages for local development</a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-notebooks">Computational notebooks</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflows-for-jupyter-notebook-development">Workflows for Jupyter notebook development</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-jupyter-notebooks-with-ides">Using Jupyter notebooks with IDEs</a><ul class="nav section-nav flex-column">
@@ -701,8 +735,7 @@ hello world
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#containers">Containers</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logging">Logging</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
 </ul>
   </nav></div>
 

@@ -1,4 +1,12 @@
+## for Intro
+
+- discuss Naur, "Programming as theory building"
+
 ## from AI-assisted coding chapter
+
+## github spec kit
+
+## More on MCP?
 
 ## AI-human pair programming
 
