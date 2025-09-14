@@ -1498,7 +1498,41 @@ Let me examine the current implementation to understand what's really happening.
 Be judicious in asking for extra thinking, since it can greatly slow down the work of the model.
 But in cases when it's necessary it can be very effective.
 
+## Tracking problems during agentic coding
 
+I find that when I'm working with a coding agent like Claude Code, it will often make changes that raise more than one issue that needs to be subsequently fixed.  My initial workflow was to simply explain these in the chat window and let the model solve them, but I found that it would often get lost when there were multiple problems to be solved. In addition, it would often lose track of the problem across context compaction or clearing.  
+
+I have found that a better approach is to place any major requests into a file (which I call `problems_tbd.md`), and then use the following prompt:  "read problems_tbd.md and fix each open problem."  Here is what the contents of that file look like, with one example issue from a project that aims to extend my [academidb](https://github.com/poldrack/academicdb) platform with a web interface:
+
+```
+## Problems to be fixed
+
+Open problems marked with [ ]
+Fixed problems marked with [x]
+**IMPORTANT**: Only mark a problem as fixed once the user has confirmed that the fix worked.  
+
+[ ] The progress window is not fully tracking the onging processing when a full database sync is performed.  In particular, it never says that Scopus ID matching is happening - it stops at PMC matching.  Please ensure that all steps in the process are reflected in the progress window.
+
+```
+
+I then give the prompt above and the model attempts to solve the problem, ultimately making the following edit to the file:
+
+```
+[x] ~~The progress window is not fully tracking the onging processing when a full database sync is performed.  In particular, it never says that Scopus ID matching is happening - it stops at PMC matching.  Please ensure that all steps in the process are reflected in the progress window.~~ **FIXED**:
+
+**Root cause**: Progress tracking in the comprehensive sync function was not properly updating progress percentages for postprocessing tasks, causing the progress bar to appear stuck after PMC matching while Scopus ID enrichment was running in the background.
+
+**Solution implemented**:
+1. **Improved progress granularity**: Split total progress calculation into distinct phases with proper step allocation (sync sources: 30 steps each, enrichment: 20 steps, postprocessing: 15 steps)
+2. **Per-task progress updates**: Each postprocessing task now updates both the current step description AND progress percentage
+3. **Better step distribution**: Postprocessing steps are evenly distributed among tasks (PMC lookup and Scopus author ID enrichment)
+4. **Progress continuity**: Progress advances even when individual tasks fail, preventing the UI from getting stuck
+5. **Clearer phase indicators**: Progress window now shows distinct phases: "Database Synchronization", "Data Enrichment", and "Post-Processing"
+
+**Files modified**: `academic/views.py:run_comprehensive_sync_background()`
+```
+
+You may want to leave the solved problems in the file as long as you are working on the same part of the code, because they provide useful context to the model. But I would clear out this file each time you move to a different part of the code, to avoid polluting the context with irrelevant information.
 
 [^1]: Confusingly, the term "API" is used in two different ways in different contexts.
 In this chapter we are using it to refer to an actual system that one can interact with to send and receive messages.
