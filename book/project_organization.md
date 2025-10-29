@@ -31,6 +31,31 @@ As we discussed in our earlier sections on clean coding, one of the most importa
 It's rare for one to perform analyses that are only meant to run on one specific computer system.  Coding portably (as discussed in Chapter 3) makes it easy to run the code on other machines.  This can be useful, for example, when one replaces one's laptop, or when one needs to scale their code to run on a high-performance computing system.  It also helps ensure that the code can be tested using automated testing tools, like those discussed in Chapter 4.  
 
 
+## Project structure
+
+Having a consistent project organization scheme is key to making projects as easily understandable as possible.  There is no single scheme that will be optimal for everyone, since different types of research may require different kinds of organizational schemes. 
+
+### Should code and data live alongside one another?
+
+One important initial question is whether code and data should live within the same directory.  This will often ride on the size of the data: If the data are small enough that they don't cause space problems on the filesystem where the code lives, then it might make sense to include the data in a subdirectory within the project directory. We will discuss in a later chapter on Data Sharing whether one should share one's data via Github; for this chapter we focus on local organization.
+
+For my projects with datasets larger than a few gigabytes, I tend to keep data separate from code for the following reasons. 
+
+- For the projects that use our local high-performance computing system, we have a dedicated location on the file system where data are stored in a read-only way to prevent them from being changed inadvertently, and where they can be accessed by any user with permissions to access that particular dataset.  Individual users keep their code in separate project directories and pull data from those shared directories.
+- In some cases it's useful to remotely mount a filesystem (such as mounting the storage system on the local cluster via sshfs) to allow reading of data without actually downloading the entire dataset.
+- For projects that I run on my laptop, I keep my code folders inside my Dropbox folder, so that they are continually backed up.  I highly recommend this, as it allows one to go back in time and restore deleted files (assuming one's Dropbox account supports this feature), and also allows one to keep a hot spare system that has a current version of all of one's code (e.g. in case one spills a latte on their laptop and fries it).  For larger datasets I often don't want to put them into Dropbox due to the size that they take up.
+
+In general, for portability it's also nice to have the data location parameterized in the code (e.g. via a .env file) rather than hardcoded through the use of a local directory name.  Thus, even if you decide to put the data within the code directory, it's good to write the code in a way that can allow the data to live anywhere.
+
+### Folder structure
+
+
+
+- directory structure
+- file naming
+
+### Cookiecutters
+
 ## Computational notebooks
 
 The advent of the Jupyter notebook has fundamentally changed the way that many scientists do their computational work.  By allowing the mixing together of code, text, and graphics, Project Jupyter has taken Donald Knuth's vision of "literate programming"{cite:p}`Knuth:1992aa` and made it available in a powerful way to users of [many supported languages](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels), including Python, R, Julia, and more.  Many scientists now do the majority of their computing within these notebooks or similar literate programming frameworks (such as RMarkdown or Quarto notebooks). Given its popularity and flexibility we will focus on Jupyter, but some of the points raised below extend to other frameworks as well.
@@ -39,7 +64,7 @@ The exploding prevalence of Jupyter notebooks is unsurprising, given their many 
 
 ### What is a Jupyter notebook?
 
-Put simply, a Jupyter notebook is a structured document that allows the mixing together of code and text, stored as a JSON (JavaScript Object Notation) file.  It is structured as a set of *cells*, each of which can be individually executed.  Each cell can contain text or code, supporting a number of different languages.  We won't provide an introduction to using Jupyter notebooks here; there are many of them online. Instead, we will focus on the specific aspects of Jupyter notebook usage that are relevant to reproducibility.
+Put simply, a Jupyter notebook is a structured document that allows the mixing together of code and text, stored as a JSON (JavaScript Object Notation) file.  It is structured as a set of *cells*, each of which can be individually executed.  Each cell can contain text or code, supporting a number of different languages.  The user interacts with the notebook through a web browser or other interface, while the commands are executed by a *kernel* that runs in the background.  We won't provide an introduction to using Jupyter notebooks here; there are many of them online. Instead, we will focus on the specific aspects of Jupyter notebook usage that are relevant to reproducibility.
 
 Many users of Jupyter notebooks work with them via the default Jupyter Lab interface within  a web browser, and there are often good reasons to use this interface. However, other IDEs (including VSCode and PyCharm) provide support for the editing and execution of Jupyter notebooks.  The main reason that I generally use a standalone editor rather than the Jupyter Lab interface is that these editors allow seamless integration of AI coding assistants.  While there are tools that attempt to integrate AI assistants within the native Jupyter interface, they are at present nowhere near the level of the commercial IDEs like VSCode.  In addition, these IDEs provide easy access to many other essential coding features, such as code formatting and automated linting. 
 
@@ -65,8 +90,7 @@ Because Jupyter notebooks store execution order in the file, the file contents w
 
 ##### Notebooks discourage testing
 
-It is not at all straightforward to develop software tests for code in a Jupyter notebook.  Given the importance of testing (as I discussed in Chapter XXX), this is a major drawback, and a strong motivator for extracting important functions into modules.
-
+Although frameworks exist for code testing within Jupyter notebooks, it is much more straightforward to develop tests for separate functions defined outside of a notebook using standard testing approaches, as outlined in Chapter 4.  This a strong motivator for extracting important functions into modules, as discussed further below.
 
 #### Notebooks as a rapid prototyping tool
 
@@ -87,7 +111,7 @@ A final way that one might use notebooks is as a way to create standalone progra
 
 #### Notebooks as a tool to mix languages
 
-It's very common for researchers to use different coding languages to solve different problems.  A common use case is the Python user who wishes to take advantage of the much wider range of statistical methods that are implemented in R.  There is a package called `rpy2` that allows this within pure Python code, but it can be cumbersome to work with.  Fortunately, Jupyter notebooks provide a convenient solution to this problem, via [*magic* commands](https://scipy-ipython.readthedocs.io/en/latest/interactive/magics.html).  These are commands that start with either a `%` (for line commands) or `%%` for cell commands, which enable additional functionality.    
+It's very common for researchers to use different coding languages to solve different problems.  A common use case is the Python user who wishes to take advantage of the much wider range of statistical methods that are implemented in R.  There is a package called `rpy2` that allows this within pure Python code, but it can be cumbersome to work with, particularly due to the need to convert complex data types.  Fortunately, Jupyter notebooks provide a convenient solution to this problem, via [*magic* commands](https://scipy-ipython.readthedocs.io/en/latest/interactive/magics.html).  These are commands that start with either a `%` (for line commands) or `%%` for cell commands, which enable additional functionality.    
 
 An example of this can be seen in the [mixing_languages.ipynb](src/BetterCodeBetterScience/notebooks/mixing_languages.ipynb) notebook, in which we load and preprocess some data using Python and then use R magic commands to analyze the data using a package only available within R.  In this example, we will work with data from a study published by our laboratory (Eisenberg et al., 2019), in which 522 people completed a large battery of psychological tests and surveys.  We will focus here on the responses to a survey known as the "Barratt Impulsiveness Scale" which includes 30 questions related to different aspects of the psychological construct of "impulsiveness"; for example, "I say things without thinking" or "I plan tasks carefully".  Each participant rated each of these statements on a four-point scale from 'Rarely/Never' to 'Almost Always/Always'; the scores were coded so that the number 1 always represented the most impulsive choice and 4 represented the most self-controlled choice.  
 
@@ -132,22 +156,36 @@ while (!best_model_found) {
 }
 ```
 
-This cell ingests the `data_df_spread` data frame from the previous Python cells (automatically converting it to an R data frame), performs the analysis in R, and then outputs the `bic_values` variable back into a Python variable.  The R session remains active in the background, such that we can use another cell later in the notebook to work with the variables generated in that cell and compute the loadings of each item onto each factor, exporting them back into Python:
+This cell ingests uses the `-i` flag to ingest the `data_df_spread` data frame from the previous Python cells; a major advantage of this approach is that it automatically converts the Python data frame to an R data frame. After performing the analysis in R, it then outputs the `bic_values` variable back into a Python variable (using the `-o` flag), again automatically converting into a Python data frame.  The R session remains active in the background, such that we can use another cell later in the notebook to work with the variables generated in that cell and compute the loadings of each item onto each factor, exporting them back into Python:
 
 ```R
 %%R -o loadings
 loadings <- as.data.frame(summary(best_model)$rotF, verbose=FALSE)
 ```
 
-The ability to easily integrate code from Python and [many other languages](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels) is one of the most important applications of Jupyter notebooks for scientists.  
+The ability to easily integrate code from Python and [many other languages](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels) is one of the most important applications of Jupyter notebooks for scientists. 
 
 
 
 ### Best practices for using Jupyter notebooks
 
+#### Habitually restart kernel and run the full notebook
+
+Most Jupyter users learn over time to restart their kernel and run the entire notebook (or at least the code above a cell of interest) whenever there is any sort of confusing bug.  It's the only foolproof way to make sure that there is no out-of-order execution and that all of the code was executed using the same module versions.  A complete run of the notebook using a fresh kernel is the only way to definitively confirm the function of the notebook.
+
+#### Keep notebooks short
+
+One of the graduate students in my lab recently created a notebook that was so long that I began referring to it as their "big beautiful notebook."  A monster notebook will generally become unwieldy, because it often has dependencies that span across many different parts of the notebook. In addition, a large notebook will often take a very long time to run, making it more difficult to practice the "restart and run all" practice recommended above.  Instead of having a single large notebook, it's better to develop shorter notebooks that are targeted at specific functions.  This will also help better encapsulate the data, since they will need to be shared explicitly across the different notebooks.
+
+#### Parameterize the notebook
+
+Because notebooks are often generated in a quick and dirty way, it't not uncommon to see parameters such as directory names or function settings strewn across the entire notebook.  This violates the principles of clean coding that we mentioned in Chapter 3, and makes changes very difficult to effectively implement. Instead, it's better to define any parameters or settings in a cell at the top of the notebook. In this way, one can easily make changes and ensure that they are propagated throughout the notebook.
+
 #### Extract functions into modules
 
-It's common for users of Jupyter notebooks to define functions within their notebook in order to modularize their code. This is of course a good practice, but suggest that these functions be moved to a module outside of jupyter and imported, rather than being defined within the Jupyter notebook. The reason has to do with the fact that the variables defined in all of the cells within a Jupyter notebook have a global scope.  As we discussed in Chapter Three, global variables are generally frowned upon because they can make it very difficult to debug problems.  In the case of Jupyter notebooks, we have on more than one occasioned been flummoxed by a difficult debugging problem, only to realize that it was due to our use of a global variable within a function.  If a function is defined within the notebook then variables within the global scope are accessible within the function, whereas if a function is imported from another module those global variables are not accessible within the function.  As an example, if we execute the following code within a Jupyter notebook cell:
+It's common for users of Jupyter notebooks to define functions within their notebook in order to modularize their code. This is of course a good practice, but suggest that these functions be moved to a Python module outside of the Jupyter notebook and imported, rather than being defined within the Jupyter notebook. The reason has to do with the fact that the variables defined in all of the cells within a Jupyter notebook have a global scope.  As we discussed in Chapter Three, global variables are generally frowned upon because they can make it very difficult to debug problems.  In the case of Jupyter notebooks, we have on more than one occasioned been flummoxed by a difficult debugging problem, only to realize that it was due to our use of a global variable within a function.  If a function is defined within the notebook then variables within the global scope are accessible within the function, whereas if a function is imported from another module those global variables are not accessible within the function. Another advantage of using a defined function is that having a explicit interface makes the dependencies of the function clearer.
+
+As an example, if we execute the following code within a Jupyter notebook cell:
 
 ```
 x = 1
@@ -189,15 +227,15 @@ File ~/Dropbox/code/coding_for_science/src/codingforscience/jupyter/myfunc2.py:2
 NameError: name 'x' is not defined
 ```
 
-Extracting functions from notebooks into a Python module not only helps prevent problems due to the inadvertent use of global variables; it also makes those functions easier to test.  And as we learned in Chapter XXX, testing is the best way to keep our code base working and to make it easy to change when we need to.  Extracting functions also helps keep the notebook clean and readable, abstracting away the details of the functions and showing primarily the results.
+Extracting functions from notebooks into a Python module not only helps prevent problems due to the inadvertent use of global variables; it also makes those functions easier to test.  And as we learned in Chapter 4, testing is the best way to keep our code base working and to make it easy to change when we need to.  Extracting functions also helps keep the notebook clean and readable, abstracting away the details of the functions and showing primarily the results.
 
 #### Avoid using autoreload
 
-When using functions imported from a module, any changes made to the module need to be imported. However, simply re-rerunning the import statement won't work, since it doesn't reload any functions that have been previously imported.  A trick to fix this is to use the `%autoreload` magic, which can reload all of the imported modules whenever code is run (using the `%autoreload 2` command).  The problem is that you can't tell which cells have been run with which versions of the code, so you don't which version the current value of any particular variable came from, except those in the most recently run cell.  This is a recipe for confusion.  The only want to reduce this confusion would be to rerun the entire notebook, which leads to the next best practice.
+When using functions imported from a module, any changes made to the module need to be imported. However, simply re-rerunning the import statement won't work, since it doesn't reload any functions that have been previously imported.  A trick to fix this is to use the `%autoreload` magic, which can reload all of the imported modules whenever code is run (using the `%autoreload 2` command). This might seem to accelerate the pace of development, but it comes at a steep cost:  The problem is that you can't tell which cells have been run with which versions of the code, so you don't which version the current value of any particular variable came from, except those in the most recently run cell.  This is a recipe for confusion.  The only want to reduce this confusion would be to rerun the entire notebook, as noted above.
 
-#### Habitually restart kernel and run the full notebook
+#### Use an environment manager to manage dependencies
 
-Most Jupyter users learn over time to restart their kernel and run the entire notebook (or at least the code above a cell of interest) whenever there is any sort of confusing bug.  It's the only foolproof way to make sure that there is no out-of-order execution and that all of the code was executed using the same module versions.
+The reproducibility of the computations within a notebook depend on the reproducibilty of the environment and dependencies, so it's important to use an environment manager.  As noted in Chapter 2, we prefer `uv`, but one can also use any of the other Python package managers.  
 
 ### Version control with Jupyter notebooks
 
@@ -224,13 +262,15 @@ While notebooks have understandably gained wide traction, they also have some im
 +   "execution_count": 4,
 ```
 
-This is one of the reasons why we say that notebook files don't work well with version control: simply executing the file without any actual changes will still result in a difference according to git, and these differences can litter the git history, making it very difficult to discern true code differences.  
+This is one of the reasons why we say that notebook files don't work well with version control: simply executing the file without any actual changes will still result in a difference according to git, and these differences can litter the git history, making it very difficult to discern true code differences.    
 
 Another challenge with using Jupyter notebooks alongside version control occurs when the notebook includes images, such as output from plotting commands.  Images in Jupyter notebooks are stored in a serialized text-based format; you can see this by perusing the text of a notebook that includes images, where you will see large sections of seemingly random text, which represent the content of the image converted into text.  If the images change then the `git diff` will be littered with huge sections of this gibberish text.  One could filter these out when viewing the diffs (e.g. using `grep`) but another challenge is that very large images can cause the version control system to become slow and bloated if there are many notebooks with images that change over time.
 
+There are tools that one can use to address this, such as `nbstripout` to remove cell outputs before committing a file, or `nbdime` to provide "rich diffs" that make it easier to see the differences in the current state versus the last commit.  However, our preferred approach is to convert notebooks to pure Python code prior to committing.
+
 ### Converting notebooks to pure Python
 
-One alternative that we like is to convert our notebooks to pure Python files using the `jupytext` tool.  Jupytext supports several formats that can encode the metadata from a notebook into comments within a python file, allowing direct conversion in both directions between a Jupyter notebook and a pure Python file. We like the `py:percent` format, which places a specific marker (`# %%`) above each cell:
+The `jupytext` tool supports several formats that can encode the metadata from a notebook into comments within a python file, allowing direct conversion in both directions between a Jupyter notebook and a pure Python file. We like the `py:percent` format, which places a specific marker (`# %%`) above each cell:
 
 ```
 # %% [markdown]
@@ -243,35 +283,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 ```
 
-These cells can then be version-controlled just as one would with any Python file. To convert a Jupyter notebook to Python, use the jupytext command:
+These cells can then be version-controlled just as one would with any Python file. To create a linked Python version of a Jupyter notebook, use the jupytext command:
 
 ```
-❯ jupytext --to py:percent ExampleNotebook1.ipynb
-[jupytext] Reading ExampleNotebook1.ipynb in format ipynb
-[jupytext] Writing ExampleNotebook1.py in format py:percent
-
+❯  jupytext --set-formats ipynb,py:percent example_notebook2.ipynb
+[jupytext] Reading example_notebook2.ipynb in format ipynb
+[jupytext] Updating notebook metadata with '{"jupytext": {"formats": "ipynb,py:percent"}}'
+[jupytext] Updating example_notebook2.ipynb
+[jupytext] Updating example_notebook2.py
 ```
 
-which will create a new Python version of the file.  Then set the metadata of the Python file to include ipynb as one of its formats, as this will allow syncing of the files:
-
-```
-❯ jupytext --set-formats "py:percent,ipynb" ExampleNotebook1.py
-[jupytext] Reading ExampleNotebook1.py in format py
-[jupytext] Updating notebook metadata with '{"jupytext": {"formats": "py:percent,ipynb"}}'
-[jupytext] Loading ExampleNotebook1.ipynb
-[jupytext] Updating ExampleNotebook1.ipynb
-[jupytext] Updating ExampleNotebook1.py
-```
-
-Then, one can synchronize the Jupyter notebook and Python versions using the command:
-
-```
-jupytext --sync notebook.ipynb
-```
+This creates a new Python file that is linked to the notebook, such that edits can be synchronized between the notebook and python version.
 
 #### Using jupytext as a pre-commit hook
 
-If one wants to edit code using Jupyter notebooks while still maintaining the advantages of the pure Python format for version control (assuming one is using Git), one option is to apply Jupytext as part of a `pre-commit hook`, which is a git feature that allows commands to be executed automatically prior to the execution of a commit.  This takes advantage of the syncing function described above.  Automatic syncing can be enabled within a git repository by creating a file called `.pre-commit-config.yaml` within the main repository directory, with the [following contents](https://github.com/mwouts/jupytext/blob/v1.9.1/docs/using-pre-commit.md):
+If one wants to edit code using Jupyter notebooks while still maintaining the advantages of the pure Python format for version control (assuming one is using Git), one option is to apply Jupytext as part of a `pre-commit hook`, which is a git feature that allows commands to be executed automatically prior to the execution of a commit. To use this function, you must have the `pre-commit` Python module installed.   Automatic syncing of python and notebook files can be enabled within a git repository by creating a file called `.pre-commit-config.yaml` within the main repository directory, with the [following contents](https://github.com/mwouts/jupytext/blob/v1.9.1/docs/using-pre-commit.md):
 
 ```
 repos:
@@ -361,27 +387,158 @@ This means that if we call `filter()` it will now refer to `dplyr::filter()` rat
 
 ```
 
-
-
-## Python packages
-
-One of the most attractive features of Python is the immense ecosystem of *packages* that have grown up around it.  For nearly any field of scientific research one can find packages that provide access to specialized functions for that field.  *EXAMPLES?*
-
-### What is a Python package?
-
-### Creating a new Python package
-
-### Submitting a package to PYPI
-
-### Editable packages for local development
-
-- workflow for developing a package using editable package + autoreload
+### Creating a Python module using uv
 
 
 
 ## Containers
 
-- Donoho quote
+> An article about computational science in a scientific publication is not the
+scholarship itself, it is merely advertising of the scholarship. The actual scholarship is the complete software development environment and the complete set of instructions which generated the figures. \{cite:p}`Buckheit:1995aa`
+
+So far we have discussed the importance of code for reproducibility, and in a later chapter we talk extensively about the sharing of data. However, the foregoing quote from Buckheit and Donoho highlights the additional importance of the computational platform.  When they wrote their paper in 1995 the were no easily accessible solutions for sharing of compute platforms, but a technology known as *containerization* has emerged in the last decade, which provides an easily implemented and widely accessible solution for the sharing of computational platforms.
+
+To understand the concept of a container, it's first useful to understand the related idea of the *virtual machine* (or *VM*).  A VM is like a "computer-in-a-computer", in the sense that it behaves like a fully functioning computer, despite the fact that it only exists virtually within its host system. If you have ever used a cloud system like Amazon Web Services Elastic Compute Cloud (EC2), you have run a virtual machine; the virtualization technology is how Amazon can run many virtual computers on a single physical computing node. The virtual machine runs a fully functioning version of the operating system; for example, a Windows virtual machine would run a fully functioning version of Windows, even if it's implemented on an Apple Mac host.  One challenge of this is that sharing the virtual machine with someone else requires sharing the entire operating system along with any installed components, which can often take many gigabytes of space.
+
+A container is a way to share only the components that are required to run the intended applications, rather than sharing the entire operating system. This makes containers generally much smaller and faster to work with compared to a virtual machine.  Containers were made popular by the *Docker* software, which allows the same container to run on a Mac, Windows, or Linux machine, because the Docker software runs a Linux virtual machine that supports these containers.  Another tool known as [Apptainer](https://apptainer.org/) (formerly Singularity) is commonly used to run containerized applications on high-performance computing (HPC) systems, since Docker requires root access that is not available to users on most shared systems.  We will focus on Docker here, given that it is broadly available and that Apptainer can easily run Docker containers as well.
+
+A container image is, at present, the most reproducible way to share software, because it ensures that the dependencies will remain fixed.  We use containers to distribute software built by our lab, such as `fMRIPrep`, because it greatly reduces installation hassles for complex applications.  All the user needs to do is install the Docker software, and they are up and running quickly.  Without the containerized version, the user would need to install a large number of dependencies, some of which might not be available for their operating system.  Containers are [far from perfect](https://gael-varoquaux.info/programming/of-software-and-science-reproducible-science-what-why-and-how.html), but they are currently the best solution we have for reproducible software execution.
+
+### Running a Docker container
+
+We will start by running a container based on an existing *container image*, which is a file that defines the contents of the container.  The [Docker Hub](https://hub.docker.com/) is a portal that contains images for many different applications. For this example, we will use the [Python image](https://hub.docker.com/_/python), which contains the required dependencies for a basic Python installation. 
+
+We first need to pull the container image from Docker Hub onto our local system, using the `docker pull` command to obtain version 3.13.9 of the container:
+
+```bash
+
+➤  docker pull python:3.13.9
+3.13.9: Pulling from library/python
+2a101b2fcb53: Pull complete
+f510ac7d6fe7: Pull complete
+721433549fef: Pull complete
+e2f695ddffd8: Pull complete
+17e8deb32a49: Pull complete
+bc60d97daad5: Pull complete
+6275e9642344: Pull complete
+Digest: sha256:12513c633252a28bcfee85839aa384e1af322f11275779c6645076c6cd0cfe52
+Status: Downloaded newer image for python:3.13.9
+docker.io/library/python:3.13.9
+```
+
+Now that the image exists on our machine, we can use it to open a container and run a Python command:
+
+```bash
+➤  docker run python:3.13.9 python -c "import sys; print(f'Hello World from Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
+Hello World from Python 3.13.9
+```
+
+We could also log into the container, to see that it's really just like any other Unix system.  We do this by giving the `-it` flag to docker run, which tells it to run in interactive model and allocate a terminal, which in this case is `bash`:
+
+```bash
+➤  docker run -it python:3.13.9 bash
+root@65bb0e71462d:/# pwd
+/
+root@65bb0e71462d:/# whoami
+root
+root@65bb0e71462d:/# ls
+bin   dev  home  media	opt   root  sbin  sys  usr
+boot  etc  lib	 mnt	proc  run   srv   tmp  var
+```
+
+### Mounting local storage within a container
+
+For realistic applications we will often want to be able to access our local storage volumes to be able to process files, run local code, or save outputs. With Docker we can *bind* a local storage volume to a location within the container.  Let's say that we want to output contents from an operation within the container to a local directory called `container-output` and that we want this to appear as `/data` within the container.  We can do that using the `-v` flag to `docker run`:
+
+```bash
+➤  docker run -it -v ./container-output:/data python:3.13.9 bash
+root@d14247359d45:/# cd /data
+root@d14247359d45:/data# ls
+root@d14247359d45:/data# echo "test output from container" > test_output.txt
+root@d14247359d45:/data# more test_output.txt
+test output from container
+root@d14247359d45:/data# exit
+exit
+➤  ls container-output
+test_output.txt
+➤  more container-output/test_output.txt                                    
+test output from container
+```
+
+
+### Configuring a Docker image
+
+To create a reproducible software execution environment, we will often need to create our own new Docker image that contains the necessary dependencies and application code.  AI coding tools are generally quite good at creating the required `Dockerfile` that defines the image. We use the following prompt to Claude Sonnet 4:
+
+```
+I would like to generate a Dockerfile to define a Docker image based on the python:3.13.9 image.  The Python package wonderwords should be installed from PyPi. A local Python script should be created that creates a random sentence using wonderwords.RandomSentence() and prints it.  This script should be the entrypoint for the Docker container.  Create this within src/BetterCodeBetterScience/docker-example inside the current project.  Do not create a new workspace - use the existing workspace for this project.
+```
+
+Here is the content of the resulting `Dockerfile`:
+
+```
+FROM python:3.13.9
+
+# Set working directory
+WORKDIR /app
+
+# Install wonderwords package
+RUN pip install wonderwords==2.2.0
+
+# Copy the Python script
+COPY random_sentence.py .
+
+# Set the entrypoint to run our script
+ENTRYPOINT ["python", "random_sentence.py"]
+```
+
+The entry point defines the command that will be run by default when the container is run. We can then build the image:
+
+```bash
+➤  docker build -t random-sentence-generator .
+[+] Building 0.0s (9/9) FINISHED                              docker:desktop-linux
+ => [internal] load build definition from Dockerfile                          0.0s
+ => => transferring dockerfile: 339B                                          0.0s
+ => [internal] load metadata for docker.io/library/python:3.13.9              0.0s
+ => [internal] load .dockerignore                                             0.0s
+ => => transferring context: 2B                                               0.0s
+ => [1/4] FROM docker.io/library/python:3.13.9                                0.0s
+ => [internal] load build context                                             0.0s
+ => => transferring context: 89B                                              0.0s
+ => CACHED [2/4] WORKDIR /app                                                 0.0s
+ => CACHED [3/4] RUN pip install wonderwords==2.2.0.                          0.0s
+ => CACHED [4/4] COPY random_sentence.py .                                    0.0s
+ => exporting to image                                                        0.0s
+ => => exporting layers                                                       0.0s
+ => => writing image sha256:02794d11ad789b3a056831da2a431deb2241a5da0b20506e  0.0s
+ => => naming to docker.io/library/random-sentence-generator                  0.0s
+
+```
+
+We can now see it in the list of images obtained using `docker images`:
+
+```bash
+➤  docker images
+REPOSITORY                  TAG               IMAGE ID       CREATED         SIZE
+random-sentence-generator   latest            02794d11ad78   5 minutes ago   1.13GB
+python                      3.13.9            49bb15d4b6f6   2 weeks ago     1.12GB
+```
+
+
+We then generate the container to execute the command:
+
+```bash
+➤  docker run --rm random-sentence-generator
+Random sentence: The tangible fairy informs crazy.
+```
+
+### Using containers as a sandbox for AI agents
+
+In addition to allowing the sharing of reproducible environments, containers also provide a very handy tool in the context of agentic coding tools: They allow us to create a sandboxed computing environment that limits the scope of the agent's actions.  This is essential when one is using agentic tools with disabled access controls.  For example, Claude Code usually requires the user to provide explicitly permission for access to particular locations on the local disk (with the option to enable them automatically for the remainder of the session).  However, it has a `--dangerously-skip-permissions` flag (also referred to as "YOLO mode") that allows one to turn off these permissions, giving the agent complete access reading and writing files, running scripts or programs, and accessing the internet without any limits.  This is primarily meant for use on "headless" computers to automate various processes, but it's not surprising that users have tried to use it on their own local systems to speed up the development process.  The [Anthropic documentation for Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices) explicitly cautions against this:
+
+> Letting Claude run arbitrary commands is risky and can result in data loss, system corruption, or even data exfiltration (e.g., via prompt injection attacks). To minimize these risks, use --dangerously-skip-permissions in a container without internet access. 
+
+Their documentation also links to an example Dockerfile that makes it easy to implement this once you know how to use Docker.
 
 
 ## Logging
