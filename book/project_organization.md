@@ -45,16 +45,142 @@ For my projects with datasets larger than a few gigabytes, I tend to keep data s
 - In some cases it's useful to remotely mount a filesystem (such as mounting the storage system on the local cluster via sshfs) to allow reading of data without actually downloading the entire dataset.
 - For projects that I run on my laptop, I keep my code folders inside my Dropbox folder, so that they are continually backed up.  I highly recommend this, as it allows one to go back in time and restore deleted files (assuming one's Dropbox account supports this feature), and also allows one to keep a hot spare system that has a current version of all of one's code (e.g. in case one spills a latte on their laptop and fries it).  For larger datasets I often don't want to put them into Dropbox due to the size that they take up.
 
-In general, for portability it's also nice to have the data location parameterized in the code (e.g. via a .env file) rather than hardcoded through the use of a local directory name.  Thus, even if you decide to put the data within the code directory, it's good to write the code in a way that can allow the data to live anywhere.
+In general, for portability it's also nice to have the data location parameterized in the code (e.g. via a .env file) rather than hardcoded through the use of a local directory name.  Thus, even if you decide to put the data within the code directory, it's good to write the code in a way that can allow the data to live in an arbitrary location.
 
 ### Folder structure
 
+A consistent and rational folder structure is key to good project organization.  For a simple Python project, I recommend starting using the package organization provided by `uv`.  
+
+```bash
+➤  uv init --package myproject
+Initialized project `myproject` at `/Users/poldrack/Downloads/myproject`
+➤  tree myproject
+myproject
+├── pyproject.toml
+├── README.md
+└── src
+    └── myproject
+        └── __init__.py
+```
+
+Using this structure will make it easy to generate a Python module from your code, located within the `src/<projectname>` directory.  I would also consider adding the following directories, depending on your specific use case:
+
+- `data`: if you plan to keep data within your project directory
+- `notebooks`: for interactive notebooks, which I prefer to keep separate from module code
+- `results`: for output from code
+- `scripts`: for executable scripts (e.g. bash scripts). Note: For Python scripts I prefer to use the [`project.scripts` functionality](https://docs.astral.sh/uv/guides/scripts/) in `uv`, which allows one to point to a particular function within a code file as the entrypoint for an executable script.
+- `tests`: for software tests. While one can put tests alongside code within the `src/<projectname>` directory, it is standard to put them in a separate `tests` directory within the main project directory.  This keeps test code separate from project code, and makes it easy to find all of the tests.
+
+I would suggest setting these all up when you create the project, so there won't be any temptation to cut corners down the road.  There are tools known as *cookiecutters* that can help automate the creation of standard directory structures, but I've not personally found them to be necessary or particularly useful; I feel like `uv init --package` plus a few  `mkdir` commands is a simple way to get it done.
+
+#### Organizing Python code
+
+Another question arises regarding whether one should have subdirectories (often called *subpackages*) within the source directory for different components of the project.  Here is an example of what the structure might look like when all of the project files are at the same level in the base directory:
+
+```bash
+src/mypackage/
+├── __init__.py
+├── core.py
+├── utils.py
+├── exceptions.py
+├── config.py
+└── validators.py
+```
+
+On the other hand, we might instead consider breaking similar functions into subpackages:
+
+```bash
+mypackage/
+├── __init__.py
+├── models/
+│   ├── __init__.py
+│   ├── user.py
+│   └── product.py
+├── api/
+│   ├── __init__.py
+│   ├── routes.py
+│   └── serializers.py
+├── services/
+│   ├── __init__.py
+│   └── auth.py
+└── utils/
+    ├── __init__.py
+    └── helpers.py
+```
+
+In general the flat structure is to be preferred because it is simpler.  In particular, the user can easily import modules, e.g. `from mypackage import utils`.  This is possible with the nested structure using subpackages, but it requires adding additional code to the `__init__.py` file to load the modules within the subpackage.  As you may remember from Chapter 3, I try to avoid putting code into `__init__.py` at all costs because I think it's a common source of confusion in debugging.  However, if you have a large number of modules that form clear functional groupings, then it's worth considering moving to a nested structure, which may be more intuitive for users as the package gets complex.
+
+### Folder naming
+
+The general principles of variable naming that we discussed in Chapter 3 should also apply to folder naming: Use names that are as specific and accurate as possible, and be sure that you use those folders in the appropriate way.  
+
+Let's say that you generate a set of subfolders within the `data` and `results` folders:
+
+```bash
+data
+├── preprocessed
+└── raw
+results
+├── figures
+├── modeling
+└── preprocessing
+```
+
+It's important to first note that some distinctions that seem like they should be obvious, like "raw" versus "preprocessed" data, can often hide much more complexity than meets the eye. In fact, I once spent several hours at a workshop in a discussion of what exactly counts as "raw" data in a particular field of neuroimaging. What's most important is that you come up with a definition and stick with it, so that it will be clear what goes where.  It's also probably worth noting in a README file if there are any such definitions that are important to understanding what goes where; for example, "Here 'raw' refers to data that have been downloaded directly from the measurement device, with no additional processing applied."  
+
+You will likely want to have some additional folder structure within each of these directories, and it's important to use a smart naming scheme.  Any time there is more than one parameter that varies across the subfolders, we generally prefer a naming scheme that using key-value pairs separated by underscores, which derives from the [Brain Imaging Data Structure (BIDS)](https://bids.neuroimaging.io/) standard that we were involved in developing. For example, let's say that we have several different types of decoding models that will be fit and stored under the modeling subdirectory, which vary by the fitting method ("svm" versus "logreg") and the regularization type ("L1", "L2", or "elasticnet").  We could generate directories for each of these using the following scheme:
+
+```bash
+modeling
+├── method-logreg_reg-elasticnet
+├── method-logreg_reg-L1
+├── method-logreg_reg-L2
+├── method-svm_reg-elasticnet
+├── method-svm_reg-L1
+└── method-svm_reg-L2
+```
+
+One substantial benefit of this scheme is that it can easily be parsed in an automatic way.  It is important to be very careful not to include additional dashes or underscores within the values, since this will defeat the ability to reliably parse the folder names.
+
+### Folder numbering
+
+There are some cases where it makes sense to number folders, as when there are discrete steps in a workflow that one wants to keep in order.  One good habit for numbering in file names is to use zero-padded numbers, with enough padding to cover all possible values.  For example, let's say that one wants to number folders for individual figures.  If you are certain that there will not be more than 9 figures, then it's ok to number them with single digits, but in general I would err on the side of including zero-padding. Otherwise, figures will not easily sort by number if there end up being more than 9 figures:
+
+```bash
+➤  ls -1
+figure-1
+figure-10
+figure-11
+figure-2
+figure-3
+figure-4
+figure-5
+figure-6
+figure-7
+figure-8
+figure-9
+```
+
+Whereas it sorts properly with zero-padding:
+
+```bash
+➤  ls -1
+figure-01
+figure-02
+figure-03
+figure-04
+figure-05
+figure-06
+figure-07
+figure-08
+figure-09
+figure-10
+figure-11
+figure-12
+```
 
 
-- directory structure
-- file naming
 
-### Cookiecutters
 
 ## Computational notebooks
 
@@ -319,77 +445,6 @@ repos:
 ```
 
 The first section will automatically run jupytext and generate a pure Python version of the notebook before the commit is completed.  The second section will unstage the `ipynb` files before committing, so that they will not be committed to the git repository (only the Python files will). This will keep the Python and Jupyter notebook files synced while only committing the Python files to the git repository.  
-
-
-## Python modules
-
-While Python has native access to a small number of functions, much of the functionality of Python comes from *modules*, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as `os` or `math`) or external packages (such as `numpy` or `pytorch`). It's also possible to create one's own modules simply by putting functions into a file.
-
-Let's say that we have a set of functions that do specific operations on text, saved to a file called `textfuncs.py` in our working directory:
-
-```
-def reverse(text):
-    return text[::-1]
-
-def capitalize(text):
-    return text.capitalize()
-
-def lowercase(text):
-    return text.lower()
-```
-
-If we wish to use those functions within another script ('mytext.py'), we can simply import the module and then run them:
-
-```
-import textfuncs
-
-def main():
-    mytext = "Hello World"
-    print(mytext)
-    print(textfuncs.reverse(mytext))
-    print(textfuncs.capitalize(mytext))
-    print(textfuncs.lowercase(mytext))
-
-if __name__ == "__main__":
-    main()
-```
-
-Giving the results:
-
-```
-❯ python mytext.py
-Hello World
-dlroW olleH
-Hello world
-hello world
-```
-
-```{admonition} Antipattern
-It's not uncommon to see Python programmers use *wildcard imports*, such as `from mytext import *`.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It's better practice to explicitly import all objects from a module, or to use fully specified paths within the module.
-
-R users might notice that this antipattern is built into the way that library functions are usually imported in R: In general, when one imports a library the functions are made available directly in the global namespace.  For example, if we load the `dplyr` library we will see several errors regarding objects being masked:
-
-````
-> library(dplyr)
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-````
-
-This means that if we call `filter()` it will now refer to `dplyr::filter()` rather than the default reference to `stats::filter()`.  This can cause major problems when one adds library imports during the development process, since those later additions can mask functions that had worked without disambiguation before.  For this reason, when coding in R it's always good to use the full disambiguated function call for any functions with generic names like "select" or "filter".
-
-```
-
-### Creating a Python module using uv
-
-
 
 ## Containers
 
