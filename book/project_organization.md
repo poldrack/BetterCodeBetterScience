@@ -45,7 +45,7 @@ For my projects with datasets larger than a few gigabytes, I tend to keep data s
 - In some cases it's useful to remotely mount a filesystem (such as mounting the storage system on the local cluster via sshfs) to allow reading of data without actually downloading the entire dataset.
 - For projects that I run on my laptop, I keep my code folders inside my Dropbox folder, so that they are continually backed up.  I highly recommend this, as it allows one to go back in time and restore deleted files (assuming one's Dropbox account supports this feature), and also allows one to keep a hot spare system that has a current version of all of one's code (e.g. in case one spills a latte on their laptop and fries it).  For larger datasets I often don't want to put them into Dropbox due to the size that they take up.
 
-In general, for portability it's also nice to have the data location parameterized in the code (e.g. via a .env file) rather than hardcoded through the use of a local directory name.  Thus, even if you decide to put the data within the code directory, it's good to write the code in a way that can allow the data to live in an arbitrary location.
+In general, for portability it's also nice to have the data location parameterized in the code (e.g. via a .env file or local config file) rather than hardcoded through the use of a local directory name.  Thus, even if you decide to put the data within the code directory, it's good to write the code in a way that can allow the data to live in an arbitrary location.
 
 ### Folder structure
 
