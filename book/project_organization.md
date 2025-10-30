@@ -71,7 +71,7 @@ Using this structure will make it easy to generate a Python module from your cod
 - `scripts`: for executable scripts (e.g. bash scripts). Note: For Python scripts I prefer to use the [`project.scripts` functionality](https://docs.astral.sh/uv/guides/scripts/) in `uv`, which allows one to point to a particular function within a code file as the entrypoint for an executable script.
 - `tests`: for software tests. While one can put tests alongside code within the `src/<projectname>` directory, it is standard to put them in a separate `tests` directory within the main project directory.  This keeps test code separate from project code, and makes it easy to find all of the tests.
 
-I would suggest setting these all up when you create the project, so there won't be any temptation to cut corners down the road.  There are tools known as *cookiecutters* that can help automate the creation of standard directory structures, but I've not personally found them to be necessary or particularly useful; I feel like `uv init --package` plus a few  `mkdir` commands is a simple way to get it done.
+I would suggest setting these all up when you create the project, so there won't be any temptation to cut corners down the road.  There are tools known as *cookiecutters* that can help automate the creation of standard directory structures. While I've not personally found them to be necessary or particularly useful, they can be helpful for larger groups to ensure the generation of standardized directory structures.
 
 #### Organizing Python code
 
@@ -108,7 +108,7 @@ mypackage/
     └── helpers.py
 ```
 
-In general the flat structure is to be preferred because it is simpler.  In particular, the user can easily import modules, e.g. `from mypackage import utils`.  This is possible with the nested structure using subpackages, but it requires adding additional code to the `__init__.py` file to load the modules within the subpackage.  As you may remember from Chapter 3, I try to avoid putting code into `__init__.py` at all costs because I think it's a common source of confusion in debugging.  However, if you have a large number of modules that form clear functional groupings, then it's worth considering moving to a nested structure, which may be more intuitive for users as the package gets complex.
+In general the flat structure is to be preferred because it is simpler.  In particular, the user can easily import modules, e.g. `from mypackage import utils`.  This is possible with the nested structure using subpackages, though the import statements become longer; keeping the same short import commands requires adding additional code to the `__init__.py` file to load the modules within the subpackage.  As you may remember from Chapter 3, I try to avoid putting code into `__init__.py` at all costs because I think it's a common source of confusion in debugging.  However, if you have a large number of modules that form clear functional groupings, then it's worth considering moving to a nested structure, which may be more intuitive for users as the package gets complex.
 
 ### Folder naming
 
