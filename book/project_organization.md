@@ -309,7 +309,7 @@ Because notebooks are often generated in a quick and dirty way, it't not uncommo
 
 #### Extract functions into modules
 
-It's common for users of Jupyter notebooks to define functions within their notebook in order to modularize their code. This is of course a good practice, but suggest that these functions be moved to a Python module outside of the Jupyter notebook and imported, rather than being defined within the Jupyter notebook. The reason has to do with the fact that the variables defined in all of the cells within a Jupyter notebook have a global scope.  As we discussed in Chapter Three, global variables are generally frowned upon because they can make it very difficult to debug problems.  In the case of Jupyter notebooks, we have on more than one occasioned been flummoxed by a difficult debugging problem, only to realize that it was due to our use of a global variable within a function.  If a function is defined within the notebook then variables within the global scope are accessible within the function, whereas if a function is imported from another module those global variables are not accessible within the function. Another advantage of using a defined function is that having a explicit interface makes the dependencies of the function clearer.
+It's common for users of Jupyter notebooks to define functions within their notebook in order to modularize their code. This is of course a good practice, but suggest that these functions be moved to a Python module outside of the Jupyter notebook and imported, rather than being defined within the Jupyter notebook. The reason has to do with the fact that the variables defined in all of the cells within a Jupyter notebook have a global scope.  As we discussed in Chapter Three, global variables are generally frowned upon because they can make it very difficult to debug problems.  In the case of Jupyter notebooks, we have on more than one occasion been flummoxed by a difficult debugging problem, only to realize that it was due to our use of a global variable within a function.  If a function is defined within the notebook then variables within the global scope are accessible within the function, whereas if a function is imported from another module those global variables are not accessible within the function. Another advantage of using a defined function is that having a explicit interface makes the dependencies of the function clearer.
 
 As an example, if we execute the following code within a Jupyter notebook cell:
 
@@ -357,7 +357,7 @@ Extracting functions from notebooks into a Python module not only helps prevent 
 
 #### Avoid using autoreload
 
-When using functions imported from a module, any changes made to the module need to be imported. However, simply re-rerunning the import statement won't work, since it doesn't reload any functions that have been previously imported.  A trick to fix this is to use the `%autoreload` magic, which can reload all of the imported modules whenever code is run (using the `%autoreload 2` command). This might seem to accelerate the pace of development, but it comes at a steep cost:  The problem is that you can't tell which cells have been run with which versions of the code, so you don't which version the current value of any particular variable came from, except those in the most recently run cell.  This is a recipe for confusion.  The only want to reduce this confusion would be to rerun the entire notebook, as noted above.
+When using functions imported from a module, any changes made to the module need to be imported. However, simply re-rerunning the import statement won't work, since it doesn't reload any functions that have been previously imported.  A trick to fix this is to use the `%autoreload` magic, which can reload all of the imported modules whenever code is run (using the `%autoreload 2` command). This might seem to accelerate the pace of development, but it comes at a steep cost:  The problem is that you can't tell which cells have been run with which versions of the code, so you don't know which version the current value of any particular variable came from, except those in the most recently run cell.  This is a recipe for confusion.  The only way to reduce this confusion would be to rerun the entire notebook, as noted above.
 
 #### Use an environment manager to manage dependencies
 
@@ -392,7 +392,7 @@ This is one of the reasons why we say that notebook files don't work well with v
 
 Another challenge with using Jupyter notebooks alongside version control occurs when the notebook includes images, such as output from plotting commands.  Images in Jupyter notebooks are stored in a serialized text-based format; you can see this by perusing the text of a notebook that includes images, where you will see large sections of seemingly random text, which represent the content of the image converted into text.  If the images change then the `git diff` will be littered with huge sections of this gibberish text.  One could filter these out when viewing the diffs (e.g. using `grep`) but another challenge is that very large images can cause the version control system to become slow and bloated if there are many notebooks with images that change over time.
 
-There are tools that one can use to address this, such as `nbstripout` to remove cell outputs before committing a file, or `nbdime` to provide "rich diffs" that make it easier to see the differences in the current state versus the last commit.  However, our preferred approach is to convert notebooks to pure Python code prior to committing.
+There are tools that one can use to address this, such as `nbstripout` to remove cell outputs before committing a file, or `nbdime` to provide "rich diffs" that make it easier to see the differences in the current state versus the last commit. There is also a library called nbdev that provides [git hooks](https://nbdev.fast.ai/tutorials/git_friendly_jupyter.html#what-are-nbdev-hooks) to help with the git workflow.  However, converting notebooks to pure Python code prior to committing is a straight forward way to work around these issues.
 
 ### Converting notebooks to pure Python
 
@@ -451,11 +451,11 @@ The first section will automatically run jupytext and generate a pure Python ver
 > An article about computational science in a scientific publication is not the
 scholarship itself, it is merely advertising of the scholarship. The actual scholarship is the complete software development environment and the complete set of instructions which generated the figures. \{cite:p}`Buckheit:1995aa`
 
-So far we have discussed the importance of code for reproducibility, and in a later chapter we talk extensively about the sharing of data. However, the foregoing quote from Buckheit and Donoho highlights the additional importance of the computational platform.  When they wrote their paper in 1995 the were no easily accessible solutions for sharing of compute platforms, but a technology known as *containerization* has emerged in the last decade, which provides an easily implemented and widely accessible solution for the sharing of computational platforms.
+So far we have discussed the importance of code for reproducibility, and in a later chapter we talk extensively about the sharing of data. However, the foregoing quote from Buckheit and Donoho highlights the additional importance of the computational platform.  When they wrote their paper in 1995 there were no easily accessible solutions for sharing of compute platforms, but a technology known as *containerization* has emerged in the last decade, which provides an easily implemented and widely accessible solution for the sharing of computational platforms.
 
 To understand the concept of a container, it's first useful to understand the related idea of the *virtual machine* (or *VM*).  A VM is like a "computer-in-a-computer", in the sense that it behaves like a fully functioning computer, despite the fact that it only exists virtually within its host system. If you have ever used a cloud system like Amazon Web Services Elastic Compute Cloud (EC2), you have run a virtual machine; the virtualization technology is how Amazon can run many virtual computers on a single physical computing node. The virtual machine runs a fully functioning version of the operating system; for example, a Windows virtual machine would run a fully functioning version of Windows, even if it's implemented on an Apple Mac host.  One challenge of this is that sharing the virtual machine with someone else requires sharing the entire operating system along with any installed components, which can often take many gigabytes of space.
 
-A container is a way to share only the components that are required to run the intended applications, rather than sharing the entire operating system. This makes containers generally much smaller and faster to work with compared to a virtual machine.  Containers were made popular by the *Docker* software, which allows the same container to run on a Mac, Windows, or Linux machine, because the Docker software runs a Linux virtual machine that supports these containers.  Another tool known as [Apptainer](https://apptainer.org/) (formerly Singularity) is commonly used to run containerized applications on high-performance computing (HPC) systems, since Docker requires root access that is not available to users on most shared systems.  We will focus on Docker here, given that it is broadly available and that Apptainer can easily run Docker containers as well.
+A container is a way to share only the components that are required to run the intended applications, rather than sharing the entire operating system. This makes containers generally much smaller and faster to work with compared to a virtual machine.  Containers were made popular by the *Docker* software, which allows the same container to run on a Mac, Windows, or Linux machine, because the Docker software runs a Linux virtual machine that supports these containers.  Another tool known as [Apptainer](https://apptainer.org/) (a fork of the Singularity project) is commonly used to run containerized applications on high-performance computing (HPC) systems, since Docker requires root access that is not available to users on most shared systems.  We will focus on Docker here, given that it is broadly available and that Apptainer can easily convert Docker containers and run them as well.
 
 A container image is, at present, the most reproducible way to share software, because it ensures that the dependencies will remain fixed.  We use containers to distribute software built by our lab, such as `fMRIPrep`, because it greatly reduces installation hassles for complex applications.  All the user needs to do is install the Docker software, and they are up and running quickly.  Without the containerized version, the user would need to install a large number of dependencies, some of which might not be available for their operating system.  Containers are [far from perfect](https://gael-varoquaux.info/programming/of-software-and-science-reproducible-science-what-why-and-how.html), but they are currently the best solution we have for reproducible software execution.
 
@@ -481,14 +481,16 @@ Status: Downloaded newer image for python:3.13.9
 docker.io/library/python:3.13.9
 ```
 
-Now that the image exists on our machine, we can use it to open a container and run a Python command:
+Make sure to always specify a valid version of the image and do not use the convenient `latest` tag, which will lead to unreproducible setups, because the version of the image will depend on the download date and can lead to security vulnerabilities.  
+
+Now that the image exists on our machine, we can use it to start a container and run a Python command:
 
 ```bash
 ➤  docker run python:3.13.9 python -c "import sys; print(f'Hello World from Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
 Hello World from Python 3.13.9
 ```
 
-We could also log into the container, to see that it's really just like any other Unix system.  We do this by giving the `-it` flag to docker run, which tells it to run in interactive model and allocate a terminal, which in this case is `bash`:
+We could also log into the container, to see that it's really just like any other Unix system.  We do this by giving the `-it` flag to docker run, which tells it to run in interactive mode and allocate a terminal, which in this case is `bash`:
 
 ```bash
 ➤  docker run -it python:3.13.9 bash
@@ -503,7 +505,7 @@ boot  etc  lib	 mnt	proc  run   srv   tmp  var
 
 ### Mounting local storage within a container
 
-For realistic applications we will often want to be able to access our local storage volumes to be able to process files, run local code, or save outputs. With Docker we can *bind* a local storage volume to a location within the container.  Let's say that we want to output contents from an operation within the container to a local directory called `container-output` and that we want this to appear as `/data` within the container.  We can do that using the `-v` flag to `docker run`:
+For realistic applications we will often want to be able to access our local storage volumes to be able to process files, run local code, or save outputs. With Docker we can *bind* mount a local storage volume to a location within the container.  Let's say that we want to output contents from an operation within the container to a local directory called `container-output` and that we want this to appear as `/data` within the container.  We can do that using the `-v` flag to `docker run`:
 
 ```bash
 ➤  docker run -it -v ./container-output:/data python:3.13.9 bash
@@ -580,7 +582,7 @@ python                      3.13.9            49bb15d4b6f6   2 weeks ago     1.1
 ```
 
 
-We then generate the container to execute the command:
+We then run the container to execute the command:
 
 ```bash
 ➤  docker run --rm random-sentence-generator
@@ -589,7 +591,7 @@ Random sentence: The tangible fairy informs crazy.
 
 ### Using containers as a sandbox for AI agents
 
-In addition to allowing the sharing of reproducible environments, containers also provide a very handy tool in the context of agentic coding tools: They allow us to create a sandboxed computing environment that limits the scope of the agent's actions.  This is essential when one is using agentic tools with disabled access controls.  For example, Claude Code usually requires the user to provide explicitly permission for access to particular locations on the local disk (with the option to enable them automatically for the remainder of the session).  However, it has a `--dangerously-skip-permissions` flag (also referred to as "YOLO mode") that allows one to turn off these permissions, giving the agent complete access reading and writing files, running scripts or programs, and accessing the internet without any limits.  This is primarily meant for use on "headless" computers to automate various processes, but it's not surprising that users have tried to use it on their own local systems to speed up the development process.  The [Anthropic documentation for Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices) explicitly cautions against this:
+In addition to allowing the sharing of reproducible environments, containers also provide a very handy tool in the context of agentic coding tools: They allow us to create a sandboxed computing environment that limits the scope of the agent's actions.  This is essential when one is using agentic tools with disabled access controls.  For example, Claude Code usually requires the user to provide explicitly permission for access to particular locations on the local disk (with the option to enable them automatically for the remainder of the session).  However, it has a `--dangerously-skip-permissions` flag (also referred to as "YOLO mode") that allows one to turn off these permissions, giving the agent complete access to reading and writing files, running scripts or programs, and accessing the internet without any limits.  This is primarily meant for use on "headless" computers to automate various processes, but it's not surprising that users have tried to use it on their own local systems to speed up the development process.  The [Anthropic documentation for Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices) explicitly cautions against this:
 
 > Letting Claude run arbitrary commands is risky and can result in data loss, system corruption, or even data exfiltration (e.g., via prompt injection attacks). To minimize these risks, use --dangerously-skip-permissions in a container without internet access. 
 
