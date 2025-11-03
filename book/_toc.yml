@@ -9,7 +9,7 @@ chapters:
 - file: software_engineering
 - file: testing
 - file: AI_coding_assistants
-# - file: project_organization
+- file: project_organization
 # - file: validation
 # - file: performance
 # - file: data_management
