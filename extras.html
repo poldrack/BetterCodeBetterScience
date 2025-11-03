@@ -378,11 +378,16 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">for Intro</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#for-essentials">for essentials</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#from-ai-assisted-coding-chapter">from AI-assisted coding chapter</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#github-spec-kit">github spec kit</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-on-mcp">More on MCP?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ai-human-pair-programming">AI-human pair programming</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-llm-coding-for-reproducibility">Leveraging LLM coding for reproducibility</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure">Project structure</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
+</ul>
+</li>
 </ul>
 
             </nav>
@@ -399,6 +404,12 @@ document.write(`
 <h1>for Intro<a class="headerlink" href="#for-intro" title="Permalink to this heading">#</a></h1>
 <ul class="simple">
 <li><p>discuss Naur, “Programming as theory building”</p></li>
+</ul>
+</section>
+<section id="for-essentials">
+<h1>for essentials<a class="headerlink" href="#for-essentials" title="Permalink to this heading">#</a></h1>
+<ul class="simple">
+<li><p>discuss databases - e.g. sqlite example</p></li>
 </ul>
 </section>
 <section id="from-ai-assisted-coding-chapter">
@@ -419,6 +430,72 @@ document.write(`
 <p>LLM-based chatbots can be very useful for solving many problems beyond coding.  For example, we recently worked on a paper with more than 100 authors, and needed to harmonize the affiliation listings across authors.  This would have been immensely tedious for a human, but working with an LLM we were able to solve the problem with only a few manual changes needed.  Other examples where we have used LLMs in the research process include data reformatting and summarization of text for meta-analyses.  However, as noted above, the use of chatbots in scientific research is challenging from the standpoint of reproducibility, since it is generally impossible to guarantee the ability to reproduce an LLM output; even if the random seed is fixed, the commercial models change regularly, without the ability to go back to a specific model version.</p>
 <p>The ability to LLMs to write code to solve problems provides a solution to the reproducibility challenge: instead of simply using a chatbot to solve a problem, ask the chatbot to generate code to solve the problem, which makes the result testable and reproducible.  This is also a way to solve problems with information that you don’t want to submit to the LLM for privacy reasons.</p>
 <p>For example, …</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="project-structure">
+<h1>Project structure<a class="headerlink" href="#project-structure" title="Permalink to this heading">#</a></h1>
+<section id="python-modules">
+<h2>Python modules<a class="headerlink" href="#python-modules" title="Permalink to this heading">#</a></h2>
+<p>While Python has native access to a small number of functions, much of the functionality of Python comes from <em>modules</em>, which provide access to objects defined in separate files that can be imported into a Python session.  All Python users will be familiar with importing functions from standard libraries (such as <code class="docutils literal notranslate"><span class="pre">os</span></code> or <code class="docutils literal notranslate"><span class="pre">math</span></code>) or external packages (such as <code class="docutils literal notranslate"><span class="pre">numpy</span></code> or <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>). It’s also possible to create one’s own modules simply by putting functions into a file.</p>
+<p>Let’s say that we have a set of functions that do specific operations on text, saved to a file called <code class="docutils literal notranslate"><span class="pre">textfuncs.py</span></code> in our working directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">capitalize</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">lowercase</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If we wish to use those functions within another script (’<a class="reference external" href="http://mytext.py">mytext.py</a>’), we can simply import the module and then run them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">textfuncs</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">mytext</span> <span class="o">=</span> <span class="s2">&quot;Hello World&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mytext</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textfuncs</span><span class="o">.</span><span class="n">lowercase</span><span class="p">(</span><span class="n">mytext</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Giving the results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>❯ python mytext.py
+Hello World
+dlroW olleH
+Hello world
+hello world
+</pre></div>
+</div>
+<div class="admonition-antipattern admonition">
+<p class="admonition-title">Antipattern</p>
+<p>It’s not uncommon to see Python programmers use <em>wildcard imports</em>, such as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">mytext</span> <span class="pre">import</span> <span class="pre">*</span></code>.  This practice is an antipattern and should be avoided, because it can make it very difficult to debug problems with imported functions, particularly if there is a wildcard import from more than one module.  It can also result in collisions if two modules have a function with the same name, and can prevent linters from properly analyzing the code.  It’s better practice to explicitly import all objects from a module, or to use fully specified paths within the module.</p>
+<p>R users might notice that this antipattern is built into the way that library functions are usually imported in R: In general, when one imports a library the functions are made available directly in the global namespace.  For example, if we load the <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> library we will see several errors regarding objects being masked:</p>
+</div>
+<blockquote>
+<div><p>library(dplyr)</p>
+</div></blockquote>
+<p>Attaching package: ‘dplyr’</p>
+<p>The following objects are masked from ‘package:stats’:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>filter, lag
+</pre></div>
+</div>
+<p>The following objects are masked from ‘package:base’:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>intersect, setdiff, setequal, union
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+This means that if we call `filter()` it will now refer to `dplyr::filter()` rather than the default reference to `stats::filter()`.  This can cause major problems when one adds library imports during the development process, since those later additions can mask functions that had worked without disambiguation before.  For this reason, when coding in R it&#39;s always good to use the full disambiguated function call for any functions with generic names like &quot;select&quot; or &quot;filter&quot;.
+
+```
+
+### Creating a Python module using uv
+
+</pre></div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -468,11 +545,16 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">for Intro</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#for-essentials">for essentials</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#from-ai-assisted-coding-chapter">from AI-assisted coding chapter</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#github-spec-kit">github spec kit</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-on-mcp">More on MCP?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ai-human-pair-programming">AI-human pair programming</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-llm-coding-for-reproducibility">Leveraging LLM coding for reproducibility</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure">Project structure</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-modules">Python modules</a></li>
+</ul>
+</li>
 </ul>
 
   </nav></div>
