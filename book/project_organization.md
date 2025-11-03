@@ -200,7 +200,7 @@ There are a number of different ways that one can work Jupyter notebooks into th
 
 #### All interactive notebooks, all the time
 
-Some researchers do all of their coding interactively within notebooks.  This is the simplest pattern, since it only requires a single interface, and allows full interactive access to all of the code.  However, in my opinion there are often good reasons not to use this approach.  Several of these are drawn from Joel Grus' famous 2018 JupyterCon talk titled ["I don't like notebooks"]](https://docs.google.com/presentation/d/1n2RlMdmv1p25Xy5thJUhkKGvjtV-dkAIsUXP-AL4ffI/preview?slide=id.g362da58057_0_668), but they all derive from my experience as a user of Jupyter notebooks for more than a decade.
+Some researchers do all of their coding interactively within notebooks.  This is the simplest pattern, since it only requires a single interface, and allows full interactive access to all of the code.  However, in my opinion there are often good reasons not to use this approach.  Several of these are drawn from Joel Grus' famous 2018 JupyterCon talk titled ["I don't like notebooks"]](https://docs.google.com/presentation/d/1n2RlMdmv1p25Xy5thJUhkKGvjtV-dkAIsUXP-AL4ffI/preview?slide=id.g362da58057_0_1), but they all derive from my experience as a user of Jupyter notebooks for more than a decade.
 
 ##### Dependence on execution order
 
