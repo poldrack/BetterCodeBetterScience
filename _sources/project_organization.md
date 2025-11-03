@@ -597,7 +597,3 @@ In addition to allowing the sharing of reproducible environments, containers als
 
 Their documentation also links to an example Dockerfile that makes it easy to implement this once you know how to use Docker.
 
-
-## Logging
-
-*NOTE:* Not sure where this should actually go but we should talk about it somewhere.  Leaving as a placeholder here for now.
