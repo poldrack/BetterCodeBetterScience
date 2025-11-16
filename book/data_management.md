@@ -946,11 +946,6 @@ action summary:
 
 One can also push data using Datalad to a range of other remote hosts; see the [Datalad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
 
-## Collaborative workflows
-
-- data shared by multiple researchers
-- use setgid for group
-
 
 ## Working with secondary data
 
