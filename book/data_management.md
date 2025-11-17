@@ -11,13 +11,12 @@ Research data vary in their value, and in some cases can be highly valuable.  Fo
 
 ### The data management lifecycle
 
-An important concept in research data management is the *data management lifecycle*, which refers to the different stages of a research project.  Figure {numref}`Figure {number} <NIST_RDA-fig>` shows an example of how the NIST Research Data Framework outlines the stages of the data management lifecycle:
+An important concept in research data management is the *data management lifecycle*, which refers to the different stages of a research project.  Figure {numref}`Figure {number} <lifecycle-fig>` shows an example of how the NIST Research Data Framework outlines the stages of the data management lifecycle:
 
-:::{figure-md} NIST_RDA-fig
-<img src="
-https://www.nist.gov/sites/default/files/styles/2800_x_2800_limit/public/images/2023/09/18/rdaf%20graphic%20with%20background.png?itok=FHiPIz77" alt="NIST Data Management Lifecycle" width="500px">
+:::{figure-md} lifecycle-fig
+<img src="images/data_lifecycle_rdmkit.png" alt="RDMkit Data Management Lifecycle" width="500px">
 
-A depiction of the data management lifecycle, from the NIST Research Data Framework.  Republished courtesy of the National Institute of Standards and Technology.
+A depiction of the data management lifecycle, from the [RDMkit project by ELIXIR](https://rdmkit.elixir-europe.org/data_life_cycle), CC-BY-4.0.
 :::
 
 This figure highlights the fact that data management should be part of the discussion at each stage in a project.  Throughout this chapter we will discuss various aspects of data management that are relevant to these different stages of the lifecycle of a project.
