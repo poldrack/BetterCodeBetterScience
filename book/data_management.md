@@ -3,9 +3,7 @@
 ```{contents}
 ```
 
-- talk about Potti case - https://www.nature.com/articles/nm0610-618a
-- and/or Sudhof
-
+Research data are like the water of science: When they stop flowing and dry up, everything withers and ultimately dies.  In this chapter we discuss the principles and practices for good research data management and organization.
 
 ## Principles of data management
 
@@ -111,8 +109,6 @@ This chapter will lay out a set of approaches for effective data management, whi
 
 
 ## Storing data: File system versus database?
-
-- files vs database systems
 
 One important factor in the choice of database versus flat file storage is what software tools will be used to analyze the data.  If the analyses are primarily being performed using custom code in Python or R, then it is relatively easy to either retrieve information from a database or load data from a flat file.  However, in some fields (including the field of neuroimaging where I work) it is common to use software packages that are built to process flat files, which strongly drives researchers in the field towards that approach.
 
@@ -578,9 +574,10 @@ There is always a tension between using a domain-specific standard versus a gene
 
 ## Data organization schemes
 
-- use a standard scheme if it exists
-    - preferably one with an automated validator
-- everything should be machine readable
+It is essential to use a consistent data organization scheme for one's research data. This is obvious when the data are shared with other researchers, but even if the data will never be shared with anyone else, good organization is essential when one looks back at one's own data in the future.  Thus, good data organization is a gift to your future self!
+
+In this section we discuss data organization. The most important principle of data organization is that the scheme should be easily understood consistently applied.  If a standard scheme exists in one's field of research, then I would strongly suggest using that scheme, or at least adapting it to one's local requirements.  A second important principle is that file and folder names should be machine readable. Increasingly we want to use automated tools to parse large datasets, and a machine-readable organization scheme (as I discuss below) is essential to doing this effectively.
+
 
 ### File granularity
 
@@ -947,16 +944,17 @@ action summary:
 One can also push data using Datalad to a range of other remote hosts; see the [Datalad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
 
 
-## Working with secondary data
-
-
-
-## Working with protected/private data
-
 
 ## Archiving data
 
-- data retention/deletion policies
+At the end of a project the data may seem like they are no longer needed, but in many cases there are reasons to retain the data beyond the end of the project. Funding agencies often have a required data retention period beyond the end of the grant. For example, the US National Institutes of Health (NIH) requires that records be retained for [three years](https://grants.nih.gov/grants/policy/nihgps/HTML5/section_8/8.4.2_record_retention_and_access.htm) beyond the end of the funding.  Some universities also have their own data retention requirements; for example, my institution (Stanford University) also has a [three-year data retention requirement](https://doresearch.stanford.edu/policies/research-policy-handbook/conduct-research/retention-and-access-research-data), whereas Johns Hopkins University has a [five-year retention requirement](https://www.hopkinsmedicine.org/institutional-review-board/guidelines-policies/guidelines/record-retention). In my opinion it is preferable to retain data, at least in archival form, as long as possible. I have received requests to share data more than 15 years after the original study completion, and it was only due to long-term retention of these data that we were able to honor these requests.  
 
+Archiving of research data can take several forms:
+
+- Physical hard drive: Datasets up to several terabytes can be stored on a physical hard drive kept in a secure and safe location.  This is not an optimal storage method, primarily because physical hard drives can fail over time. If one insists on using physical hard drives, then I would suggest placing the data on two different hard drives (preferably different models, to diversify vulnerability to hardware issues), and that those drives are stored in different locations to avoid risk of destruction in a disaster such as a flood or fire.
+- Archival storage media: In the past it was common to store data onto media such as writable DVDs or cartridge disks. A major problem with this kind of archiving is the inevitable obsolescence of storage media formats: When was the last time you saw a computer with a DVD reader, much less a Zip drive (which was the common medium when I was a postdoc)?  This method should generally be avoided, except as a redundant backup to another storage form.
+- Cloud storage: Increasingly, commercial cloud storage providers such as Dropbox or Google Drive are used as archival storage locations.  However, these providers do not guarantee long-term availability of the data, and to not offer verification that would allow one to ensure that the data haven't been silently corrupted.  I generally use these tools as an additional redundant store for much of my older data, but I would not want to rely upon them as my sole archival storage.
+
+As we will discuss in more detail in our later chapter on sharing of research objects, it is generally preferably to archive data in a location that has a long-term preservation policy and verifiability.  This can include institutional repositories (usually run by librarians, who have deep expertise in archiving), general purpose repositories (like OSF or Zenodo), or domain-specific repositories. 
 
 [^1]: Note that the term "license" is often used to describe these data usage agreements, but this terminology is technically inappropriate in jurisdictions such as the U.S. where data are treated as "facts" and thus are not subject to intellectual property laws (such as copyright laws). 
