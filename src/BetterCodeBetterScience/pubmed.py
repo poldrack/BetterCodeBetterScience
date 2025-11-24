@@ -57,44 +57,76 @@ def get_processed_query_results(
     if email is None:
         email = get_email_from_dotenv()
 
-    pubmed_records = run_pubmed_query(query, email, retmax, verbose)
+    # split the query into a search (PMIDs) and a fetch (full records)
+    pmids = run_pubmed_search(query, email, retmax, verbose)
+    pubmed_records = fetch_pubmed_records(pmids, email, retmax, verbose)
     return parse_pubmed_query_result(pubmed_records)
+
+
+def run_pubmed_search(
+    query: str, email: str = None, retmax: int = 1000, verbose: bool = False
+, exact: bool = False) -> list:
+    """Run the PubMed search (esearch) and return a list of PMIDs.
+
+    This function only performs the esearch step and returns the list of
+    integer PMIDs. It does not fetch the full XML records.
+    """
+    if email is None:
+        email = get_email_from_dotenv()
+    
+    Entrez.email = email
+    if verbose:
+        print(f"using {email} for Entrez service")
+        print("searching for", query)
+    if exact:
+        query = f'"{query}"'
+    handle = Entrez.esearch(db="pubmed", retmax=retmax, term=query)
+    record = Entrez.read(handle)
+    handle.close()
+    pmids = [int(i) for i in record.get("IdList", [])]
+    if verbose:
+        print("found %d matches" % len(pmids))
+    return pmids
+
+
+def fetch_pubmed_records(
+    pmids: list, email: str = None, retmax: int = 1000, verbose: bool = False
+) -> dict:
+    """Fetch full PubMed records (efetch) for a list of PMIDs.
+
+    Returns the parsed Entrez.read(...) result (a dict with e.g. "PubmedArticle").
+    If the pmid list is empty an empty structure is returned.
+    """
+    if email is None:
+        email = get_email_from_dotenv()
+    Entrez.email = email
+
+    if not pmids:
+        if verbose:
+            print("no PMIDs to fetch")
+        return {"PubmedArticle": []}
+
+    id_str = ",".join(["%d" % i for i in pmids])
+    handle = Entrez.efetch(
+        db="pubmed", id=id_str, retmax=retmax, retmode="xml",
+    )
+    record = Entrez.read(handle)
+    handle.close()
+    return record
 
 
 def run_pubmed_query(
     query: str, email: str, retmax: int = 1000, verbose: bool = False
 ) -> dict:
+    """Compatibility wrapper: run search then fetch full records.
+
+    This preserves the old `run_pubmed_query` API while the new split
+    functions are available for callers that want the separate steps.
     """
-    Run a pubmed query and return the raw pubmed records
-
-    Args:
-        query (str): the query to search for
-        email (str): the email to use for the Entrez service
-        retmax (int): the maximum number of results to return
-        verbose (bool): whether to print verbose output
-
-    Returns:
-        dict: a dictionary of pubmed records
-    """
-    Entrez.email = email
-    if verbose:
-        print(f"using {email} for Entrez service")
-        print("searching for", query)
-    handle = Entrez.esearch(db="pubmed", retmax=retmax, term=query)
-    record = Entrez.read(handle)
-    handle.close()
-    pmids = [int(i) for i in record["IdList"]]
-    if verbose:
-        print("found %d matches" % len(pmids))
-
-    # load full records
-    handle = Entrez.efetch(
-        db="pubmed",
-        id=",".join(["%d" % i for i in pmids]),
-        retmax=retmax,
-        retmode="xml",
-    )
-    return Entrez.read(handle)
+    if email is None:
+        email = get_email_from_dotenv()
+    pmids = run_pubmed_search(query, email, retmax, verbose)
+    return fetch_pubmed_records(pmids, email, retmax, verbose)
 
 
 def parse_pubmed_query_result(pubmed_records: dict) -> dict:
@@ -109,8 +141,11 @@ def parse_pubmed_query_result(pubmed_records: dict) -> dict:
     """
     pubs = {}
     for i in pubmed_records["PubmedArticle"]:
-        parsed_record = parse_pubmed_record(i)
-        pubs[parsed_record["DOI"]] = parsed_record
+        try:
+            parsed_record = parse_pubmed_record(i)
+            pubs[parsed_record["PMID"]] = parsed_record
+        except Exception as e:
+            print(f"Error parsing record {i}")
     return pubs
 
 
