@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### Database examples
 #
-# This is a worked example of the use of several NoSQL databases (MongoDB, ChromaDB, and Neo4j) for the chapter on Data Management. 
+# This is a worked example of the use of several NoSQL databases (MongoDB, ChromaDB, and Neo4j) for the chapter on Data Management.
 #
 # The question that we will ask in this analysis is: Can the biological similarity between two traits (estimated using pathway enrichment of genome-wide association study [GWAS] data) be estimated from the semantic similarity of published abstracts that mention that trait?
 
@@ -29,18 +29,18 @@ from chromadb import PersistentClient
 from tqdm.notebook import tqdm
 from pathlib import Path
 from database import (
-    setup_mongo_collection, 
+    setup_mongo_collection,
     get_chromadb_collection,
-    get_neo4j_session
+    get_neo4j_session,
 )
 from BetterCodeBetterScience.database_example_funcs import (
     get_exploded_gwas_data,
-    import_geneset_annotations_by_trait, 
+    import_geneset_annotations_by_trait,
     get_trait_info_from_ols,
     annotate_geneset_annotations_by_trait,
     get_pathway_info_by_trait,
     compute_phenotype_similarities,
-    compute_text_similarities
+    compute_text_similarities,
 )
 from BetterCodeBetterScience.database import get_mongo_client
 import seaborn as sns
@@ -54,7 +54,7 @@ datadir = Path(os.getenv('DATA_DIR', '../../data'))
 # %% [markdown]
 # ### Step 1: load gwas-phenotype associations
 #
-# We will use a database of GWAS results from [EBI](https://www.ebi.ac.uk/gwas/docs/file-downloads). 
+# We will use a database of GWAS results from [EBI](https://www.ebi.ac.uk/gwas/docs/file-downloads).
 #
 # These might seem perfect for a relational database, but they are not quite ready, because one of the columns of interest (`SNP_GENE_IDS`, which maps the snp to one or more genes) maps to multiple genes in some cases, and thus violates the First Normal Form. We could fix this by exploding the column:
 
@@ -62,7 +62,7 @@ datadir = Path(os.getenv('DATA_DIR', '../../data'))
 gwas_data = get_exploded_gwas_data()
 
 # %% [markdown]
-# This is now ready to import to a relational database. However, for this example we will use a document store (MongoDB) to store the records, since it I find it much easier to work with.  We will first generate a collection that links trait identifiers to the gene sets that have been identified for that trait in GWAS.  
+# This is now ready to import to a relational database. However, for this example we will use a document store (MongoDB) to store the records, since it I find it much easier to work with.  We will first generate a collection that links trait identifiers to the gene sets that have been identified for that trait in GWAS.
 
 # %%
 import_geneset_annotations_by_trait(gwas_data)
@@ -95,9 +95,9 @@ get_pathway_info_by_trait()
 # %% [markdown]
 # ### Graph database example
 #
-# Next we want to compute the similarity of traits in terms of the biological processes that they are associated with.  We will do this using the Neo4j graph database, which has a set of data analysis methods that will allow us to easily compute the required similarity metric.  
+# Next we want to compute the similarity of traits in terms of the biological processes that they are associated with.  We will do this using the Neo4j graph database, which has a set of data analysis methods that will allow us to easily compute the required similarity metric.
 #
-# First we need to add our trait and pathway information to the Neo4j database.  We start by adding the traits as nodes, and then add the pathways along with their links to each trait.  
+# First we need to add our trait and pathway information to the Neo4j database.  We start by adding the traits as nodes, and then add the pathways along with their links to each trait.
 
 # %%
 
@@ -105,7 +105,6 @@ get_pathway_info_by_trait()
 # Assuming Neo4j is running locally with default credentials
 # For production, use environment variables or secure config
 # browse db at http://localhost:7474/browser/
-
 
 
 build_neo4j_graph()
@@ -133,14 +132,14 @@ fetch_and_store_pubmed_abstracts()
 # %% [markdown]
 # ### Add documents to chromadb vector db
 #
-# We want to use the documents downloaded from Pubmed to compute the semantic similarity between traits.  This is a good application for a *vector database*, which can ingest documents, embed them into a vector space, and then perform similarity computations between documents based on their vector embeddings.  We will use ChromaDB which is a popular open-source vector database. 
+# We want to use the documents downloaded from Pubmed to compute the semantic similarity between traits.  This is a good application for a *vector database*, which can ingest documents, embed them into a vector space, and then perform similarity computations between documents based on their vector embeddings.  We will use ChromaDB which is a popular open-source vector database.
 
 # %%
 # add to chromadb vector db
 add_pubmed_abstracts_to_chromadb()
 
 # %% [markdown]
-# Now use chromadb to get average text similarity for 
+# Now use chromadb to get average text similarity for
 
 # %%
 
@@ -153,9 +152,11 @@ sns.scatterplot(
     x='pathway_similarity',
     y='text_similarity',
     alpha=0.5,
-    size=1
+    size=1,
 )
-plt.title(f'Pathway Similarity vs Text Similarity (r={text_similarity_df["pathway_similarity"].corr(text_similarity_df["text_similarity"]):.2f})')
+plt.title(
+    f'Pathway Similarity vs Text Similarity (r={text_similarity_df["pathway_similarity"].corr(text_similarity_df["text_similarity"]):.2f})'
+)
 
 # %% magic_args="-i results_df" language="R"
 #
@@ -164,4 +165,4 @@ plt.title(f'Pathway Similarity vs Text Similarity (r={text_similarity_df["pathwa
 # }
 # library(lme4)
 # model <- lmer(text_similarity ~ pathway_similarity + (1 | phenotype1) + (1 | phenotype2), data = results_df)
-# summary(model)  
+# summary(model)
