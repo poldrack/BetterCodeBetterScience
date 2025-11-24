@@ -12,5 +12,9 @@ cd gwas
 unzip ../gwas_catalog_v1.0.2-associations.zip
 ```
 
+According to the EBI site, the GWAS Catalog data is currently mapped to Genome Assembly GRCh38.p14 and dbSNP Build 156.
+
+
+
 
 
