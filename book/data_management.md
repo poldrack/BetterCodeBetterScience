@@ -7,20 +7,71 @@ Research data are like the water of science: When they stop flowing and dry up, 
 
 ## Principles of data management
 
-Research data vary in their value, and in some cases can be highly valuable.  For example, the Large Hadron Collider at CERN, which was responsible for the data supporting the discovery of the Higgs Boson in 2012, has computing costs alone of [about $275 Million](https://en.as.com/latest_news/how-much-money-did-cerns-large-hadron-collider-cost-to-build-and-who-paid-for-it-n/), such that the loss of the resulting data from those computations would have enormous costs. Similarly, the data resulting from the LIGO gravitational wave detectors are enormously valuable, since those events by definition cannot be recreated.  For this reason, scientific agencies have long focused on developing frameworks for research data management. In the US, the National Institute of Standards and Technology (NIST) has developed a [Research Data Framework](https://www.nist.gov/programs-projects/research-data-framework-rdaf) that provides researchers with a detailed set of best practices for research data management.  
+Research data vary in value, and in some cases can be highly valuable.  For example, the Large Hadron Collider at CERN, which was responsible for the data supporting the discovery of the Higgs Boson in 2012, has annual computing costs alone estimated at [about $286 Million](https://en.as.com/latest_news/how-much-money-did-cerns-large-hadron-collider-cost-to-build-and-who-paid-for-it-n/), such that the loss of the resulting data from those computations would have enormous costs. An in some cases where unique events are detected, such as the LIGO gravitational wave detector or telescope images of cosmic events, the data cannot be recreated if they are lost, making them immensely valuable.  For this reason, scientific agencies have long focused on developing frameworks for research data management. In the US, the National Institute of Standards and Technology (NIST) has developed a [Research Data Framework](https://www.nist.gov/programs-projects/research-data-framework-rdaf) that provides researchers with a detailed set of best practices for research data management.  
 
-### The data management lifecycle
 
-An important concept in research data management is the *data management lifecycle*, which refers to the different stages of a research project.  Figure {numref}`Figure {number} <lifecycle-fig>` shows an example of how the NIST Research Data Framework outlines the stages of the data management lifecycle:
+### The FAIR Principles
+
+The FAIR Principles {cite:p}`Wilkinson:2016aa` are a set of guiding principles for the effective sharing of research objects, including but not limited to research data.  The FAIR acronym refers to four features of research objects that are essential to effective sharing:
+
+#### Findable
+
+Data are findable if they could be reasonably found by another researcher, usually via the standard web searchers or database queries.  Making data findable involves:
+
+- Associating them with a persistent identifier (such as a digital object identifier, or DOI)
+- Placing them in a repository that is searchable
+- Including sufficient machine-readable metadata to allow a successful search
+
+#### Accessible
+
+Data are accessible if they can be accessed via clear procedures once they have been found. Making data accessible involves:
+
+- Providing access by standard protocols (such as HTTP) or common transfer mechanisms (such as Globus).
+- Providing access to the metadata, even if the raw data are not available
+- Providing clear information regarding any limits on access and requirements for data access, if the data are not openly available
+
+Note that "accessible" doesn't necessarily imply "open"; in many cases, access to the data themselves may require additional data usage agreements between institutions.  Accessibility in the FAIR sense simply requires that there is a clear process by which the data can be accessed.
+
+#### Interoperable
+
+Data are interoperable if they can be integrated with other data or processed automatically after they have been accessed.  Making data interoperable primarily involves:
+
+- making the data accessible via standard file formats
+- making the metadata available using standard vocabularies or ontologies
+
+#### Reusable
+
+Data are reusable if the requirements for reuse are clearly specified.  Making data reusable involves:
+
+- Providing a clear usage agreement (or "license"[^1]) for the data 
+- Providing a clear and comprehensive description of the provenance of the data
+
+The FAIR principles are relatively abstract, in the sense that they don't provide specific guidance about what FAIR means in any particular domain.  However, there are numerous resources that can help implement these principles, such as [RDMKit](https://rdmkit.elixir-europe.org/) and the [FAIR Cookbook](https://faircookbook.elixir-europe.org/content/home.html), both generated by the European ELIXIR organization.
+
+
+## The data lifecycle
+
+An important concept in research data management is the *data lifecycle*, which describes the role of data management in each of the different stages of a research project.  Figure {numref}`Figure {number} <lifecycle-fig>` shows an example of how the [RDMkit project](https://rdmkit.elixir-europe.org/data_life_cycle) outlines the stages of the data lifecycle:
 
 :::{figure-md} lifecycle-fig
-<img src="images/data_lifecycle_rdmkit.png" alt="RDMkit Data Management Lifecycle" width="500px">
+<img src="images/data_lifecycle_rdmkit.png" alt="RDMkit Data Lifecycle" width="500px">
 
 A depiction of the data management lifecycle, from the [RDMkit project by ELIXIR](https://rdmkit.elixir-europe.org/data_life_cycle), CC-BY-4.0.
 :::
 
-This figure highlights the fact that data management should be part of the discussion at each stage in a project.  Throughout this chapter we will discuss various aspects of data management that are relevant to these different stages of the lifecycle of a project.
+This figure highlights the fact that data management should be part of the discussion at each stage in a project.  In this chapter we will discuss several of the stages in the data lifecycle in detail, though we leave in-depth discussion of data processing and analysis workflows to a later chapter.
 
+
+## Planning a study
+
+It is essential to think about data management from the inception of a study, in order to ensure that early decisions don't lead to pain down the road.  Here are some examples of problems that might arise:
+
+- If data quality control measures are not put in place at the beginning of the study, then problems with the data might not be discovered until it's too late.
+- If important metadata are not stored, then it might be impossible to properly analyze the data later on.
+- If procedures for data versioning and provenance are not in place from the beginning, one can end up with confusion about which data files are appropriate for analysis and how the different data files were generated.
+- If the data are not properly documented, then it might not be possible to understand the meaning of specific variables in the dataset later on.
+
+These are just a few of the problems that can arise, making it important to have a plan for data management at the onset of a research study.
 
 ### Data Management Plans
 
@@ -31,87 +82,154 @@ Research funding agencies are increasingly requiring data management plans (DMPs
 
 I recommend always creating a data management plan at the start of a project, even if it's not required by your institution or funding agency.
 
+## Collecting data
 
-## The FAIR Principles
+Once data collection starts, it is essential to ensure that the data are properly saved and readable.  One should never assume that the code responsible for saving the data has actually worked properly; instead, the data should be separately loaded and checked to make sure that the data are being correctly stored and are properly readable. One good practice is to develop a checklist for new studies to ensure that the data are being collected properly; the details of such a checklist will depend on the specific area of study, but an example from our lab can be found [here]().
 
-The FAIR Principles {cite:p}`Wilkinson:2016aa` are a set of guiding principles for the effective sharing of research objects, including but not limited to research data.  The FAIR acronym refers to four features of research objects that are essential to effective sharing:
+## Storing data
 
-### Findable
+There are several different ways that one can store research data, which vary in their ease of use, speed, reliability, and resilience.  One major distinction is between the use of file systems (either physical or cloud systems) or database systems.  
 
-Data are findable if they could be reasonably found by another researcher, usually via the Internet.  Making data findable involves:
+Before discussing different options, it is useful to lay out the important considerations regarding different data storage solutions.  These are the dimensions across which different options will vary:
 
-- Associating them with a persistent identifier (such as a digital object identifier, or DOI)
-- Placing them in a repository that is searchable
-- Including sufficient machine-readable metadata to allow a successful search
+- *Ease of use*: How much extra work is required for the user to implement the storage solution?
+- *Collaboration*: Do multiple researchers need to access the data? Do they need to be able to modify the dataset concurrently?
+- *Storage capacity*: Is the solution sufficient to store the relevant amount of data for the study?  Is it scalable over time?
+- *Performance*: Is the solution fast enough to enable the required processing and analysis steps?
+- *Accessibility*: Is the storage system accessible to the system where the compute will be performed (e.g. local computer, HPC cluster, cloud system)?
+- *Security*: Does the system meet the security and compliance requirements for the particular dataset? Does it allow appropriate access control?
+- *Redundancy*: Is the system robust to disasters, ranging from the failure of one hard drive to a catastrophic flood or fire?  Does it provide the required backup capability?
+- *Cost*: Does the cost of the solution fit within the researcher's budget?  Are there hidden costs that must be taken into account?
+- *Longevity*: Will the data remain available in the long term?  
 
-### Accessible
-
-Data are accessible if they can be accessed via clear procedures once they have been found. Making data accessible involves:
-
-- Providing access by standard protocols (such as HTTP or Globus)
-- Providing access to the metadata, even if the raw data are not available
-- Providing clear information regarding any limits on access and requirements for data access, if the data are not openly available
-
-Note that "accessible" doesn't necessarily imply "open"; in many cases, access to the data themselves may require additional data usage agreements between institutions.  Accessibility in the FAIR sense simply requires that there is a clear process by which the data can be accessed.
-
-### Interoperable
-
-Data are interoperable if they can be easily used by a researcher after they have been accessed.  Making data interoperable primarily involves:
-
-- making the data accessible via standard file formats
-- making the metadata available using standard vocabularies or ontologies
-
-### Reusable
-
-Data are reusable if the requirements for reuse are clearly specified.  Making data reusable involves:
-
-- Providing a clear usage agreement (or "license"[^1]) for the data 
-- Providing a clear and comprehensive description of the provenance of the data
-
-The FAIR principles are relatively abstract, in the sense that they don't provide specific guidance about what FAIR means in any particular domain.  However, there are numerous resources that can help implement these principles, such as [RDMKit](https://rdmkit.elixir-europe.org/) and the [FAIR Cookbook](https://faircookbook.elixir-europe.org/content/home.html), both generated by the European ELIXIR organization.
-
-## Data management best practices
-
-We now turn to tools and best practices for data management in practice, starting with a "worst practice" that is unfortunately too common in science.
-
-### Russ's First Law of Scientific Data Management
-
-> "Don't use spreadsheets to manage scientific data."
-
-In this chapter I will talk in detail about best practices for data management, but I start by discussing a data management "anti-pattern", which is the use of spreadsheets for data management.  Spreadsheet software such as Microsoft Excel is commonly used by researchers for all sorts of data management and processing operations.  Why are spreadsheets problematic?
-
-- They encourage manual manipulation of the data, which makes the operations non-reproducible by definition.
-- Spreadsheet tools will often automatically format data, sometimes changing things in important but unwanted ways.  For example, gene names such as "SEPT2" and "MARCH1" are converted to dates by Microsoft Excel, and some accession numbers (e.g. "2310009E13") are converted to floating point numbers.  An analysis of published genomics papers {cite:p}`Ziemann:2016aa` found that roughly twenty percent of supplementary gene lists created using Excel contained errors in gene names due to these conversions.
-- It is very easy to make errors when performing operations on a spreadsheet, and these errors can often go unnoticed.  A well known example occurred in the paper  ["Growth in the time of debt"](https://www.nber.org/papers/w15639) by the prominent economists Carmen Reinhart and Kenneth Rogoff. This paper claimed to have found that high levels of national debt led to decreased economic growth, and was used as a basis for promoting austerity programs after the 2008 financial crisis.  However, [researchers subsequently discovered](https://academic.oup.com/cje/article/38/2/257/1714018) that the authors had made an error in their Excel spreadsheet, excluding data from several countries; when the full data were used, the relationship between growth and debt became much weaker. 
-- Spreadsheet software can sometimes have limitations that can cause problems.  For example, the use of an outdated Microsoft Excel file format (.xls) [caused underreporting of COVID-19 cases](https://www.bbc.com/news/technology-54423988) due to limitations on the number of rows in that file format, and the lack of any warnings when additional rows in the imported data files were ignored.
-- Spreadsheets do not easily lend themselves to version control and change tracking, although some spreadsheet tools (such as Google Sheets) do provide the ability to clearly label versions of the data.
-
-I will occasionally use Microsoft Excel to examine a data file, but I think that spreadsheet tools should *never* be used as part of a scientific data workflow.
-
-### Practical principles for scientific data management
-
-This chapter will lay out a set of approaches for effective data management, which are built around a set of principles that I think are useful and practical for researchers:
-
-- Original data should be immutable (read-only)
-- Original data should be backed up on a separate system
-- Data access should operate according to the principle of least privilege
-- All data processing operations should be reproducible
-    - Thus, manual operations should be minimized and extensively documented
-- File/folder names should be machine-readable
-- Open and non-proprietary file formats should be used whenever possible
-- The provenance of any file should be findable
-- All data should be documented so that the user can determine the identity of any variable in the dataset
-- Changes to the data should be tracked
-    - Either via VCS or some other strategy
-- When working with secondary data, always know your rights and responsibilities
-- Understand the data storage/retention/deletion requirements for your data
+It's also important to point out that most projects end up using multiple storage solutions for different portions of the data lifecycle. 
 
 
-## Storing data: File system versus database?
+### File system storage
 
-One important factor in the choice of database versus flat file storage is what software tools will be used to analyze the data.  If the analyses are primarily being performed using custom code in Python or R, then it is relatively easy to either retrieve information from a database or load data from a flat file.  However, in some fields (including the field of neuroimaging where I work) it is common to use software packages that are built to process flat files, which strongly drives researchers in the field towards that approach.
+A file system is an organized system for naming and locating computer files on a storage system such as a hard disk.  Readers of this book will undoubtedly be familiar with the file systems present on Mac, Windows, or UNIX/Linux systems, which represent a hierarchical *tree* of folders and files. Here is an example of the file tree for the source code folder in the book project:
 
-Most of the discussion below will focus on file system data organization, primarily because that's where my expertise lies, but many of the principles also apply to the database case as well.
+```bash
+➤  tree -L 2 src
+src
+└── BetterCodeBetterScience
+    ├── __init__.py
+    ├── __pycache__
+    ├── bug_driven_testing.py
+    ├── claudecode
+    ├── constants.py
+    ├── data_management.ipynb
+    ├── distance.py
+    ├── distance_testing
+    ├── docker-example
+    ├── escape_velocity.py
+    ├── formatting_example.py
+    ├── formatting_example_ai.py
+    ├── formatting_example_ruff.py
+    ├── incontext_learning_example.ipynb
+    ├── language_model_api_prompting.ipynb
+    ├── llm_utils.py
+    ├── modify_data.py
+    ├── my_linear_regression.py
+    ├── simple_testing.py
+    ├── simpleScaler.py
+    ├── test_independence.py
+    └── textmining
+```
+
+We often use spatial metaphors to describe file systems; we say that a file is "inside" a folder, or that we are going to "move" a file from one folder to another.  Working effectively and efficiently with data stored on a file system will be enhanced by a solid knowledge of the various tools that one can use to interact with a file system.  In the examples throughout the book I will focus on *POSIX*-compliant operating systems like MacOS and Linux, but most of the same concepts also apply to other file systems such as Windows.
+
+#### Storage on a PC/laptop hard drive
+
+The simplest way to store data is on a hard drive on a researcher's personal computer workstation or laptop.  While this is easy and relatively cheap for smaller datasets, it is also fraught for numerous reasons:
+
+- It is risky, as the failure of the hard drive or loss of the system to damage or theft can result in total loss of the data.
+- Depending on whether or not the system is encrypted, theft may expose the data in ways that violate confidentiality.
+- Most PC/laptop systems do not have automatic backup systems, so they are less likely to have a viable backup for recovery if a problem occurs.
+- It is difficult or impossible to allow collaborators to access the data
+- For many research domains, the size of the data (often in terabytes) will quickly outstrip the capacity of local hard drives.
+
+For these reasons, I generally recommend to researchers in my lab that they should never rely solely on their own computer as the storage solution for research data.  
+
+#### Storage on a network drive
+
+Research data is often stored on network drives.  These can vary from a network-attached storage system dedicated to one or more users within a research group, to large-scale network drives managed by an institutional computing center.  One common feature of network storage is the use of redundant drive systems, such as RAID (Redundant Array of Independent Disks). These systems combine multiple individual hard drives in ways that provide some degree of redundancy, such that the system can withstand the loss of one or more individual disks (depending on the setup) with no data loss.  However, it is critically important to remember that while RAID does provide some degree of fault-tolerance, it *does not* provide the disaster recovery benefits of a true backup.  
+
+Many researchers run and manage their own RAID systems for their group's use, either attached to a single workstation or to a network.  This can be a cost-effective solution for large data storage, especially in situations where institutional data storage resources are not available.  However, I think that the apparent robustness of RAID systems can provide a false sense of security to their users.  Take the most common RAID setup for redundant storage, RAID 5, in which the system is robust to the failure of one of its hard drives.  When a drive fails, the system enters a "degraded" mode, often providing a notice to the user such as a flashing red light or beeping sounds.  If this failure goes unnoticed, or the system administrator puts off fixing it, the failure of a second drive during degraded mode or during the rebuilding of the array after replacing the first failed drive can lead to complete data loss.  Similarly, if the rebuilding of the array fails (for example, due to power loss during the rebuild or an unrecoverable error in reading from the other drives), this can compromise the data. Safe use of RAID arrays requires consistent attention (including email notifications of failure if possible) and a strong backup strategy.
+
+Most research institutions now offer large network-attached storage systems for research data, often connected directly to high-performance computing systems.  We have used systems like these for our research data for more than 15 years, and I personally would never go back to running my group's own RAID system (which we did for years beforehand).  Foremost, the system administration and hardware management resources of an institutional computing center will almost always outstrip those of most research groups.  These large systems will have monitoring and repair procedures in place to ensure against data loss, and in the 15 years that we have used these systems (at Stanford and the University of Texas), we have never experienced data loss due to hardware failure.  However, they are still liable to potential disasters.  These systems are also highly performant, providing parallel access to the data through high-speed interconnections with the compute system.
+
+Backing up one's data from a large network drive is a great idea in theory, but in our experience it has often been either impossible or too costly, given the many terabytes of research data that we store on the systems.  Given the relatively low likelihood of failure, we have adopted a more risk-tolerant strategy to big data storage:
+
+- Original data and any data that cannot be reasonably recreated from original data are stored on at least two independent systems (such as the network drive and a cloud storage system)
+- Software code is stored on a separate partition that is backed up by the computing center, as well as being pushed to Github.
+
+In this way, we have redundant copies of the code and original data that could be used to recreate the processed data if necessary.  This is a risky strategy, but the more risk-averse alternative of continuously backing up our entire 250TB partition would be cost-prohibitive.
+
+### Cloud drives
+
+Cloud drives, such as Dropbox or Google Drive, have become very popular for storage and sharing of data.  I personally keep all of my code and documents synced to Dropbox from my laptop, and the file recovery capabilities of Dropbox have saved me from myself more than once after accidentally deleting the wrong files.  I also regularly share files with other researchers using the Dropbox file sharing features.  Because of the potential impact of loss of my laptop, I also keep a "hot spare" laptop that is constantly kept in sync with my primary laptop via Dropbox.  Thus, cloud drives are essential for my own research and productivity workflow. However, cloud drives on their own are unlikely to be a primary solution for data storage with large datasets, for several reasons including:
+
+- Their cost increases dramatically as the datasets move into the terabyte range.
+- You can't bring the compute to the data using these systems - you have to bring the data to the compute.  This means that the data need to be fully downloaded to each synced system, resulting in a large number of copies of the dataset.
+- These systems also are not optimized for large files, and network speed may result in long synchronization times.
+
+In addition, many institutions have specific restrictions regarding the use of specific cloud drives, especially with regard to private or protected information.
+
+
+### Cloud object storage
+
+An increasingly common storage option, especially for very large datasets, is the use of cloud-based *object stores*, such as Amazon's Simple Storage Service (S3) or Google Cloud Storage.  In some ways object storage is similar to a standard file system, in that it allows the storage of arbitrary types of files, which can be retrieved using a key that functions like a file path on a file system.  However, there are also important differences between object storage and file systems. Most importantly, cloud object stores are accessed via web API calls rather than by operations on a local storage system.  Cloud object stores have several features that can make them very attractive for research data storage:
+
+- They offer scalability in terms of data size that is limited only by one's budget
+- They provide robustness through redundant storage across multiple systems
+- They are often much less expensive than standard file system ("block") storage
+
+These systems are most effective when they are accessed directly using computing resources hosted by the same cloud provider.  If they are located within the same datacenter, then the network connectivity can be substantially faster.  It rarely makes sense to access data directly on a cloud object store from a local computing system, both because of the potentially high cost of reading and writing data from these systems and because of the relatively slow network connectivity between a local system and a cloud provider. 
+
+### Database storage
+
+In some areas of science, such as genomics, it is common to store data using *database systems* rather than files on a filesystem. A database system is a software system that stores data records and allows the user to query the records based on specific features and to add, modify, or delete records.  A database system can run locally on one's own computer, or can be accessed remotely via the Internet; most cloud computing providers provide database systems that can be hosted virtually, providing access to storage space that is limited only by one's budget.
+
+There are many potential benefits to the use of database storage that will be outlined below. However, one important factor in the choice of database versus flat file storage is what software tools will be used to analyze the data.  If the analyses are primarily being performed using custom code in Python or R, then it is relatively easy to either retrieve information from a database or load data from a flat file.  However, in some fields (including the field of neuroimaging where I work) it is common to use software packages that are built to process flat files, which strongly drives researchers in the field towards that approach.  
+
+I will first briefly outline several of the most common forms of database systems, and then show an example that employs each of them.
+
+#### Relational databases
+
+The best known form of database is the *relational database*, which organizes tabular data into a set of tables with well-defined relationships between them.  They also enable queries using a query language, of which Structured Query Language (SQL) is a well-known example.  For me, SQL has always been one of those things that I use just infrequently enough that I never actually learn it.  Fortunately, LLMs are very good at translating natural language into SQL queries, lowering the barrier of entry for researchers who want to try out database storage.
+
+##### ACID
+
+One important feature of a relational databases is that they generally implement features to ensure data integrity and reliability.  These are often referred to as the *ACID* properties:
+
+- *Atomicity*: Transactions are atomic, meaning that they either succeed or they don't: there are no partial transactions.  If a transaction fails then the database remains in the state it was in prior to the failed transaction.
+- *Consistency*: A transaction is required to leave the database in a valid state.  Any transaction that attempts to violate any constraints or rules (such as the requirement that every measurement includes a valid device key) will be rejected.
+- *Isolation*: Individual transactions do not interfere with one another, such that they would never see any partial changes due to another transaction.  Thus, one can submit many transactions at once and be sure that they will each be processed correctly without interference from others.
+- *Durability*:  Transactions are durable, such that once they are written they will be permanent despite failures such as power outages or system crashes (as long as the server is not damaged).
+
+The adherence of relational database systems to these principles helps ensure the integrity of scientific data, in comparison to the use of flat files which do not necessarily achieve these goals.
+
+#### NoSQL databases
+
+While relational databases were the only game in town for many years, there are now a number of other kinds of database, collectively referred to as *NoSQL* databases because they use non-relational data models (like documents, graphs, or key-value pairs) rather than the tables with fixed schemas that define a standard relational database.  Each of these can be very useful for specific problems that match the database's strengths. Some, but not all, NoSQL databases are ACID compliant.  It's important to ensure that one has the right safeguards in place when using a non-compliant database system.
+
+##### Document stores
+
+A *document store* is basically what it sounds like: a system into which one can dump documents and then query them. I think of this as in some ways the opposite of a SQL database.  In the SQL database, most of the work comes in designing the database schema, which will determine up front how the data are represented; after that, querying is fairly straightforward.  In a document store, one can insert documents with varying structure into the database without the need for a predefined schema. The hard work in a document store comes in figuring out how to structure queries and indexes effectively, especially when the structure of the data varies.  For most of the tasks where I have used databases I have chosen document stores over relational databases because of the flexibility that they offer.
+
+##### Graph databases
+
+A graph database is built to efficiently store and query graph-structured data.  These are data where the primary features of interest for querying are the relationships between entities, rather than the entities themselves. Scientific examples could include social network relationships, protein-protein interactions, or connections between neurons or brain areas.  Graph databases are particularly good at finding multi-step relationships within the graph, which are much more difficult to find using a relational database or document store.  A commonly used graph database is Neo4j, which has its own query language called *Cypher* that is specifically designed for queries on graph structure.
+
+##### Vector databases
+
+A relatively recent entry into the database field is the *vector database*, which is optimized for finding similar numerical vectors.  These have become essential in the context of AI, because they can be used to quickly find similar items that are embedded in a vector space, typically using neural networks.  These items can include text documents, images, molecular structures, or any other kind of data that can be embedded in a vector space.  Vector databases differ in that can return ranked similarity ratings in addition to a discrete set of matches, and thus they are best for performing analyses that involve similarity-based search.
+
+##### An example of database usage
+
+*TBD*
+
 
 ## Data access
 
@@ -361,7 +479,7 @@ Text file formats like CSV and TSV are nice for their ease of interpretability, 
 When we look at the amount of time needed to load these files, we see an even stronger edge for the Parquet format. Because the loading times can vary due to other activity on the system, we load each 100 times to get an average load time:
 
 ```python
-iimport time
+import time
 # time loading of each format
 # load 100 times to get average loading time of each format
 
@@ -388,7 +506,6 @@ ratio 8.77
 ```
 
 Here we see that loading the CSV file takes almost 9 times as long as the Parquet file.  For a single file of this size this is not a meaningful difference in times, but for projects involving many files or much larger files the difference in loading times could become a real game-changer.
-
 
 ### Multidimensional array data
 
@@ -656,7 +773,6 @@ Now let's say that someone else wanted to search across datasets to find researc
 }
 ```
 
-
 ## Data documentation
 
 While metadata is generally meant to be used by computers, it is also important to provide human-readable documentation for a dataset, so that other researchers (or one's own self in the future) can understand and reuse the data successfully.  There are two forms of documentation that can be important to provide.
@@ -736,8 +852,66 @@ A depiction of the PROV data model entities and relations.  Copyright © [2013] 
 
 This data model highlights the breadth of information that needs to be represented in order to accurately record provenance.
 
-There are several different ways to track provnenance in practice, which vary in their complexity, comprehensiveness, and ease of use.  We will discuss this in much more detail in a later chapter on workflows.
+There are several different ways to track provenance in practice, which vary in their complexity, comprehensiveness, and ease of use.  We will discuss this in much more detail in a later chapter on workflows.
 
+## Handling of sensitive data
+
+Researchers in some fields, particularly those who work with data obtained from human subjects, often handle data are *sensitive*, meaning that they may require a higher degree of security and/or additional procedures to protect the privacy and confidentiality of the research subjects. 
+
+### Data security
+
+Sensitive data often require additional protections from potential breach.  The minimum requirement is generally that the data are housed on an encrypted file system and any transfers are made via an encrypted channel, and that access to the system is controlled.  Some datasets include more stringent security measures in their Data Use Agreement.  For example, the Adolescent Brain Cognitive Development (ABCD) study, a widely used dataset on brain and cognitive development, [requires](https://abcdstudy.org/scientists/data-sharing/) that any systems used to house or process the data must meet a specific standard for sensitive information known as  [NIST SP 800-171](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html). This standard comprises 17 "families" of security requirements that a system must meet to be compliant:
+
+- Access Control
+- Maintenance
+- Security Assessment and Monitoring
+- Awareness and Training
+- Media Protection
+- System and Communications Protection
+- Audit and Accountability
+- Personnel Security
+- System and Information Integrity
+- Configuration Management
+- Physical Protection
+- Planning
+- Identification and Authentication
+- Risk Assessment
+- System and Services Acquisition
+- Incident Response
+- Supply Chain Risk Management
+
+In general this level of security certification will be limited to computer systems run by an organizational IT group rather than by an individual investigator, due to the stringency of the requirements.
+
+### Deidentification
+
+Deidentification generally involves the removal of specific identifying information that could potentially be used to reidentify a human subject.  In the US, this generally relies upon the *Safe Harbor* provision in the Health Insurance Portability and Accountability Act of 1996 (HIPAA), which [states the following criteria](https://www.hhs.gov/hipaa/for-professionals/special-topics/de-identification/index.html) for rendering a dataset deidentified:
+
+```
+(i) The following identifiers of the individual or of relatives, employers, or household members of the individual, are removed:
+
+- (A) Names
+- (B) All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:(1) The geographic unit formed by combining all ZIP codes with the same three initial digits contains more than 20,000 people; and(2) The initial three digits of a ZIP code for all such geographic units containing 20,000 or fewer people is changed to 000
+- (C) All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
+- (D) Telephone numbers(L) Vehicle identifiers and serial numbers, including license plate numbers
+- (E) Fax number
+- (M) Device identifiers and serial numbers
+- (F) Email addresses(N) Web Universal Resource Locators (URLs)
+- (G) Social security numbers(O) Internet Protocol (IP) addresses
+- (H) Medical record numbers(P) Biometric identifiers, including finger and voice prints
+- (I) Health plan beneficiary numbers(Q) Full-face photographs and any comparable images
+- (J) Account numbers(R) Any other unique identifying number, characteristic, or code, except as permitted by paragraph (c) of this section [Paragraph (c) is presented below in the section “Re-identification”]; and
+- (K) Certificate/license numbers
+
+(ii) The covered entity does not have actual knowledge that the information could be used alone or in combination with other information to identify an individual who is a subject of the information.
+```
+
+In the US, deidentification of data is generally sufficient to render them non-sensitive, whereas this is generally *not* the case in European countries covered by the General Data Protection Regulation (GDPR).
+
+### Anonymization
+
+Anonymization refers to the modification of data in a way that can essentially guarantee that the subjects cannot be reidentified. For example, one might modify ages so that they are stated in ranges (such as 20-25 years old) instead of a specific year.  These methods generally change the data in ways that could potentially affect downstream analyses, and thus many researchers shy away from using anonymized data unless absolutely necessary.   
+
+One method that is often used for large datasets is known as *differential privacy*, which involves adding noise to analytic results in a way that can provably prevent reidentification.  For example, this method is [now used](https://www.census.gov/programs-surveys/decennial-census/decade/2020/planning-management/process/disclosure-avoidance/differential-privacy.html) by the US Census Bureau to protect individuals. This has the benefit of providing a provable mathematical guarantee of privacy by quantifying the maximum degree of privacy loss given a particular amount of noise added.  However, this method may have adverse effects on the data, such by disparately impacting small sub-populations within a larger dataset {cite:p}`Santos-Lozada:2020aa`.
 
 ## Version control for data
 
@@ -747,7 +921,7 @@ In the case of original data we never want to allow any changes, but for derived
 
 When the relevant data are small (e.g. smaller than a few megabytes) and stored in a text format (such as CSV/TSV), one can simply use git to track changes in the data.  (We will discuss in a later chapter why Github is not an optimal platform for sharing data, at least not on its own.). 
 
-However, git does not work well for version control on larger datasets using binary data files.  Git is able to efficiently store version information about code because it tracks the specific differences in the code between versions (known as a *diff*), and only stores the differences.  Thus, if one has a very large code file and changes one line, only that one line difference is stored in the git database.  However, with binary data this strategy is not effective, and git has to store the entire new dataset each time, leading to bloated respostories and very slow performance. 
+However, git does not work well for version control on larger datasets using binary data files.  Git is able to efficiently store version information about code because it tracks the specific differences in the code between versions (known as a *diff*), and only stores the differences.  Thus, if one has a very large code file and changes one line, only that one line difference is stored in the git database.  However, with binary data this strategy is not effective, and git has to store the entire new dataset each time, leading to bloated repositories and very slow performance. 
 
 ### Using Datalad for version control on larger datasets
 
@@ -874,7 +1048,7 @@ nothing to save, working tree clean
 
 Datalad is a particularly powerful tool for sharing data across systems.  It allows one to push or pull data from a number of different remote storage systems; in this example we will use the [Open Science Framework (OSF)](https://osf.io/) as our storage location, because it is particularly easy to use with Datalad.
 
-We first need to install and set up the `datalad-osf` Python pagkage, per [the Datalad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use Datalad to authenticate with OSF:
+We first need to install and set up the `datalad-osf` Python package, per [the Datalad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use Datalad to authenticate with OSF:
 
 ```bash
 ➤  datalad osf-credentials                                                1 ↵
@@ -956,4 +1130,4 @@ Archiving of research data can take several forms:
 
 As we will discuss in more detail in our later chapter on sharing of research objects, it is generally preferably to archive data in a location that has a long-term preservation policy and verifiability.  This can include institutional repositories (usually run by librarians, who have deep expertise in archiving), general purpose repositories (like OSF or Zenodo), or domain-specific repositories. 
 
-[^1]: Note that the term "license" is often used to describe these data usage agreements, but this terminology is technically inappropriate in jurisdictions such as the U.S. where data are treated as "facts" and thus are not subject to intellectual property laws (such as copyright laws). 
+[^1]: Note that the term "license" is often used to describe these data usage agreements, but this terminology is technically inappropriate in jurisdictions such as the U.S. where most data are treated as "facts" and thus are not subject to intellectual property laws (such as copyright laws). 
