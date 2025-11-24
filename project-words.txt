@@ -1,4 +1,7 @@
 # New Words
+gost
+lmer
+scatterplot
 academidb
 accelperm
 addopts
