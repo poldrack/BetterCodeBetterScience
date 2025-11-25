@@ -1,4 +1,7 @@
 # New Words
+pheno
+tsim
+keepdims
 gost
 lmer
 scatterplot

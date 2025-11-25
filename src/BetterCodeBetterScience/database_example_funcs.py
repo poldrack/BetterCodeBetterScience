@@ -1,197 +1,222 @@
 # functions used in database examples notebook
 
-import requests
-import dotenv
-from database import (
-    setup_mongo_collection,
-    get_chromadb_collection,
-    get_neo4j_session,
-)
-from tqdm import tqdm
-import pandas as pd
-import os
-from pathlib import Path
-import ols_client
-from requests.exceptions import HTTPError
-from gprofiler import GProfiler
-from pubmed import (
-    run_pubmed_search,
-    fetch_pubmed_records,
-    parse_pubmed_query_result,
-)
-import pymongo
-from pymongo import UpdateOne
+# Standard library
 import hashlib
 import json
+import os
+import time
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+# Third-party
 import numpy as np
+import pandas as pd
+import pymongo
+import requests
+from gprofiler import GProfiler
+from neo4j import Transaction
+from neo4j.exceptions import ClientError
+from pymongo import UpdateOne
+from pymongo.collection import Collection
+from requests.exceptions import HTTPError
+from tqdm import tqdm
+import dotenv
+import ols_client
+# Local
+from database import (
+    get_chromadb_collection,
+    get_neo4j_session,
+    setup_mongo_collection,
+)
+from pubmed import (
+    fetch_pubmed_records,
+    parse_pubmed_query_result,
+    run_pubmed_search,
+)
 
 dotenv.load_dotenv()
 
+COLLECTION_GENESET = 'geneset_annotations_by_trait'
+COLLECTION_PATHWAYS = 'pathways'
+COLLECTION_PUBMED = 'pubmed_abstracts'
+COLLECTION_PMID_BY_TRAIT = 'pmids_by_trait'
+COLLECTION_TRAIT_INFO = 'trait_info_by_trait'
 
-def compute_phenotype_similarities():
+
+def compute_phenotype_similarities(
+    graph_name: str = 'phenotype-pathway-graph',
+    min_pathways: int = 2
+) -> pd.DataFrame:
+    """
+    Computes Jaccard similarity between Phenotypes based on shared Pathways 
+    using Neo4j Graph Data Science (GDS).
+
+    Args:
+        graph_name: Name for the in-memory graph projection.
+        min_pathways: Minimum number of associated pathways required for a 
+                      phenotype to be included in the calculation.
+
+    Returns:
+        pd.DataFrame: A DataFrame with columns [phenotype1, phenotype2, similarity].
+    """
     with get_neo4j_session() as session:
+        # 1. Clean up any existing graph with the same name
         try:
-            session.run(
-                "CALL gds.graph.drop('phenotype-pathway-graph') YIELD graphName"
-            )
-        except:   # noqa: E722
-            pass  # graph did not exist
+            session.run("CALL gds.graph.drop($name)", name=graph_name)
+        except ClientError:
+            # Graph did not exist, safe to ignore
+            pass
 
-        session.run(
-            """
+        # 2. Project the Graph
+        # We project Phenotypes, Pathways, and the relationship between them.
+        # 'UNDIRECTED' orientation allows the algorithm to see the shared connections.
+        session.run("""
             CALL gds.graph.project(
-            'phenotype-pathway-graph',
-            ['Phenotype', 'Pathway'],
-            {
-                MAPPED_TO: {
-                orientation: 'UNDIRECTED'
+                $graph_name,
+                ['Phenotype', 'Pathway'],
+                {
+                    MAPPED_TO: {
+                        orientation: 'UNDIRECTED'
+                    }
                 }
-            }) """
-        )
+            )
+        """, graph_name=graph_name)
 
-        # drop nodes with degree less than make similarity estimate more reliable
-        results = session.run(
-            """
-            CALL gds.nodeSimilarity.stream('phenotype-pathway-graph')
+        # 3. Run Node Similarity
+        # We use 'degreeCutoff' to filter out phenotypes with too few pathways 
+        # BEFORE the calculation. This is much faster than filtering the results.
+        result = session.run("""
+            CALL gds.nodeSimilarity.stream($graph_name, {
+                degreeCutoff: $min_pathways
+            })
             YIELD node1, node2, similarity
+            
+            // Map internal IDs back to our Phenotype IDs
             WITH node1, node2, similarity
             MATCH (p1:Phenotype), (p2:Phenotype)
             WHERE id(p1) = node1 AND id(p2) = node2
-                AND COUNT { (p1)-[:MAPPED_TO]->(:Pathway) } > 1
-                AND COUNT { (p2)-[:MAPPED_TO]->(:Pathway) } > 1
+            
             RETURN p1.id AS phenotype1, p2.id AS phenotype2, similarity
             ORDER BY similarity DESC
-        """
-        )
+        """, graph_name=graph_name, min_pathways=min_pathways)
 
-        return pd.DataFrame(
-            [
-                {
-                    'phenotype1': record['phenotype1'],
-                    'phenotype2': record['phenotype2'],
-                    'similarity': record['similarity'],
-                }
-                for record in results
-            ]
-        )
+        # 4. Convert to DataFrame
+        # result.data() fetches all records into a list of dictionaries
+        df = pd.DataFrame(result.data())
+        
+        # 5. Cleanup: Drop the graph to free up memory
+        try:
+            session.run("CALL gds.graph.drop($name)", name=graph_name)
+        except ClientError:
+            pass
 
+        return df
 
-def compute_text_similarities(similarity_result_df):
+def compute_text_similarities(similarity_result_df: pd.DataFrame) -> pd.DataFrame:
     pmids_by_trait_collection = setup_mongo_collection(
-        'pmids_by_trait', clear_existing=False
+        COLLECTION_PMID_BY_TRAIT, clear_existing=False
     )
 
+    # 1. Gather all unique phenotypes needed
+    all_phenotypes = set(similarity_result_df['phenotype1']) | set(similarity_result_df['phenotype2'])
+
+    # 2. Bulk fetch from MongoDB
+    # optimization: fetch only 'trait_uri' and 'pmids' fields
+    cursor = pmids_by_trait_collection.find(
+        {'trait_uri': {'$in': list(all_phenotypes)}},
+        {'trait_uri': 1, 'pmids': 1}
+    )
+    
+    # 3. Create a lookup dictionary
+    trait_lookup = {doc['trait_uri']: doc.get('pmids', []) for doc in cursor}
+
     results = []
-    for idx in similarity_result_df.index:
-        pmids = []
-        num_pmids = []
+    # 4. Iterate using the in-memory dictionary
+    for idx, row in similarity_result_df.iterrows():
+        p1, p2 = row['phenotype1'], row['phenotype2']
+        
+        pmids1 = [str(i) for i in trait_lookup.get(p1, [])]
+        pmids2 = [str(i) for i in trait_lookup.get(p2, [])]
 
-        for phenotype in [
-            similarity_result_df.loc[idx, 'phenotype1'],
-            similarity_result_df.loc[idx, 'phenotype2'],
-        ]:
-
-            doc = pmids_by_trait_collection.find_one({'trait_uri': phenotype})
-            if doc and 'pmids' in doc:
-                pmids.append([str(i) for i in doc['pmids']])
-                num_pmids.append(len(doc['pmids']))
-            else:
-                num_pmids.append(0)
-        if len(pmids) == 2 and len(pmids[0]) > 0 and len(pmids[1]) > 0:
-            tsim = vectorized_pairwise_similarity(pmids[0], pmids[1])
+        if pmids1 and pmids2:
+            tsim = vectorized_pairwise_similarity(pmids1, pmids2)
         else:
             tsim = None
-        result = {
-            'phenotype1': similarity_result_df.loc[idx, 'phenotype1'],
-            'phenotype2': similarity_result_df.loc[idx, 'phenotype2'],
-            'pathway_similarity': similarity_result_df.loc[idx, 'similarity'],
+            
+        results.append({
+            'phenotype1': p1,
+            'phenotype2': p2,
+            'pathway_similarity': row['similarity'],
             'text_similarity': tsim,
-            'num_pmids_phenotype1': num_pmids[0],
-            'num_pmids_phenotype2': num_pmids[1],
-        }
-        results.append(result)
+            'num_pmids_phenotype1': len(pmids1),
+            'num_pmids_phenotype2': len(pmids2),
+        })
 
     return pd.DataFrame(results)
 
 
-def build_neo4j_graph():
-
-    geneset_annotations_by_trait = setup_mongo_collection(
-        collection_name='geneset_annotations_by_trait'
-    )
+def build_neo4j_graph() -> None:
+    geneset_collection = setup_mongo_collection(COLLECTION_GENESET)
+    pathway_collection = setup_mongo_collection(COLLECTION_PATHWAYS, clear_existing=False)
 
     with get_neo4j_session() as session:
-        # Clear existing data if needed
+        # Clear DB
         session.run('MATCH (n) DETACH DELETE n')
+        
+        # Create Indexes (Newer Neo4j syntax uses CREATE CONSTRAINT FOR ...)
+        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Phenotype) REQUIRE p.id IS UNIQUE')
+        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Pathway) REQUIRE p.id IS UNIQUE')
 
-        # Create constraints for performance
-        session.run(
-            'CREATE CONSTRAINT IF NOT EXISTS FOR (p:Phenotype) REQUIRE p.id IS UNIQUE'
-        )
-        session.run(
-            'CREATE CONSTRAINT IF NOT EXISTS FOR (g:Gene) REQUIRE g.id IS UNIQUE'
-        )
+        # 1. Batch Import Pathways
+        # Fetch all pathways into a list of dicts
+        print("Loading pathways...")
+        pathways_data = list(pathway_collection.find({}, {'_id': 0, 'pathway_id': 1, 'name': 1, 'source': 1, 'description': 1}))
+        
+        # Use UNWIND to insert all pathways in one transaction
+        session.run("""
+            UNWIND $batch AS row
+            MERGE (pw:Pathway {id: row.pathway_id})
+            SET pw.name = row.name,
+                pw.source = row.source,
+                pw.description = row.description
+        """, batch=pathways_data)
 
-        # add all pathways as nodes
-        pathway_collection = setup_mongo_collection(
-            'pathways', clear_existing=False
-        )
-        pathways = list(pathway_collection.find())
-        for pathway in pathways:
-            session.run(
-                """
-                MERGE (pw:Pathway {id: $pathway_id})
-                SET pw.name = $name,
-                    pw.source = $source,
-                    pw.description = $description
-            """,
-                pathway_id=pathway['pathway_id'],
-                name=pathway.get('name', ''),
-                source=pathway.get('source', ''),
-                description=pathway.get('description', ''),
-            )
+        # 2. Batch Import Phenotypes and Relationships
+        print("Loading phenotypes and relationships...")
+        # We need to restructure the Mongo data slightly for Neo4j consumption
+        pheno_batch = []
+        for doc in geneset_collection.find():
+            pheno_id = str(doc['mapped_trait_uri'])
+            # Extract list of pathway IDs
+            pathway_ids = [i['native'] for i in doc.get('functional_annotation', []) if 'native' in i]
+            
+            if pathway_ids:
+                pheno_batch.append({
+                    'id': pheno_id,
+                    'name': doc.get('trait_name', ''),
+                    'pathway_ids': pathway_ids
+                })
 
-        # load all annotation data from MongoDB
-        phenotypes = geneset_annotations_by_trait.find()
+        # Insert Phenotypes and create edges to Pathways
+        session.run("""
+            UNWIND $batch AS row
+            MERGE (p:Phenotype {id: row.id})
+            SET p.name = row.name
+            
+            WITH p, row
+            UNWIND row.pathway_ids AS pw_id
+            MATCH (pw:Pathway {id: pw_id})
+            MERGE (p)-[:MAPPED_TO]->(pw)
+        """, batch=pheno_batch)
 
-        for phenotype in phenotypes:
-            phenotype_id = phenotype['mapped_trait_uri']
-            pathways = [
-                i['native'] for i in phenotype.get('functional_annotation', [])
-            ]
-            if len(pathways) == 0:
-                continue
-            # Batch create nodes and relationships
-            session.run(
-                """
-                MERGE (p:Phenotype {id: $phenotype_id})
-                SET p.name = $name
-                WITH p
-                UNWIND $pathways AS pathway
-                MERGE (g:Pathway {id: pathway})
-                MERGE (p)-[:MAPPED_TO]->(g)
-            """,
-                phenotype_id=str(phenotype_id),
-                name=phenotype.get('trait_name', ''),
-                pathways=pathways,
-            )
-
-    # print total number of pathways and phenotypes in the database
-    with get_neo4j_session() as session:
-        result = session.run(
-            'MATCH (p:Phenotype) RETURN count(p) AS phenotype_count'
-        )
-        phenotype_count = result.single()['phenotype_count']
-        result = session.run(
-            'MATCH (pw:Pathway) RETURN count(pw) AS pathway_count'
-        )
-        pathway_count = result.single()['pathway_count']
-        print(f'Total Phenotypes in DB: {phenotype_count}')
-        print(f'Total Pathways in DB: {pathway_count}')
+    print("Graph build complete.")
 
 
-def vectorized_pairwise_similarity(set_a_ids, set_b_ids):
+def vectorized_pairwise_similarity(set_a_ids: List[str], set_b_ids: List[str]) -> Optional[float]:
     """Vectorized computation of pairwise similarities"""
+
+    if not set_a_ids or not set_b_ids:
+        return None
+
     collection = get_chromadb_collection()
 
     results_a = collection.get(ids=set_a_ids, include=['embeddings'])
@@ -214,9 +239,9 @@ def vectorized_pairwise_similarity(set_a_ids, set_b_ids):
     return similarity_matrix.mean()
 
 
-def add_pubmed_abstracts_to_chromadb():
+def add_pubmed_abstracts_to_chromadb() -> None:
     pubmed_collection = setup_mongo_collection(
-        'pubmed_abstracts', clear_existing=False
+        COLLECTION_PUBMED, clear_existing=False
     )
     pubmed_collection.create_index([('PMID', pymongo.ASCENDING)], unique=True)
 
@@ -247,16 +272,17 @@ def add_pubmed_abstracts_to_chromadb():
         print(f'Added {len(batch_ids)} documents to chromadb collection')
 
 
-def create_gene_info_collection(gene_symbol):
+def create_gene_info_collection() -> None:
     # get information about each gene
     geneset_collection = setup_mongo_collection(
-        'geneset_annotations_by_trait', clear_existing=False
+        COLLECTION_GENESET, clear_existing=False
     )
     gene_collection = setup_mongo_collection('gene_info', clear_existing=False)
     geneset_docs = geneset_collection.find({})
     unique_genes = set()
     for doc in geneset_docs:
         genes = doc.get('gene_sets', [])
+        time.sleep(0.1) # to prevent overwhelming the Ensembl server
         unique_genes.update(genes)
 
     print(f'Unique genes to annotate: {len(unique_genes)}')
@@ -274,13 +300,13 @@ def create_gene_info_collection(gene_symbol):
         )
 
 
-def get_pathway_info_by_trait():
+def get_pathway_info_by_trait() -> None:
     # get information about each gene
     geneset_collection = setup_mongo_collection(
-        'geneset_annotations_by_trait', clear_existing=False
+        COLLECTION_GENESET, clear_existing=False
     )
     pathway_collection = setup_mongo_collection(
-        'pathways', clear_existing=False
+        COLLECTION_PATHWAYS, clear_existing=False
     )
 
     # loop through traits and add pathway information to the database
@@ -309,7 +335,7 @@ def get_pathway_info_by_trait():
             )
 
 
-def get_gene_info(ensembl_id):
+def get_gene_info(ensembl_id: str) -> Optional[Dict[str, Any]]:
     url = f'https://rest.ensembl.org/lookup/id/{ensembl_id}'
     headers = {'Content-Type': 'application/json'}
 
@@ -320,12 +346,12 @@ def get_gene_info(ensembl_id):
 
 
 def fetch_and_store_pubmed_abstracts(
-    batch_size=500, collection_name='pubmed_abstracts'
-):
+    batch_size: int = 500
+) -> None:
     # loop through in batches of batch_size, fetch the records using fetch_pubmed_records,
     # parse them using parse_pubmed_query_result, and store them in a new mongodb collection
     pubmed_collection = setup_mongo_collection(
-        collection_name, clear_existing=False
+        COLLECTION_PUBMED, clear_existing=False
     )
     pubmed_collection.create_index([('PMID', pymongo.ASCENDING)], unique=True)
 
@@ -360,17 +386,17 @@ def fetch_and_store_pubmed_abstracts(
 
 
 def get_pmids_for_traits(
-    n_abstracts_per_trait=100, collection_name='pmids_by_trait', verbose=False
-):
+    n_abstracts_per_trait: int = 100, verbose: bool = False
+) -> None:
     # loop through entries in synonyms_dict and for each synonym, run a pubmed search and store the results in mongodb - combine all synonyms for each DOID into a single query
 
-    pmid_collection = setup_mongo_collection(collection_name)
+    pmid_collection = setup_mongo_collection(COLLECTION_PMID_BY_TRAIT)
     _ = pmid_collection.create_index(
         [('trait_uri', pymongo.ASCENDING)], unique=True
     )
 
     # get all entries from the trait_info_by_trait collection and pull out the label and synonyms to use as pubmed search terms
-    trait_info_collection = setup_mongo_collection('trait_info_by_trait')
+    trait_info_collection = setup_mongo_collection(COLLECTION_TRAIT_INFO)
     db_result = list(trait_info_collection.find({}))
 
     for result in tqdm(db_result, desc='Searching PubMed'):
@@ -398,7 +424,7 @@ def get_pmids_for_traits(
             try:
                 pmids = run_pubmed_search(query, retmax=n_abstracts_per_trait)
                 break
-            except:   # noqa: E722
+            except Exception:   # noqa: E722
                 if attempt < 2:
                     print(
                         f'PubMed search failed for {trait_uri} (attempt {attempt + 1}/3). Retrying...'
@@ -408,7 +434,6 @@ def get_pmids_for_traits(
                         f'PubMed search failed for {trait_uri} after 3 attempts. Skipping.'
                     )
                     pmids = []
-        pmids = run_pubmed_search(query, retmax=n_abstracts_per_trait)
         pmid_collection.update_one(
             {'trait_uri': trait_uri},
             {'$set': {'label': lbl, 'pmids': pmids, 'search_query': query}},
@@ -416,22 +441,20 @@ def get_pmids_for_traits(
         )
 
 
-def get_unique_pmids_from_trait_collection():
+def get_unique_pmids_from_trait_collection() -> List[int]:
     pmids_to_fetch = []
-    pmid_collection = setup_mongo_collection('pmids_by_trait')
+    pmid_collection = setup_mongo_collection(COLLECTION_PMID_BY_TRAIT)
     for entry in pmid_collection.find({}, {'pmids': 1}):
         pmids = entry.get('pmids', [])
         pmids_to_fetch.extend(pmids)
     return list(set(pmids_to_fetch))  # unique PMIDs
 
 
-def annotate_geneset_annotations_by_trait(
-    collection_name='geneset_annotations_by_trait',
-):
+def annotate_geneset_annotations_by_trait() -> None:
     # loop over all entries in the geneset_annotations_by_trait collection
     # and do functional annotation of the gene sets
 
-    geneset_annotations_by_trait = setup_mongo_collection(collection_name)
+    geneset_annotations_by_trait = setup_mongo_collection(COLLECTION_GENESET)
 
     gp = GProfiler(return_dataframe=True)
 
@@ -478,18 +501,17 @@ def annotate_geneset_annotations_by_trait(
 
 
 def get_trait_info_from_ols(
-    collection_name='trait_info_by_trait',
-    client_url='http://www.ebi.ac.uk/ols',
-):
+    client_url: str = 'http://www.ebi.ac.uk/ols',
+) -> None:
     # use EBI OLS API to get trait information for all traits
     trait_info_by_trait = setup_mongo_collection(
-        collection_name='trait_info_by_trait'
+        collection_name=COLLECTION_TRAIT_INFO
     )
 
     trait_info_by_trait.create_index('trait_uri', unique=True)
 
     geneset_annotations_by_trait = setup_mongo_collection(
-        collection_name='geneset_annotations_by_trait'
+        collection_name=COLLECTION_GENESET
     )
 
     # get all unique trait URIs that are not already in the trait_info_by_trait collection
@@ -524,10 +546,10 @@ def get_trait_info_from_ols(
 
 
 def import_geneset_annotations_by_trait(
-    gwas_data_melted, collection_name='geneset_annotations_by_trait'
-):
+    gwas_data_melted: pd.DataFrame
+) -> None:
 
-    geneset_annotations_by_trait = setup_mongo_collection(collection_name)
+    geneset_annotations_by_trait = setup_mongo_collection(COLLECTION_GENESET)
 
     geneset_annotations_by_trait.create_index('mapped_trait_uri', unique=True)
 
@@ -562,7 +584,7 @@ def import_geneset_annotations_by_trait(
         )
 
 
-def get_exploded_gwas_data(datafile=None):
+def get_exploded_gwas_data(datafile: Optional[Path] = None) -> pd.DataFrame:
     if datafile is None:
         datadir = Path(os.getenv('DATA_DIR', '../../data'))
         datafile = (
@@ -590,7 +612,6 @@ def get_exploded_gwas_data(datafile=None):
     )
     gwas_data_melted = gwas_data_melted.drop(columns=['SNP_GENE_IDS'])
     gwas_data_melted = gwas_data_melted[gwas_data_melted['GENE_ID'].notna()]
-    gwas_data_melted.shape
 
     print(
         f'found data for {gwas_data_melted["PUBMEDID"].nunique()} unique PUBMEDIDs'
@@ -598,7 +619,7 @@ def get_exploded_gwas_data(datafile=None):
     return gwas_data_melted
 
 
-def load_disease_ontology(url=None):
+def load_disease_ontology(url: Optional[str] = None) -> dict:
     if url is None:
         url = 'https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/refs/heads/main/src/ontology/doid-base.json'
 
@@ -610,7 +631,7 @@ def load_disease_ontology(url=None):
         raise ValueError(f'Failed to load JSON: {response.status_code}')
 
 
-def process_disease_ontology(data):
+def process_disease_ontology(data: dict) -> None:
     # remove obsolete nodes, which have 'obsolete' in their 'lbl' field
     total_nodes = len(data['graphs'][0]['nodes'])
 
@@ -679,7 +700,7 @@ def process_disease_ontology(data):
     return node_classes, node_properties, edges
 
 
-def get_info_from_ols(trait_id, ols_client):
+def get_info_from_ols(trait_id: str, ols_client) -> Optional[dict]:
     ontology, id = trait_id.split('_')
     response = ols_client.get_term(ontology=ontology, iri=f'{trait_id}')
     if '_embedded' in response and 'terms' in response['_embedded']:
@@ -689,7 +710,7 @@ def get_info_from_ols(trait_id, ols_client):
         return None
 
 
-def extract_owl_mappings(owl_path):
+def extract_owl_mappings(owl_path: Path) -> dict:
     import xml.etree.ElementTree as ET
 
     def local(tag):
@@ -740,7 +761,7 @@ def extract_owl_mappings(owl_path):
                 for rch in restr:
                     if local(rch.tag) == 'onProperty':
                         # this was written by claude - not sure why it's necessary
-                        prop_uri = rch.attrib.get(
+                        prop_uri = rch.attrib.get( # noqa: F841
                             '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource'
                         ) or rch.attrib.get(
                             'resource'
@@ -760,7 +781,7 @@ def extract_owl_mappings(owl_path):
 ## Disease ontology parsing functions
 
 
-def get_rel_type_from_edge(rel_type):
+def get_rel_type_from_edge(rel_type: str) -> str:
     # first filter for bespoke case from infectious disease ontology
     bespoke_replacements = {
         'IDO_0000664': 'has_material_basis_in',
@@ -790,7 +811,7 @@ def get_rel_type_from_edge(rel_type):
     return 'RELATED_TO'
 
 
-def get_relation_dict(edges):
+def get_relation_dict(edges: list) -> dict:
     edge_types = set([edge.get('pred') for edge in edges])
 
     relation_dict = {}
@@ -806,7 +827,7 @@ def get_relation_dict(edges):
 
 
 # add labels to edge records
-def add_relation_labels_to_edges(edges):
+def add_relation_labels_to_edges(edges: list) -> None:
     relation_dict = get_relation_dict(edges)
     for i, edge in enumerate(edges):
         pred = edge.get('pred')
@@ -823,12 +844,12 @@ def add_relation_labels_to_edges(edges):
     assert len(set([edge['id'] for edge in edges])) == len(
         edges
     ), 'Edge IDs are not unique'
-    return edges
+
 
 
 def create_collection_from_documents(
-    collection, documents, unique_index_col, drop_existing=True
-):
+    collection: Collection, documents: pd.DataFrame, unique_index_col: str, drop_existing: bool = True
+) -> None:
     # Clear existing data in the collection (optional, for clean start)
     if drop_existing:
         collection.drop()
@@ -866,7 +887,7 @@ def create_collection_from_documents(
 # Using MERGE for Upsert functionality with batching for performance
 
 
-def upsert_nodes_batch(tx, nodes_batch):
+def upsert_nodes_batch(tx: Transaction, nodes_batch: list) -> None:
     """Upsert multiple nodes in a single transaction"""
     query = """
     UNWIND $nodes AS node
@@ -876,7 +897,7 @@ def upsert_nodes_batch(tx, nodes_batch):
     tx.run(query, nodes=nodes_batch)
 
 
-def upsert_relationships_batch(tx, relationships_batch):
+def upsert_relationships_batch(tx: Transaction, relationships_batch: list) -> None:
     """Upsert multiple relationships in a single transaction"""
     query = """
     UNWIND $rels AS rel
@@ -886,7 +907,7 @@ def upsert_relationships_batch(tx, relationships_batch):
     tx.run(query, rels=relationships_batch)
 
 
-def filter_properties(props):
+def filter_properties(props: dict) -> dict:
     """Filter properties to only include Neo4j-compatible types"""
     filtered = {}
     for k, v in props.items():
