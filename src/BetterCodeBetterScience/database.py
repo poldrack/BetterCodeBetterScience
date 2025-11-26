@@ -3,9 +3,11 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from chromadb import PersistentClient
 from neo4j import GraphDatabase
+import chromadb.utils.embedding_functions as embedding_functions
 
 
 def get_neo4j_session():
+    assert 'NEO4J_PASSWORD' in os.environ, 'NEO4J_PASSWORD should be set in .env'
     neo4j_driver = GraphDatabase.driver(
         'bolt://localhost:7687', auth=('neo4j', os.environ['NEO4J_PASSWORD'])
     )
@@ -70,12 +72,23 @@ def setup_mongo_collection(
     return collection
 
 
-def get_chromadb_collection(path='../../data/chroma_data'):
-    client = PersistentClient(path='../../data/chroma_data')
-    # check if collection "pubmed_docs" exists, if not create it
-    if 'pubmed_docs' in [col.name for col in client.list_collections()]:
-        print('Using existing collection: pubmed_docs')
-        return client.get_collection(name='pubmed_docs')
+def get_chromadb_collection(collection_name='pubmed_docs', 
+    path='../../data/chroma_data',
+    embedding: str = "text-embedding-3-large"):
+
+    assert 'OPENAI' in os.environ, 'OPENAI API key should be set in .env'
+    if embedding is not None:
+        embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+                    api_key=os.getenv('OPENAI'),
+                    model_name=embedding
+            )
     else:
-        print('Created new collection: pubmed_docs')
-        return client.create_collection(name='pubmed_docs')
+        embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name="all-MiniLM-L6-v2")
+    client = PersistentClient(path=path)
+    # check if collection exists, if not create it
+    if collection_name in [col.name for col in client.list_collections()]:
+        return client.get_collection(name=collection_name)
+    else:
+        print(f'Created new collection: {collection_name}')
+        return client.create_collection(name=collection_name, embedding_function=embedding_function)
