@@ -495,7 +495,8 @@ for _ in range(nreps):
 end = time.time()
 parquet_time = (end - start)/nreps
 print(f"Parquet load time: {parquet_time:.4f} seconds")
-print(f'ratio {csv_time/parquet_time:.2f}')```
+print(f'ratio {csv_time/parquet_time:.2f}')
+```
 
 ```
 CSV load time: 0.0719 seconds
