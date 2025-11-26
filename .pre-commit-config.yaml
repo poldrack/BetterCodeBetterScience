@@ -6,3 +6,4 @@ repos:
       additional_dependencies:
         - tomli
       exclude: '\.html$'
+      args: ["--ignore-words", "project-words.txt" ]

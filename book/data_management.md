@@ -226,10 +226,733 @@ A graph database is built to efficiently store and query graph-structured data. 
 
 A relatively recent entry into the database field is the *vector database*, which is optimized for finding similar numerical vectors.  These have become essential in the context of AI, because they can be used to quickly find similar items that are embedded in a vector space, typically using neural networks.  These items can include text documents, images, molecular structures, or any other kind of data that can be embedded in a vector space.  Vector databases differ in that can return ranked similarity ratings in addition to a discrete set of matches, and thus they are best for performing analyses that involve similarity-based search.
 
-##### An example of database usage
+#### An example of database usage
 
-*TBD*
+Here I will work through an example of a real scientific question using several database systems. I will focus on NoSQL databases, for two reasons:
 
+1: They are less well known amongst scientists compared to relational databases
+2: I personally prefer the NoSQL approach in most cases
+
+The question that I will ask is as follows: How well can the biological similarity between traits (including diseases as well as other phenotypes) be estimated from the semantic similarity of publications that refer to the trait?  We will use two primary datasets to assess this:
+
+- A dataset of genome-wise association study (GWAS) results for specific traits obtained from [here](https://www.ebi.ac.uk/gwas/docs/file-downloads).
+- Abstracts that refer to each of the traits identified in the GWAS result, obtained from the [PubMed](https://pubmed.ncbi.nlm.nih.gov/) database.  
+
+I will not present all of the code for each step; this can be found [here](src/BetterCodeBetterScience/database_example_funcs.py) and [here](src/BetterCodeBetterScience/database.py). Rather, I will show snippets that are particularly relevant to the databases being used. 
+
+##### Adding GWAS data to a document store
+
+We start by uploading the GWAS data and adding them to a document store, using *MongoDB*, which I installed on my local machine.   We start by reading the CSV file containing the data.  Looking at those data, we see that they are not properly *normalized*. Normalization is a concept that is essential for relational databases but can also be very helpful for document stores.  We won't go into the details of normalization here (for more, see [here](https://learn.microsoft.com/en-us/troubleshoot/microsoft-365-apps/access/database-normalization-description)); rather, we will simply outline the primary requirements of the *first normal form*, which is the most basic form of normalization.  This requires that:
+
+1) There are no duplicate records
+2) The columns contain scalar values (and thus do not contain composite values such as sets of values)
+3) There are not multiple columns that contain the same kind of data
+
+In this case, looking at the data we see that several columns contain multiple values for genes, due to the fact that some single nucleotide polymorphisms (SNPs) map to multiple genes.  These values separated by commas (e.g. "FADS2, FADS1").  To normalize this, we can *explode* the data frame, which involves separating out these values into separate rows, which have otherwise identical contents.  
+
+```python
+gwas_data = get_exploded_gwas_data()
+```
+
+We can now import the data from this data frame into a MongoDB collection, mapping each unique trait to the genes that are reported as being associated with it.  First I generated a separate function that sets up a MongoDB collection:
+
+```python
+def setup_mongo_collection(
+    collection_name,
+    uri=None,
+    db_name='research_database',
+    clear_existing=False,
+):
+    assert (
+        'MONGO_USERNAME' in os.environ and 'MONGO_PASSWORD' in os.environ
+    ), 'MongoDB username and password should be set in .env'
+
+    if uri is None:
+        uri = 'mongodb://localhost:27017'
+
+    # Create a new client and connect to the server
+    client = get_mongo_client(uri)
+
+    # In MongoDB, databases and collections are created lazily (when first document is inserted)
+    db = client[db_name]
+    collection = db[collection_name]
+
+    if clear_existing:
+        collection.drop()
+        print(f'Dropped existing collection: {collection_name}')
+
+    # print the number of documents in the collection
+    print(
+        f'Number of documents in {collection_name}: {collection.count_documents({})}'
+    )
+
+    return collection
+```
+
+We can then use that function to set up our gene set collection:
+
+
+```python
+# since the collection names are shared across functions, 
+# create global variable with their names
+COLLECTION_GENESET = 'geneset_annotations_by_trait'
+
+def import_genesets_by_trait(
+    gwas_data_melted: pd.DataFrame
+) -> None:
+
+    geneset_annotations_by_trait = setup_mongo_collection(COLLECTION_GENESET)
+    # "mapped_trait_uri" is the field that contains the identifier for each trait
+    geneset_annotations_by_trait.create_index('mapped_trait_uri', unique=True)
+
+    # first get a mapping from MAPPED_TRAIT_URI to TRAIT_NAME
+    trait_name_mapping = gwas_data_melted.set_index('MAPPED_TRAIT_URI')[
+        'MAPPED_TRAIT'
+    ].to_dict()
+
+    # loop through each unique MAPPED_TRAIT_URI in gwas_data data frame 
+    # add all of its gene sets to the mongo collection - don't do the annotation yet
+    for mapped_trait_uri in tqdm(
+        gwas_data_melted['MAPPED_TRAIT_URI'].unique()
+    ):
+        gene_sets = (
+            gwas_data_melted[
+                gwas_data_melted['MAPPED_TRAIT_URI'] == mapped_trait_uri
+            ]['GENE_ID']
+            .unique()
+            .tolist()
+        )
+        # clean up gene names
+        gene_sets = [gene.strip() for gene in gene_sets]
+        # add the item to the mongodb collection, also
+        # including the trait name
+        geneset_annotations_by_trait.update_one(
+            {'mapped_trait_uri': str(mapped_trait_uri)},
+            {
+                '$set': {
+                    'mapped_trait_uri': str(mapped_trait_uri),
+                    'gene_sets': gene_sets,
+                    'trait_name': trait_name_mapping.get(mapped_trait_uri, ''),
+                }
+            },
+            upsert=True,
+        )
+
+
+import_genesets_by_trait(gwas_data)
+```
+
+Note that this function uses an *upsert* operation, which is a combination of insertion (if the document with this key doesn't already exist) or updating (if the document with this key already exists).  This results in a collection with 3,047 records, each of which is indexed by the trait identifier and includes a list of all of the genes associated with the trait across the GWAS studies.  We also include the trait names to make the records human-readable, but we rely upon the unique identifiers (which in this case are defined as URLs, such as "http://www.ebi.ac.uk/efo/EFO_0004309" which maps to the trait of "platelet count". 
+
+##### Annotating gene sets
+
+Remember that our goal in this analysis is to identify the biological overlap between traits. We could do this by assessing the degree to which they are associated with the same genes, but this would miss out on the fact that genes work together in networks that are often associated with the function of specific biological pathways.  Given a particular set of genes, we can use bioinformatics tools to identify the biological processes that are associated with that set of genes. In this case I used the  [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) tool from ELIXIR, which comes with a handy [Python package](https://pypi.org/project/gprofiler-official/).   This tool returns a set of pathways that are statistically enriched for each gene set, each of which is defined by a unique identifier that refers to a particular ontology such as the Gene Ontology.   For example, the 877 genes associated with the "platelet count" trait are involved in a range of biological processes and pathways, which range from the very general (e.g. GO:0005515, referring to "protein binding") to the very specific (e.g. GO:0007599, referring to "hemostasis", which is the stopping of bleeding).  
+
+We can use `g:Profiler` to obtain the annotation for the gene set associated with each trait:
+
+```python
+
+def annotate_genesets_by_trait() -> None:
+    # loop over all entries in the geneset_annotations_by_trait collection
+    # and do functional annotation of the gene sets
+
+    geneset_annotations_by_trait = setup_mongo_collection(COLLECTION_GENESET)
+
+    gp = GProfiler(return_dataframe=True)
+
+    # use a list here so that we can use tqdm to show progress
+    # skip any entries that already have functional_annotation
+    annotations = [
+        i
+        for i in geneset_annotations_by_trait.find({})
+        if 'functional_annotation' not in i
+    ]
+
+    for entry in tqdm(annotations):
+        mapped_trait_uri = entry['mapped_trait_uri']
+        gene_sets = entry['gene_sets']
+        if len(gene_sets) == 0:
+            continue
+        # do functional annotation
+        try:
+            annotation_results = gp.profile(
+                organism='hsapiens',
+                query=gene_sets,
+                sources=['GO:BP', 'GO:MF', 'GO:CC', 'KEGG', 'REAC'],
+            )
+        except Exception as e:
+            # bare except to avoid breaking the loop
+            print(f'Error annotating {mapped_trait_uri}: {e}')
+            continue
+
+        # convert the dataframe to a dictionary
+        annotation_results_dict = annotation_results.to_dict(orient='records')
+        # update the entry in the mongo collection with the annotation results
+        geneset_annotations_by_trait.update_one(
+            {'mapped_trait_uri': str(mapped_trait_uri)},
+            {'$set': {'functional_annotation': annotation_results_dict}},
+        )
+    # drop members of geneset_annotations_by_trait with empty functional annotation
+    geneset_annotations_by_trait.delete_many(
+        {'functional_annotation': {'$in': [None, [], {}]}}
+    )
+
+    print(
+        f'Remaining entries with functional annotation: {
+          geneset_annotations_by_trait.count_documents({})}'
+    )
+
+
+annotate_genesets_by_trait()
+```
+```text
+Number of documents in geneset_annotations_by_trait: 3047
+100%|██████████| 3047/3047 [56:31<00:00,  1.11s/it] 
+Remaining entries with functional annotation: 1845
+```
+
+
+##### Mapping pathway information to traits
+
+The previous analysis added a `functional annotation` element to each trait, which includes information about the associated pathways. While we could use this collection to obtain the mappings from traits to pathways, the deeply embedded nature of the annotation data would make the queries somewhat complicated.  Next we will use that information to generate a collection including all unique pathways, which we will then use to compute biological similarity between traits:
+
+```python
+COLLECTION_PATHWAYS = 'pathways'
+
+def get_pathway_info_by_trait() -> None:
+    geneset_collection = setup_mongo_collection(
+        COLLECTION_GENESET, clear_existing=False
+    )
+    pathway_collection = setup_mongo_collection(
+        COLLECTION_PATHWAYS, clear_existing=False
+    )
+
+    # loop through traits and add pathway information to the database
+    traits = [
+        i
+        for i in geneset_collection.find()
+        if 'functional_annotation' in i and len(i['functional_annotation']) > 0
+    ]
+
+    for trait in tqdm(traits):
+        annotations = trait['functional_annotation']
+        for pathway in annotations:
+            # change key for clarity
+            pathway['pathway_id'] = pathway.pop('native')
+
+            pathway_collection.update_one(
+                {'pathway_id': pathway['pathway_id']},
+                {
+                    '$set': {
+                        'name': pathway.get('name', ''),
+                        'source': pathway.get('source', ''),
+                        'description': pathway.get('description', ''),
+                    }
+                },
+                upsert=True,
+            )
+
+
+get_pathway_info_by_trait()
+```
+```text
+Number of documents in geneset_annotations_by_trait: 1845
+Number of documents in pathways: 0
+100%|██████████| 1845/1845 [00:18<00:00, 98.22it/s] 
+```
+
+
+##### Generate the graph database linking publications pathways to traits
+
+Graph databases are designed to store and query relational information, making them perfect for our dataset linking pathways to traits.  In the next step I created a graph database using the Neo4j database package, which involves creating a Neo4j session and then issuing a set of Cyper commands:
+
+```python
+def get_neo4j_session():
+    assert 'NEO4J_PASSWORD' in os.environ, 'NEO4J_PASSWORD should be set in .env'
+    neo4j_driver = GraphDatabase.driver(
+        'bolt://localhost:7687', auth=('neo4j', os.environ['NEO4J_PASSWORD'])
+    )
+    return neo4j_driver.session()
+
+
+def build_neo4j_graph() -> None:
+    geneset_collection = setup_mongo_collection(COLLECTION_GENESET)
+    pathway_collection = setup_mongo_collection(COLLECTION_PATHWAYS)
+
+    with get_neo4j_session() as session:
+        # Clear DB
+        session.run('MATCH (n) DETACH DELETE n')
+        
+        # Create Indexes (Newer Neo4j syntax uses CREATE CONSTRAINT FOR ...)
+        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Phenotype) REQUIRE p.id IS UNIQUE')
+        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Pathway) REQUIRE p.id IS UNIQUE')
+
+        # 1. Batch Import Pathways
+        # Fetch all pathways into a list of dicts
+        print("Loading pathways...")
+        pathways_data = list(pathway_collection.find({},
+          {'_id': 0, 'pathway_id': 1, 'name': 1, 'source': 1, 'description': 1}))
+        
+        # Use UNWIND to insert all pathways in one transaction
+        session.run("""
+            UNWIND $batch AS row
+            MERGE (pw:Pathway {id: row.pathway_id})
+            SET pw.name = row.name,
+                pw.source = row.source,
+                pw.description = row.description
+        """, batch=pathways_data)
+
+        # 2. Batch Import Phenotypes and Relationships
+        print("Loading phenotypes and relationships...")
+        # We need to restructure the Mongo data slightly for Neo4j consumption
+        pheno_batch = []
+        for doc in geneset_collection.find():
+            pheno_id = str(doc['mapped_trait_uri'])
+            # Extract list of pathway IDs
+            pathway_ids = [
+                i['native'] 
+                for i in doc.get('functional_annotation', []) 
+                if 'native' in i]
+             
+            if pathway_ids:
+                pheno_batch.append({
+                    'id': pheno_id,
+                    'name': doc.get('trait_name', ''),
+                    'pathway_ids': pathway_ids
+                })
+
+        # Insert Phenotypes and create edges to Pathways
+        session.run("""
+            UNWIND $batch AS row
+            MERGE (p:Phenotype {id: row.id})
+            SET p.name = row.name
+            
+            WITH p, row
+            UNWIND row.pathway_ids AS pw_id
+            MATCH (pw:Pathway {id: pw_id})
+            MERGE (p)-[:MAPPED_TO]->(pw)
+        """, batch=pheno_batch)
+
+    print("Graph build complete.")
+
+
+build_neo4j_graph()
+```
+```text
+Number of documents in geneset_annotations_by_trait: 1845
+Number of documents in pathways: 6051
+Loading pathways...
+Loading phenotypes and relationships...
+Graph build complete.
+```
+
+Having populated the database, we can then use the [gds.nodeSimilarity function](https://neo4j.com/docs/graph-data-science/current/algorithms/node-similarity/) from the Neo4j Graph Data Science library to compute the similarity of each trait in terms of their pathway overlap.  This function takes a *bipartite graph* (which is a graph that contains two sets of nodes - in our case, pathways and traits) and returns the Jaccard similarity coefficient, in which in this case reflects the ratio of common pathways to the total number of pathways for each pair of nodes. We filter out nodes that have fewer than two pathways associated with them to make the estimate more stable. (Note that here we use the term "phenotype" interchangeably with "trait".)
+
+```python
+
+def compute_phenotype_similarities(
+    graph_name: str = 'phenotype-pathway-graph',
+    min_pathways: int = 2
+) -> pd.DataFrame:
+
+    with get_neo4j_session() as session:
+        # 1. Clean up any existing graph with the same name
+        try:
+            session.run("CALL gds.graph.drop($name)", name=graph_name)
+        except ClientError:
+            # Graph did not exist, safe to ignore
+            pass
+
+        # 2. Project the Graph
+        # We project Phenotypes, Pathways, and the relationship between them.
+        # 'UNDIRECTED' orientation allows the algorithm to see the shared connections.
+        session.run("""
+            CALL gds.graph.project(
+                $graph_name,
+                ['Phenotype', 'Pathway'],
+                {
+                    MAPPED_TO: {
+                        orientation: 'UNDIRECTED'
+                    }
+                }
+            )
+        """, graph_name=graph_name)
+
+        # 3. Run Node Similarity
+        # We use 'degreeCutoff' to filter out phenotypes with too few pathways 
+        # BEFORE the calculation. This is much faster than filtering the results.
+        result = session.run("""
+            CALL gds.nodeSimilarity.stream($graph_name, {
+                degreeCutoff: $min_pathways
+            })
+            YIELD node1, node2, similarity
+            
+            // Map internal IDs back to our Phenotype IDs
+            WITH node1, node2, similarity
+            MATCH (p1:Phenotype), (p2:Phenotype)
+            WHERE id(p1) = node1 AND id(p2) = node2
+            
+            RETURN p1.id AS phenotype1, p2.id AS phenotype2, similarity
+            ORDER BY similarity DESC
+        """, graph_name=graph_name, min_pathways=min_pathways)
+
+        # 4. Convert to DataFrame
+        # result.data() fetches all records into a list of dictionaries
+        df = pd.DataFrame(result.data())
+        
+        # 5. Cleanup: Drop the graph to free up memory
+        try:
+            session.run("CALL gds.graph.drop($name)", name=graph_name)
+        except ClientError:
+            pass
+
+        return df
+
+
+similarity_result_df = compute_phenotype_similarities()
+```
+
+##### Obtaining literature related to traits
+
+Next we need to obtain abstracts related to each trait for our literature-mining analysis.  To do this, we first wish to obtain any synonyms for the traits, to maximize the effectiveness of the search.  We can obtain these from the [EBI Ontology Search API](https://www.ebi.ac.uk/ols4/api-docs):
+
+```python
+COLLECTION_TRAIT_INFO = 'trait_info_by_trait'
+
+def get_trait_info_from_ols(
+    client_url: str = 'http://www.ebi.ac.uk/ols',
+) -> None:
+    # use EBI OLS API to get trait information for all traits
+    trait_info_by_trait = setup_mongo_collection(
+        collection_name=COLLECTION_TRAIT_INFO
+    )
+
+    trait_info_by_trait.create_index('trait_uri', unique=True)
+
+    geneset_annotations_by_trait = setup_mongo_collection(
+        collection_name=COLLECTION_GENESET
+    )
+
+    # get all unique trait URIs that are not already in the trait_info_by_trait collection
+    # use lstrip because many have a leading space
+    unique_trait_uris = [
+        i.lstrip()
+        for i in geneset_annotations_by_trait.distinct('mapped_trait_uri')
+        if trait_info_by_trait.count_documents({'trait_uri': i.lstrip()}) == 0
+    ]
+    print(f'Found {len(unique_trait_uris)} un-annotated trait URIs.')
+
+    client = ols_client.Client(client_url)
+
+    for trait_uri in tqdm(unique_trait_uris):
+        trait_id = trait_uri.split('/')[-1]
+        trait_uri = str(trait_uri)
+        # skip if already in the collection
+        if trait_info_by_trait.count_documents({'trait_uri': trait_uri}) > 0:
+            continue
+        try:
+            term_data = get_info_from_ols(trait_id, client)
+        except HTTPError:
+            print(f'HTTPError for {trait_uri}')
+            continue
+        if term_data is None:
+            print(f'No data returned for {trait_uri}')
+            continue
+        trait_info_by_trait.update_one(
+            {'trait_uri': str(trait_uri)},
+            {'$set': {'trait_uri': str(trait_uri), 'trait_info': term_data}},
+            upsert=True,
+        )
+
+
+get_trait_info_from_ols()
+```
+```text
+Number of documents in geneset_annotations_by_trait: 1845
+Number of documents in pathways: 0
+100%|██████████| 1845/1845 [00:18<00:00, 98.22it/s] 
+```
+
+We then use the `Biopython.Entrez` module to search PubMed for each of the traits, along with any synonyms, obtaining a maximum of 100 abstracts for each query:
+
+```python
+COLLECTION_PMID_BY_TRAIT = 'pmids_by_trait'
+
+def get_pmids_for_traits(
+    n_abstracts_per_trait: int = 100, verbose: bool = False
+) -> None:
+
+    pmid_collection = setup_mongo_collection(COLLECTION_PMID_BY_TRAIT)
+    _ = pmid_collection.create_index(
+        [('trait_uri', pymongo.ASCENDING)], unique=True
+    )
+
+    # get all entries from the trait_info_by_trait collection and pull out the label and synonyms to use as pubmed search terms
+    trait_info_collection = setup_mongo_collection(COLLECTION_TRAIT_INFO)
+    db_result = list(trait_info_collection.find({}))
+
+    for result in tqdm(db_result, desc='Searching PubMed'):
+        trait_uri = result['trait_uri']
+        lbl = result['trait_info']['label']
+        synonyms = result['trait_info'].get('synonyms', [])
+        # create a pubmed query using the label and synonyms
+        query_terms = [lbl] + synonyms
+        query = ' OR '.join([f'"{term}"' for term in query_terms])
+
+        existing_entry = pmid_collection.find_one({'trait_uri': trait_uri})
+        # check if existing entry is not None and skip if pmid entry is not empty
+        if (
+            existing_entry is not None
+            and existing_entry.get('pmids')
+            and len(existing_entry.get('pmids')) > 0
+        ):
+            if verbose:
+                print(f'PMIDs already exist for {lbl}, skipping...')
+            continue
+        # run pubmed search - retry up to 3 times if it fails
+        for attempt in range(3):
+            try:
+                pmids = run_pubmed_search(query, retmax=n_abstracts_per_trait)
+                break
+            except Exception:   
+                if attempt < 2:
+                    print(
+                        f'PubMed search failed for {trait_uri} (attempt {attempt + 1}/3). Retrying...'
+                    )
+                else:
+                    print(
+                        f'PubMed search failed for {trait_uri} after 3 attempts. Skipping.'
+                    )
+                    pmids = []
+        pmid_collection.update_one(
+            {'trait_uri': trait_uri},
+            {'$set': {'label': lbl, 'pmids': pmids, 'search_query': query}},
+            upsert=True,
+        )
+
+
+get_pmids_for_traits()
+```
+```text
+Number of documents in pmids_by_trait: 0
+Number of documents in trait_info_by_trait: 1590
+Searching PubMed: 100%|██████████| 1590/1590 [13:58<00:00,  1.90it/s]
+```
+
+We then identify all of the unique Pubmed IDs (PMIDs) across these queries and fetch the full Pubmed record (including the title and abstract, which we will use in our semantic analysis) for each of them, placing them in a new collection:
+
+```python
+COLLECTION_PUBMED = 'pubmed_abstracts'
+
+
+def fetch_and_store_pubmed_abstracts(
+    batch_size: int = 500
+) -> None:
+
+    pubmed_collection = setup_mongo_collection(
+        COLLECTION_PUBMED, clear_existing=False
+    )
+    pubmed_collection.create_index([('PMID', pymongo.ASCENDING)], unique=True)
+
+    # remove any PMIDs already in the pubmed_collection
+    existing_pmids = set()
+    for entry in pubmed_collection.find({}, {'PMID': 1}):
+        existing_pmids.add(entry['PMID'])
+
+    pmids_to_fetch = [
+        pmid
+        for pmid in get_unique_pmids_from_trait_collection()
+        if pmid not in existing_pmids
+    ]
+
+    if len(pmids_to_fetch) == 0:
+        print('All PMIDs are already fetched. Skipping.')
+    else:
+        print(f'Fetching {len(pmids_to_fetch)} PMIDs...')
+
+    for i in tqdm(
+        range(0, len(pmids_to_fetch), batch_size),
+        desc='Fetching PubMed abstracts',
+    ):
+        batch = pmids_to_fetch[i : i + batch_size]
+        pubmed_records = fetch_pubmed_records(batch, retmax=batch_size)
+        parsed_records = parse_pubmed_query_result(pubmed_records)
+        if not parsed_records:
+            print(f'No new records to insert for batch {i // batch_size + 1}.')
+            continue
+        pubmed_collection.insert_many(parsed_records.values())
+        # print(f"Inserted {len(parsed_records)} abstracts")
+
+
+fetch_and_store_pubmed_abstracts()
+```
+```text
+Number of documents in pubmed_abstracts: 0
+Number of documents in pmids_by_trait: 1590
+Fetching 106387 PMIDs...
+
+```
+
+##### Add documents to vector database
+
+We want to use the documents downloaded from Pubmed for each trait to compute the semantic similarity between traits.  This is a good application for a *vector database*, which can ingest documents, embed them into a vector space, which we can then use to perform similarity computations between documents based on their vector embeddings.  We will use ChromaDB which is a popular open-source vector database.  By default ChromaDB uses the *all-MiniLM-L6-v2* embedding model from the [Sentence Transformers](https://www.sbert.net/) package, but we will instead use the more powerful `text-embedding-3-large` via the OpenAI API.
+
+```python
+def get_chromadb_collection(collection_name='pubmed_docs', 
+    path='../../data/chroma_data',
+    embedding: str = "text-embedding-3-large"):
+
+    assert 'OPENAI' in os.environ, 'OPENAI API key should be set in .env'
+    if embedding is not None:
+        embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+                    api_key=os.getenv('OPENAI'),
+                    model_name=embedding
+            )
+    else:
+        embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name="all-MiniLM-L6-v2")
+    client = PersistentClient(path=path)
+    # check if collection exists, if not create it
+    if collection_name in [col.name for col in client.list_collections()]:
+        return client.get_collection(name=collection_name)
+    else:
+        print(f'Created new collection: {collection_name}')
+        return client.create_collection(name=collection_name, embedding_function=embedding_function)
+
+
+def add_pubmed_abstracts_to_chromadb(batch_size: int = 5000) -> None:
+
+    pubmed_collection = setup_mongo_collection(
+        COLLECTION_PUBMED, clear_existing=False
+    )
+
+    collection = get_chromadb_collection()
+    # get ids (pmid) and documents (title + abstract) from pubmed_collection
+    ids = []
+    documents = []
+    for entry in pubmed_collection.find({}):
+        full_text = entry.get('title', '') + ' ' + entry.get('abstract', '')
+        documents.append(full_text)
+        ids.append(str(entry['PMID']))
+
+    # exclude ids that are already in the chromadb collection
+    existing_ids = set(collection.get(include=[])['ids'])
+    ids_to_add = []
+    documents_to_add = []
+    for i, id_ in enumerate(ids):
+        if id_ not in existing_ids:
+            ids_to_add.append(id_)
+            documents_to_add.append(documents[i])
+
+    # add in batches
+    for i in range(0, len(ids_to_add), batch_size):
+        batch_ids = ids_to_add[i : i + batch_size]
+        batch_documents = documents_to_add[i : i + batch_size]
+        collection.add(ids=batch_ids, documents=batch_documents)
+        print(f'Added {len(batch_ids)} documents to chromadb collection')
+
+
+add_pubmed_abstracts_to_chromadb()
+```
+```text
+Number of documents in pubmed_abstracts: 106120
+Using existing collection: pubmed_docs
+```
+
+We then compute the vector similarity between the document embeddings associated with each pair of traits. We compute the Euclidean distance between each pair of documents associated with both traits, and then compute the mean across the documents.  These are added to the data frame that also contains the pathway distances, for each in subsequent analyses:
+
+```python
+text_similarity_df = compute_text_similarities(similarity_result_df)
+```
+
+##### Analyzing and visualizing the results
+
+We can first visualize the relationship between semantic and biological similarity:
+
+```python
+sns.scatterplot(
+    data=text_similarity_df,
+    y='pathway_similarity',
+    x='text_similarity',
+    alpha=0.5,
+    size=1
+)
+plt.title(f'Pathway Similarity vs Text Similarity (r={text_similarity_df["pathway_similarity"].corr(text_similarity_df["text_similarity"]):.2f})')
+```
+
+:::{figure-md} PathwaySimilarity-fig
+<img src="images/pathway_vs_text_similarity.png" alt="Pathway versus semantic similarity across traits" width="500px">
+
+A scatterplot of biological similarity (estimated as overlap in pathways) versus semantic similarity (estimated as embedding distance of Pubmed abstracts) on the GWAS dataset.
+:::
+
+There is a small but robust correlation between these two similarity measures. In order to more accurately estimate this association we need to take into account the fact that different documents vary in their overall similarity by including a *random effect* of document within a mixed effects model.  We use the `lmer()` function from the R `lme4` package, via the R magic within Jupyter:
+
+```python
+%%R -i text_similarity_df
+
+if (!requireNamespace("lme4", quietly = TRUE)) {
+    install.packages("lme4")
+}
+if (!requireNamespace("lmerTest", quietly = TRUE)) {
+    install.packages("lmerTest")
+}
+library(lme4)
+library(lmerTest)
+
+model <- lmer(pathway_similarity ~ text_similarity  + (1 | phenotype1) + (1 | phenotype2), data = text_similarity_df)
+summary(model)  
+```
+```r
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: pathway_similarity ~ text_similarity + (1 | phenotype1) + (1 |  
+    phenotype2)
+   Data: text_similarity_df
+
+REML criterion at convergence: -9301.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-5.4960 -0.4077 -0.0685  0.2873  8.9175 
+
+Random effects:
+ Groups     Name        Variance Std.Dev.
+ phenotype1 (Intercept) 0.040351 0.20087 
+ phenotype2 (Intercept) 0.009485 0.09739 
+ Residual               0.007039 0.08390 
+Number of obs: 6904, groups:  phenotype1, 981; phenotype2, 905
+
+Fixed effects:
+                 Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)     2.484e-01  7.802e-03 1.507e+03   31.83   <2e-16 ***
+text_similarity 3.666e-01  2.532e-02 5.858e+03   14.48   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr)
+text_smlrty -0.334
+```
+
+This result is statistically significant, but we also want to ask how practically significant it is by looking at the amount of variance accounted for by the model:
+
+```python
+%%R
+
+if (!requireNamespace("MuMIn", quietly = TRUE)) {
+    install.packages("MuMIn")
+}
+
+library(MuMIn)
+r.squaredGLMM(model)
+```
+```r
+            R2m       R2c
+[1,] 0.01068788 0.8775626
+```
+
+For a mixed effect model there are two R-squared values: The *conditional* R-squared (R2c), which refers to the total variance accounted for by both fixed and random effects, and the *marginal* R-squared (R2m) that refers to the variance accounted for by the fixed effects, which is the figure of interest here.  This shows that while the association is strongly statistically significant, semantic similarity only accounts for about 1% of the variability in biological similarity, and thus is not a particularly strong predictor in practice.  The high conditional R-squared demonstrates that the variability in the data is dominated by document-level differences in similarity, such that documents vary in the degree to which they are more generally similar to others on average.
 
 ## Data access
 
@@ -246,7 +969,7 @@ By *original* data I mean data that were obtained by the researcher from another
 
 It is important to ensure that the original data are not modified, either accidentally or intentionally.  This can be achieved by setting the permissions on the files as read-only, though it is important to note that a user with superuser privileges could still make changes to the data.  For this reason, it is also important to store information that allows the validation of each file as matching its original.  This can be easily achieved by computing a *checksum* for each file and storing it separately. A checksum is a mathematical function of the file contents, which changes if any of the data in the file are changed and thus can serve as a "fingerprint" for the file contents:
 
-```bash
+```text
 ➤  echo "file contents" > file1.txt
 ➤  echo "file content" > file2.txt
 ➤  diff file1.txt file2.txt
@@ -514,7 +1237,7 @@ Many forms of data are represented as multidimensional arrays.  For example, man
 ```python
 data.shape
 ```
-```bash
+```text
 (91, 109, 91, 512)
 ```
 
@@ -606,7 +1329,7 @@ for ext in ['npy', 'h5', 'zarr']:
     avg_load_time = (end_time - start_time) / nreps
     print(f"Average loading time for {ext}: {avg_load_time:.6f} seconds")
 ```
-```bash
+```text
 Average loading time for npy: 0.451627 seconds
 Average loading time for h5: 3.138907 seconds
 Average loading time for zarr: 0.745648 seconds
@@ -641,7 +1364,7 @@ G = nx.Graph()
 G.add_edges_from(friends)
 G.edges
 ```
-```bash
+```text
 EdgeView([('Bill', 'Sally'), ('Bill', 'Mark'), ('Bill', 'Elise'), ('Mark', 'Elise'), ('Mark', 'Lisa')])
 ```
 
