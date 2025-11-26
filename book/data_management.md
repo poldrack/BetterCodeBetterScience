@@ -228,12 +228,6 @@ A graph database is built to efficiently store and query graph-structured data. 
 
 A relatively recent entry into the database field is the *vector database*, which is optimized for finding similar numerical vectors.  These have become essential in the context of AI, because they can be used to quickly find similar items that are embedded in a vector space, typically using neural networks.  These items can include text documents, images, molecular structures, or any other kind of data that can be embedded in a vector space.  Vector databases differ in that can return ranked similarity ratings in addition to a discrete set of matches, and thus they are best for performing analyses that involve similarity-based search.
 
-## Data access
-
-Access to research data within a research group should operate by the *Principle of Least Privilege*, which is a general approach to computer security that states that any user should have only enough privileges to perform their intended actions, and no more. While this is most relevant to multi-user systems, it is often relevant even to systems with only a single user. With regard to data access, this principle has two important implications.  First, any particular dataset should be accessible only to users who have permission and need to use those data. Second, if data are meant to be accessed by a user but not modified by that user, then the user should have read-only access to the data.  
-
-Even when a user may have a need to modify data, it often makes sense to set the data as read-only, so that any modifications require an explicit permissions change before the modifications can be made. This can help prevent accidental changes or data deletion, even on a single-user system.
-
 
 ## Managing original data
 
@@ -265,6 +259,13 @@ There are various types of checksums, such as MD5 (used in the example above) or
 Disasters can occur that can render data irretrievable, from a major flood or earthquake to a cup of coffee spilled onto a laptop.  It is essential to maintain a backup of the original data for disaster recovery purposes.  This backup should be located on a system that is geographically separate from the main storage, such as a cloud server.
 
 Many researchers store their data using RAID systems (which stands for "redundant array of independent disks"), which can provide some degree of resilience against disk failure.  Depending on the RAID configuration, these systems can survive the failure of one or more individual disks without data loss. However, storage on a RAID system is not a suitable replacement for backup, as these systems can still fail (e.g. due to a fire or flood that damages multiple disks).  
+
+## Data access
+
+Access to research data within a research group should operate by the *Principle of Least Privilege*, which is a general approach to computer security that states that any user should have only enough privileges to perform their intended actions, and no more. While this is most relevant to multi-user systems, it is often relevant even to systems with only a single user. With regard to data access, this principle has two important implications.  First, any particular dataset should be accessible only to users who have permission and need to use those data. Second, if data are meant to be accessed by a user but not modified by that user, then the user should have read-only access to the data.  
+
+Even when a user may have a need to modify data, it often makes sense to set the data as read-only, so that any modifications require an explicit permissions change before the modifications can be made. This can help prevent accidental changes or data deletion, even on a single-user system.
+
 
 
 ## Data formats and file types
