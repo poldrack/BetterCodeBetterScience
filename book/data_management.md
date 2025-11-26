@@ -506,6 +506,23 @@ ratio 8.77
 
 Here we see that loading the CSV file takes almost 9 times as long as the Parquet file.  For a single file of this size this is not a meaningful difference in times, but for projects involving many files or much larger files the difference in loading times could become a real game-changer.
 
+
+#### Russ's First Law of Tabular Data Management
+
+> "Don't use spreadsheets to manage scientific data."
+
+Spreadsheet software such as Microsoft Excel is commonly used by researchers for all sorts of data management and processing operations.  Why are spreadsheets problematic?
+
+- They encourage manual manipulation of the data, which makes the operations non-reproducible by definition.
+- Spreadsheet tools will often automatically format data, sometimes changing things in important but unwanted ways.  For example, gene names such as "SEPT2" and "MARCH1" are converted to dates by Microsoft Excel, and some accession numbers (e.g. "2310009E13") are converted to floating point numbers.  An analysis of published genomics papers {cite:p}`Ziemann:2016aa` found that roughly twenty percent of supplementary gene lists created using Excel contained errors in gene names due to these conversions.
+- It is very easy to make errors when performing operations on a spreadsheet, and these errors can often go unnoticed.  A well known example occurred in the paper  ["Growth in the time of debt"](https://www.nber.org/papers/w15639) by the prominent economists Carmen Reinhart and Kenneth Rogoff. This paper claimed to have found that high levels of national debt led to decreased economic growth, and was used as a basis for promoting austerity programs after the 2008 financial crisis.  However, [researchers subsequently discovered](https://academic.oup.com/cje/article/38/2/257/1714018) that the authors had made an error in their Excel spreadsheet, excluding data from several countries; when the full data were used, the relationship between growth and debt became much weaker. 
+- Spreadsheet software can sometimes have limitations that can cause problems.  For example, the use of an outdated Microsoft Excel file format (.xls) [caused underreporting of COVID-19 cases](https://www.bbc.com/news/technology-54423988) due to limitations on the number of rows in that file format, and the lack of any warnings when additional rows in the imported data files were ignored.
+- Spreadsheets do not easily lend themselves to version control and change tracking, although some spreadsheet tools (such as Google Sheets) do provide the ability to clearly label versions of the data.
+
+I will occasionally use Microsoft Excel to examine a data file, but I think that spreadsheet tools should *almost never* be used as part of a scientific data workflow.
+
+
+
 ### Multidimensional array data
 
 Many forms of data are represented as multidimensional arrays.  For example, many forms of microscopy data are represented as either two-dimensional (slice) or three-dimensional (volume) arrays, while dynamic imaging modalities are often represented as three- or four-dimensional data, with the first two or three dimensions representing space and the final dimension reflecting time.  Within Python these are generally processed using `numpy`, which efficiently processes large multidimensional arrays.  As an example, I loaded a four-dimensional brain template, where the first three dimensions are spatial and the final dimension reflects 512 different components that define a probabilistic atlas of the brain.  After loading the data into a `numpy` array, we can see its shape:
