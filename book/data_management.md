@@ -254,42 +254,7 @@ In this case, looking at the data we see that several columns contain multiple v
 gwas_data = get_exploded_gwas_data()
 ```
 
-We can now import the data from this data frame into a MongoDB collection, mapping each unique trait to the genes that are reported as being associated with it.  First I generated a separate function that sets up a MongoDB collection:
-
-```python
-def setup_mongo_collection(
-    collection_name,
-    uri=None,
-    db_name='research_database',
-    clear_existing=False,
-):
-    assert (
-        'MONGO_USERNAME' in os.environ and 'MONGO_PASSWORD' in os.environ
-    ), 'MongoDB username and password should be set in .env'
-
-    if uri is None:
-        uri = 'mongodb://localhost:27017'
-
-    # Create a new client and connect to the server
-    client = get_mongo_client(uri)
-
-    # In MongoDB, databases and collections are created lazily (when first document is inserted)
-    db = client[db_name]
-    collection = db[collection_name]
-
-    if clear_existing:
-        collection.drop()
-        print(f'Dropped existing collection: {collection_name}')
-
-    # print the number of documents in the collection
-    print(
-        f'Number of documents in {collection_name}: {collection.count_documents({})}'
-    )
-
-    return collection
-```
-
-We can then use that function to set up our gene set collection:
+We can now import the data from this data frame into a MongoDB collection, mapping each unique trait to the genes that are reported as being associated with it.  First I generated a separate function that sets up a MongoDB collection (see `setup_mongo_collection` [here](src/BetterCodeBetterScience/database.py)).  We can then use that function to set up our gene set collection:
 
 
 ```python
@@ -311,7 +276,7 @@ def import_genesets_by_trait(
     ].to_dict()
 
     # loop through each unique MAPPED_TRAIT_URI in gwas_data data frame 
-    # add all of its gene sets to the mongo collection - don't do the annotation yet
+    # add all of its gene sets to the mongo collection 
     for mapped_trait_uri in tqdm(
         gwas_data_melted['MAPPED_TRAIT_URI'].unique()
     ):
@@ -381,7 +346,7 @@ def annotate_genesets_by_trait() -> None:
                 sources=['GO:BP', 'GO:MF', 'GO:CC', 'KEGG', 'REAC'],
             )
         except Exception as e:
-            # bare except to avoid breaking the loop
+            # catch any exception to avoid breaking the loop
             print(f'Error annotating {mapped_trait_uri}: {e}')
             continue
 
@@ -392,7 +357,7 @@ def annotate_genesets_by_trait() -> None:
             {'mapped_trait_uri': str(mapped_trait_uri)},
             {'$set': {'functional_annotation': annotation_results_dict}},
         )
-    # drop members of geneset_annotations_by_trait with empty functional annotation
+    # drop members of geneset_annotations_by_trait with empty annotation
     geneset_annotations_by_trait.delete_many(
         {'functional_annotation': {'$in': [None, [], {}]}}
     )
@@ -411,6 +376,7 @@ Number of documents in geneset_annotations_by_trait: 3047
 Remaining entries with functional annotation: 1845
 ```
 
+Having now annotated the gene sets with information about their biological functions, we can now move to assessing the similarity of traits based on their associated functions.
 
 ##### Mapping pathway information to traits
 
@@ -483,9 +449,13 @@ def build_neo4j_graph() -> None:
         # Clear DB
         session.run('MATCH (n) DETACH DELETE n')
         
-        # Create Indexes (Newer Neo4j syntax uses CREATE CONSTRAINT FOR ...)
-        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Phenotype) REQUIRE p.id IS UNIQUE')
-        session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Pathway) REQUIRE p.id IS UNIQUE')
+        # Create Indexes
+        session.run((
+          'CREATE CONSTRAINT IF NOT EXISTS FOR (p:Phenotype) '
+          'REQUIRE p.id IS UNIQUE'))
+        session.run(
+          ('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Pathway) '
+          'REQUIRE p.id IS UNIQUE'))
 
         # 1. Batch Import Pathways
         # Fetch all pathways into a list of dicts
@@ -580,7 +550,7 @@ def compute_phenotype_similarities(
 
         # 3. Run Node Similarity
         # We use 'degreeCutoff' to filter out phenotypes with too few pathways 
-        # BEFORE the calculation. This is much faster than filtering the results.
+        # BEFORE the calculation - much faster than filtering the results.
         result = session.run("""
             CALL gds.nodeSimilarity.stream($graph_name, {
                 degreeCutoff: $min_pathways
@@ -612,9 +582,11 @@ def compute_phenotype_similarities(
 similarity_result_df = compute_phenotype_similarities()
 ```
 
+Now that we have the similarity between phenotypes based on their biological functions, we can move on to assessing their similarity based on associated publications.
+
 ##### Obtaining literature related to traits
 
-Next we need to obtain abstracts related to each trait for our literature-mining analysis.  To do this, we first wish to obtain any synonyms for the traits, to maximize the effectiveness of the search.  We can obtain these from the [EBI Ontology Search API](https://www.ebi.ac.uk/ols4/api-docs):
+To assess semantic similarity between traits we need to obtain abstracts related to each trait.  To do this, we first wish to obtain any synonyms for the traits, to maximize the effectiveness of the search.  We can obtain these from the [EBI Ontology Search API](https://www.ebi.ac.uk/ols4/api-docs):
 
 ```python
 COLLECTION_TRAIT_INFO = 'trait_info_by_trait'
@@ -633,7 +605,7 @@ def get_trait_info_from_ols(
         collection_name=COLLECTION_GENESET
     )
 
-    # get all unique trait URIs that are not already in the trait_info_by_trait collection
+    # get all unique trait URIs that are not already in the collection
     # use lstrip because many have a leading space
     unique_trait_uris = [
         i.lstrip()
@@ -687,7 +659,8 @@ def get_pmids_for_traits(
         [('trait_uri', pymongo.ASCENDING)], unique=True
     )
 
-    # get all entries from the trait_info_by_trait collection and pull out the label and synonyms to use as pubmed search terms
+    # get all entries from the trait_info_by_trait collection and pull out 
+    # the label and synonyms to use as pubmed search terms
     trait_info_collection = setup_mongo_collection(COLLECTION_TRAIT_INFO)
     db_result = list(trait_info_collection.find({}))
 
@@ -700,7 +673,7 @@ def get_pmids_for_traits(
         query = ' OR '.join([f'"{term}"' for term in query_terms])
 
         existing_entry = pmid_collection.find_one({'trait_uri': trait_uri})
-        # check if existing entry is not None and skip if pmid entry is not empty
+        # Skip existing entry if pmid entry is not empty
         if (
             existing_entry is not None
             and existing_entry.get('pmids')
@@ -710,20 +683,10 @@ def get_pmids_for_traits(
                 print(f'PMIDs already exist for {lbl}, skipping...')
             continue
         # run pubmed search - retry up to 3 times if it fails
-        for attempt in range(3):
-            try:
-                pmids = run_pubmed_search(query, retmax=n_abstracts_per_trait)
-                break
-            except Exception:   
-                if attempt < 2:
-                    print(
-                        f'PubMed search failed for {trait_uri} (attempt {attempt + 1}/3). Retrying...'
-                    )
-                else:
-                    print(
-                        f'PubMed search failed for {trait_uri} after 3 attempts. Skipping.'
-                    )
-                    pmids = []
+        pmids = run_pubmed_search(query, retmax=n_abstracts_per_trait,
+          max_retries=3)
+        if pmids is None or len(pmids) == 0:
+          continue
         pmid_collection.update_one(
             {'trait_uri': trait_uri},
             {'$set': {'label': lbl, 'pmids': pmids, 'search_query': query}},
@@ -865,6 +828,8 @@ We then compute the vector similarity between the document embeddings associated
 text_similarity_df = compute_text_similarities(similarity_result_df)
 ```
 
+We now have the semantic and biological similarity values for each pair of traits in a single data frame, which we can use for our statistical analysis.
+
 ##### Analyzing and visualizing the results
 
 We can first visualize the relationship between semantic and biological similarity:
@@ -877,7 +842,11 @@ sns.scatterplot(
     alpha=0.5,
     size=1
 )
-plt.title(f'Pathway Similarity vs Text Similarity (r={text_similarity_df["pathway_similarity"].corr(text_similarity_df["text_similarity"]):.2f})')
+corr_value = text_similarity_df["pathway_similarity"].corr(
+    text_similarity_df["text_similarity"])
+plt.title(
+  f'Pathway Similarity vs Text Similarity (r={corr_value:.2f})'
+)
 ```
 
 :::{figure-md} PathwaySimilarity-fig
