@@ -582,7 +582,7 @@ zarr_data[:] = data
 5	/tmp/difumo.zarr
 ```
 
-This shows that Zarr obtains double the compression of HDF5, each using its default compression method; note that it might be possible to get better compression using custom compression methods for each.  We can also compare the time needed to load each of the files; because of the relatively longer loading time for these files, we only perform 10 repetitions in this example:
+This shows that Zarr obtains even more compression than HDF5, each using its default compression method; note that it might be possible to get better compression using custom compression methods for each.  We can also compare the time needed to load each of the files; because of the relatively longer loading time for these files, we only perform 10 repetitions in this example:
 
 ```python
 nreps = 10
@@ -800,9 +800,7 @@ A codebook is meant to be a more human-friendly description of the content of th
 *Variable Information*
 
 - Variable name: crp
-
 - Variable label: High-sensitivity C-reactive protein
-
 - Variable definition: A quantitative measure of C-reactive protein in blood serum.
 
 *Measurement and Coding*
@@ -837,9 +835,9 @@ It is essential to generate data dictionaries and codebooks upon the generation 
 
 Tracking of provenance is non-trivial.  The World Wide Web Consortium (W3C) has developed a framework called [PROV](https://www.w3.org/TR/2013/NOTE-prov-primer-20130430/) which defines a model for the representation of provenance information.  This framework provides an overview of the many features of provenance that one might want to record for an information that is shared online.  The PROV data models defines three main concepts:
 
-- Entities - things that are produced, such as datasets and publications
-- Activities - processes that involve using, generating, or modifying entities
-- Agents - People, organizations, or artifacts (such as computers) that are responsible for activities
+- *Entities*: things that are produced, such as datasets and publications
+- *Activities*: processes that involve using, generating, or modifying entities
+- *Agents*: People, organizations, or artifacts (such as computers) that are responsible for activities
 
 In addition, the model defines a set of relationships between these concepts, as seen in Figure {numref}`Figure {number} <PROV-fig>`:
 
@@ -887,19 +885,24 @@ Deidentification generally involves the removal of specific identifying informat
 
 ```
 (i) The following identifiers of the individual or of relatives, employers, or household members of the individual, are removed:
-
 - (A) Names
 - (B) All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:(1) The geographic unit formed by combining all ZIP codes with the same three initial digits contains more than 20,000 people; and(2) The initial three digits of a ZIP code for all such geographic units containing 20,000 or fewer people is changed to 000
 - (C) All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
-- (D) Telephone numbers(L) Vehicle identifiers and serial numbers, including license plate numbers
-- (E) Fax number
-- (M) Device identifiers and serial numbers
-- (F) Email addresses(N) Web Universal Resource Locators (URLs)
-- (G) Social security numbers(O) Internet Protocol (IP) addresses
-- (H) Medical record numbers(P) Biometric identifiers, including finger and voice prints
-- (I) Health plan beneficiary numbers(Q) Full-face photographs and any comparable images
-- (J) Account numbers(R) Any other unique identifying number, characteristic, or code, except as permitted by paragraph (c) of this section [Paragraph (c) is presented below in the section “Re-identification”]; and
+- (D) Telephone numbers
+- (E) Fax numbers
+- (F) Email addresses
+- (G) Social security numbers
+- (H) Medical record numbers
+- (I) Health plan beneficiary numbers
+- (J) Account numbers
 - (K) Certificate/license numbers
+- (L) Vehicle identifiers and serial numbers, including license plate numbers
+- (M) Device identifiers and serial numbers
+- (N) Web Universal Resource Locators (URLs)
+- (O) Internet Protocol (IP) addresses
+- (P) Biometric identifiers, including finger and voice prints
+- (Q) Full-face photographs and any comparable images
+- (R) Any other unique identifying number, characteristic, or code, except as permitted by paragraph (c) of this section [Paragraph (c) is presented below in the section “Re-identification”]; and
 
 (ii) The covered entity does not have actual knowledge that the information could be used alone or in combination with other information to identify an individual who is a subject of the information.
 ```
