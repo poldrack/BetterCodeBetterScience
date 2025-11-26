@@ -1129,7 +1129,7 @@ As we will discuss in more detail in our later chapter on sharing of research ob
 
 [^1]: Note that the term "license" is often used to describe these data usage agreements, but this terminology is technically inappropriate in jurisdictions such as the U.S. where most data are treated as "facts" and thus are not subject to intellectual property laws (such as copyright laws). 
 
-#### Appendix: An example of database usage
+## Appendix: An example of database usage
 
 Here I will work through an example of a real scientific question using several database systems. I will focus on NoSQL databases, for two reasons:
 
@@ -1145,7 +1145,7 @@ The question that I will ask is as follows: How well can the biological similari
 
 I will not present all of the code for each step; this can be found [here](src/BetterCodeBetterScience/database_example_funcs.py) and [here](src/BetterCodeBetterScience/database.py). Rather, I will show portions that are particularly relevant to the databases being used. 
 
-##### Adding GWAS data to a document store
+### Adding GWAS data to a document store
 
 We start by uploading the GWAS data and adding them to a document store, using *MongoDB*, which I installed on my local machine.   We start by reading the CSV file containing the data.  Looking at those data, we see that they are not properly *normalized*. Normalization is a concept that is essential for relational databases but can also be very helpful for document stores.  We won't go into the details of normalization here (for more, see [here](https://learn.microsoft.com/en-us/troubleshoot/microsoft-365-apps/access/database-normalization-description)); rather, we will simply outline the primary requirements of the *first normal form*, which is the most basic form of normalization.  This requires that:
 
@@ -1214,7 +1214,7 @@ import_genesets_by_trait(gwas_data)
 
 Note that this function uses an *upsert* operation, which is a combination of insertion (if the document with this key doesn't already exist) or updating (if the document with this key already exists).  This results in a collection with 3,047 records, each of which is indexed by the trait identifier and includes a list of all of the genes associated with the trait across the GWAS studies.  We also include the trait names to make the records human-readable, but we rely upon the unique identifiers (which in this case are defined as URLs, such as "http://www.ebi.ac.uk/efo/EFO_0004309" which maps to the trait of "platelet count". 
 
-##### Annotating gene sets
+### Annotating gene sets
 
 Remember that our goal in this analysis is to identify the biological overlap between traits. We could do this by assessing the degree to which they are associated with the same genes, but this would miss out on the fact that genes work together in networks that are often associated with the function of specific biological pathways.  Given a particular set of genes, we can use bioinformatics tools to identify the biological processes that are associated with that set of genes. In this case I used the  [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) tool from ELIXIR, which comes with a handy [Python package](https://pypi.org/project/gprofiler-official/).   This tool returns a set of pathways that are statistically enriched for each gene set, each of which is defined by a unique identifier that refers to a particular ontology such as the Gene Ontology.   For example, the 877 genes associated with the "platelet count" trait are involved in a range of biological processes and pathways, which range from the very general (e.g. GO:0005515, referring to "protein binding") to the very specific (e.g. GO:0007599, referring to "hemostasis", which is the stopping of bleeding).  
 
@@ -1283,7 +1283,7 @@ Remaining entries with functional annotation: 1845
 
 Having now annotated the gene sets with information about their biological functions, we can now move to assessing the similarity of traits based on their associated functions.
 
-##### Mapping pathway information to traits
+### Mapping pathway information to traits
 
 The previous analysis added a `functional annotation` element to each trait, which includes information about the associated pathways. While we could use this collection to obtain the mappings from traits to pathways, the deeply embedded nature of the annotation data would make the queries somewhat complicated.  Next we will use that information to generate a collection including all unique pathways, which we will then use to compute biological similarity between traits:
 
@@ -1333,7 +1333,7 @@ Number of documents in pathways: 0
 ```
 
 
-##### Generate the graph database linking publications pathways to traits
+### Generate the graph database linking publications pathways to traits
 
 Graph databases are designed to store and query relational information, making them perfect for our dataset linking pathways to traits.  In the next step I created a graph database using the Neo4j database package, which involves creating a Neo4j session and then issuing a set of Cyper commands:
 
@@ -1489,7 +1489,7 @@ similarity_result_df = compute_phenotype_similarities()
 
 Now that we have the similarity between phenotypes based on their biological functions, we can move on to assessing their similarity based on associated publications.
 
-##### Obtaining literature related to traits
+### Obtaining literature related to traits
 
 To assess semantic similarity between traits we need to obtain abstracts related to each trait.  To do this, we first wish to obtain any synonyms for the traits, to maximize the effectiveness of the search.  We can obtain these from the [EBI Ontology Search API](https://www.ebi.ac.uk/ols4/api-docs):
 
@@ -1661,7 +1661,7 @@ Fetching 106387 PMIDs...
 
 ```
 
-##### Add documents to vector database
+### Add documents to vector database
 
 We want to use the documents downloaded from Pubmed for each trait to compute the semantic similarity between traits.  This is a good application for a *vector database*, which can ingest documents, embed them into a vector space, which we can then use to perform similarity computations between documents based on their vector embeddings.  We will use ChromaDB which is a popular open-source vector database.  By default ChromaDB uses the *all-MiniLM-L6-v2* embedding model from the [Sentence Transformers](https://www.sbert.net/) package, but we will instead use the more powerful `text-embedding-3-large` via the OpenAI API.
 
@@ -1735,7 +1735,7 @@ text_similarity_df = compute_text_similarities(similarity_result_df)
 
 We now have the semantic and biological similarity values for each pair of traits in a single data frame, which we can use for our statistical analysis.
 
-##### Analyzing and visualizing the results
+### Analyzing and visualizing the results
 
 We can first visualize the relationship between semantic and biological similarity:
 
