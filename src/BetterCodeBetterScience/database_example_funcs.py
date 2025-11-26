@@ -156,7 +156,7 @@ def compute_text_similarities(similarity_result_df: pd.DataFrame) -> pd.DataFram
 
 def build_neo4j_graph() -> None:
     geneset_collection = setup_mongo_collection(COLLECTION_GENESET)
-    pathway_collection = setup_mongo_collection(COLLECTION_PATHWAYS, clear_existing=False)
+    pathway_collection = setup_mongo_collection(COLLECTION_PATHWAYS)
 
     with get_neo4j_session() as session:
         # Clear DB
@@ -187,7 +187,10 @@ def build_neo4j_graph() -> None:
         for doc in geneset_collection.find():
             pheno_id = str(doc['mapped_trait_uri'])
             # Extract list of pathway IDs
-            pathway_ids = [i['native'] for i in doc.get('functional_annotation', []) if 'native' in i]
+            pathway_ids = [
+                i['native'] 
+                for i in doc.get('functional_annotation', []) 
+                if 'native' in i]
             
             if pathway_ids:
                 pheno_batch.append({
@@ -239,11 +242,11 @@ def vectorized_pairwise_similarity(set_a_ids: List[str], set_b_ids: List[str]) -
     return similarity_matrix.mean()
 
 
-def add_pubmed_abstracts_to_chromadb() -> None:
+def add_pubmed_abstracts_to_chromadb(batch_size: int = 5000) -> None:
+
     pubmed_collection = setup_mongo_collection(
         COLLECTION_PUBMED, clear_existing=False
     )
-    pubmed_collection.create_index([('PMID', pymongo.ASCENDING)], unique=True)
 
     collection = get_chromadb_collection()
     # get ids (pmid) and documents (title + abstract) from pubmed_collection
@@ -255,7 +258,7 @@ def add_pubmed_abstracts_to_chromadb() -> None:
         ids.append(str(entry['PMID']))
 
     # exclude ids that are already in the chromadb collection
-    existing_ids = set(collection.get(ids=[]).ids)
+    existing_ids = set(collection.get(include=[])['ids'])
     ids_to_add = []
     documents_to_add = []
     for i, id_ in enumerate(ids):
@@ -301,7 +304,7 @@ def create_gene_info_collection() -> None:
 
 
 def get_pathway_info_by_trait() -> None:
-    # get information about each gene
+    # get information about each pathway
     geneset_collection = setup_mongo_collection(
         COLLECTION_GENESET, clear_existing=False
     )
@@ -450,7 +453,7 @@ def get_unique_pmids_from_trait_collection() -> List[int]:
     return list(set(pmids_to_fetch))  # unique PMIDs
 
 
-def annotate_geneset_annotations_by_trait() -> None:
+def annotate_genesets_by_trait() -> None:
     # loop over all entries in the geneset_annotations_by_trait collection
     # and do functional annotation of the gene sets
 
@@ -545,7 +548,7 @@ def get_trait_info_from_ols(
         )
 
 
-def import_geneset_annotations_by_trait(
+def import_genesets_by_trait(
     gwas_data_melted: pd.DataFrame
 ) -> None:
 
