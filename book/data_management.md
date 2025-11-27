@@ -1175,7 +1175,7 @@ We start by uploading the GWAS data and adding them to a document store, using *
 2) The columns contain scalar values (and thus do not contain composite values such as sets of values)
 3) There are not multiple columns that contain the same kind of data
 
-In this case, looking at the data we see that several columns contain multiple values for genes, due to the fact that some single nucleotide polymorphisms (SNPs) map to multiple genes.  These values separated by commas (e.g. "FADS2, FADS1").  To normalize this, we can *explode* the data frame, which involves separating out these values into separate rows, which have otherwise identical contents.  
+In this case, looking at the data we see that several columns contain multiple values for genes, due to the fact that some single nucleotide polymorphisms (SNPs) are located in intergenic space and thu can be mapped to multiple genes.  These values separated by commas (e.g. "FADS2, FADS1").  To normalize this, we can *explode* the data frame, which involves separating out these values into separate rows, which have otherwise identical contents.  
 
 ```python
 gwas_data = get_exploded_gwas_data()
