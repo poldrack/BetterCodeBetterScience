@@ -19,10 +19,12 @@ import numpy as np
 import json
 import templateflow.api as tflow
 from nilearn.image import resample_to_img
+import pandas as pd
+from scipy.stats import norm, t
 
 dotenv.load_dotenv()
 
-## Download data
+## 1. Download data
 # - the organized data are available from https://zenodo.org/record/3528329/files/narps_origdata_1.0.tgz
 
 assert (
@@ -56,16 +58,8 @@ logdir = basedir / 'logs'
 if not logdir.exists():
     logdir.mkdir(parents=True, exist_ok=True)
 
-## Get info about teams and hypotheses
-## team dirs are in orig, starting with numeric team IDs
 
-teamdirs = sorted(
-    [d for d in origdir.iterdir() if d.is_dir() and d.name[0].isdigit()]
-)
-print(f'Found {len(teamdirs)} team directories.')
-team_dict = {d.name: {'orig': d} for d in teamdirs}
-
-# convert orig data to a BIDS-like organization
+## 2. convert orig data to a BIDS-like organization
 
 overwrite = False
 datadir = basedir / 'data-teams'
@@ -75,9 +69,24 @@ if datadir.exists() and overwrite:
 if not datadir.exists():
     datadir.mkdir(parents=True, exist_ok=True)
 
+# Get info about teams - we will only process data for hypothesis 1 here
+# team dirs are in orig, starting with numeric team IDs
+
+teamdirs = sorted(
+    [d for d in origdir.iterdir() if d.is_dir() and d.name[0].isdigit()]
+)
+print(f'Found {len(teamdirs)} team directories.')
+team_dict = {d.name: {'orig': d} for d in teamdirs}
+
+# we will only process hypothesis 1 for this analysis for the sake of speed
+target_hypothesis = 1
+
+team_id_to_number = {}
+
 for team_id, paths in team_dict.items():
     # only use the team number
     team_id_short = team_id.split('_')[0]
+    team_id_to_number[team_id.split('_')[1]] = team_id_short
     team_orig_dir = paths['orig']
     # include "thresh" to prevent some additional files from being detected
     for type in ['thresh', 'unthresh']:
@@ -92,6 +101,8 @@ for team_id, paths in team_dict.items():
                     f'Unexpected hypothesis number format in file {img_file}, skipping.'
                 )
                 continue
+            if int(hyp) != target_hypothesis:
+                continue
             dest_file = (
                 datadir
                 / f'team-{team_id_short}_hyp-{hyp}_type-{imgtype}_space-native_desc-orig_stat.nii.gz'
@@ -103,7 +114,7 @@ for team_id, paths in team_dict.items():
             assert parse_bids_filename(dest_file)['hyp'] == hyp
             assert parse_bids_filename(dest_file)['type'] == imgtype
 
-# QC to identify bad data and move them to excluded data dir
+## 3. QC to identify bad data and move them to excluded data dir
 # look for:
 #  - different image dimensions or affine between thresh and unthresh images for a given team/hyp
 # - missing thresholded images
@@ -169,6 +180,9 @@ for unthresh_img_path in unthresh_images:
     # check for min_p_direction > error_thresh
     result['n_thresh_vox'] = int(n_thresh_vox)
 
+    # decide whether to rectify based on in-mask values
+    # and info from researcher survey
+
     if n_thresh_vox > 0:
         masker = NiftiMasker(mask_img=thresh_img)
         masker.fit()
@@ -203,11 +217,9 @@ with open(logdir / 'qc_log.json', 'w') as f:
     json.dump(qc_results, f, indent=4)
 
 
-# - Get binarized thresholded maps (narps.get_binarized_thresh_masks())
-#     - input: thresholded original image
-#     - output: binarized version
-
-# Create binarized versions of thresholded images
+## 4 - Get binarized thresholded maps 
+# some thresholded masks have continuous values, so we will binarize 
+# them at a small threshold (1e-4)
 
 print('Creating binarized images...')
 thresh_images_to_binarize = find_bids_files(
@@ -244,10 +256,10 @@ with open(logdir / 'binarization_log.json', 'w') as f:
     json.dump(results, f, indent=4)
 
 
-# - Create rectified images - narps.create_rectified_images()
-#     - input: original image (thresh and unthresh versions)
-#     - output: rectified images for reverse contrasts
-#     - NOTE: see logic within get_binarized_thresh_masks
+# 5 - Create rectified images 
+# some unthresh images need to be rectified (i.e. multiplied by -1)
+# so that they match the hypothesis
+# we infer this based on the match between thresh and unthresh images
 
 print('Creating rectified images...')
 results = {}
@@ -282,15 +294,13 @@ for unthresh_img_path, values in qc_results.items():
     )
     rectified_img.to_filename(str(output_path))
 
-    results[str(unthresh_img_path)] = result
+    results[str(output_path)] = result
 
 with open(logdir / 'rectification_log.json', 'w') as f:
     json.dump(qc_results, f, indent=4)
 
 
-# - Get resampled images (narps.get_resampled_images())
-#     - input: all image types (thresh, bin, unthresh)
-#     - output: resampled image in MNI space
+## 6:  Get resampled images
 
 ## first get MNI152NLin2009cAsym template from templateflow
 mni_template = tflow.get(
@@ -348,22 +358,122 @@ for img_path in all_images_to_resample:
 with open(logdir / 'resampling_log.json', 'w') as f:
     json.dump(results, f, indent=4)
 
+## 7: convert concatenated unthresh image to z scores
+# some teams provided t instead of z scores
 
-# - Create concatenated versions of all images - narps.create_concat_imag
-#     - input: individual 3d images
-#     - output: combined 4d images for each image type
+
+def TtoZ(data, df=54):
+    """
+    takes a nibabel file object and converts from z to t
+    using Hughett's transform
+    adapted from:
+    https://github.com/vsoch/TtoZ/blob/master/TtoZ/scripts.py
+    - default to 54 which is full sample per condition for narps
+    """
+
+    # Select just the nonzero voxels
+    nonzero_vox = data != 0
+    nonzero = data[nonzero_vox]
+
+    # We will store our results here
+    Z = np.zeros(len(nonzero))
+
+    # Select values less than or == 0, and greater than zero
+    c = np.zeros(len(nonzero))
+    k1 = nonzero <= c
+    k2 = nonzero > c
+
+    # Subset the data into two sets
+    t1 = nonzero[k1]
+    t2 = nonzero[k2]
+
+    # Calculate p values for <=0
+    p_values_t1 = t.cdf(t1, df=df)
+    z_values_t1 = norm.ppf(p_values_t1)
+
+    # Calculate p values for > 0
+    p_values_t2 = t.cdf(-t2, df=df)
+    z_values_t2 = -norm.ppf(p_values_t2)
+    Z[k1] = z_values_t1
+    Z[k2] = z_values_t2
+
+    # Write new image to file
+    new_nii = np.zeros(data.shape)
+    new_nii[nonzero_vox] = Z
+
+    return new_nii
+
+
+print('Converting unthresh images to z-scores...')
+
+# first load the spreadsheet to get the stats types
+stats_types_df = pd.read_csv(
+    origdir / 'narps_neurovault_images_details_responses_corrected.csv'
+        ) #.set_index('team_id')
+stats_types_df.columns = [
+    'Timestamp', 'team_id', 'software',
+    'unthresh_type', 'thresh_type',
+    'template', 'h5', 'h6', 'h9', 'comments']
+stats_types_df['team_number'] = [
+    team_id_to_number.get(tid, None) for tid in stats_types_df['team_id']]
+
+stat_type_by_team = {}
+for _, row in stats_types_df.iterrows():
+    team_number = row['team_number']
+    if 't value' in row['unthresh_type'].strip().lower():
+        stat_type_by_team[team_number] = 't'
+    else:
+        # default to z if unsure - i.e. no conversion
+        stat_type_by_team[team_number] = 'z'
+
+for team, stattype in stat_type_by_team.items():
+    team_unthresh_images = find_bids_files(
+        datadir, team=team,type='unthresh', space='MNI152NLin2009cAsym', desc='rectified'
+    )
+    if len(team_unthresh_images) == 0:
+        continue
+    if len(team_unthresh_images) > 1:
+        print(f'Warning: multiple unthresh images found for team {team}, using first one.')
+    unthresh_img_path = team_unthresh_images[0]
+    output_path = Path(
+        modify_bids_filename(
+            unthresh_img_path, suffix='zstat'
+        )
+    )
+    if output_path.exists() and not overwrite:
+        continue
+    unthresh_img = nib.load(str(unthresh_img_path))
+    unthresh_data = unthresh_img.get_fdata()
+    converted = False
+    if stattype == 't':
+        unthresh_data = TtoZ(unthresh_data, df=54)
+        converted = True
+    zstat_img = nib.Nifti1Image(
+        unthresh_data, unthresh_img.affine, unthresh_img.header
+    )
+    zstat_img.to_filename(str(output_path))
+    results[str(output_path)] = {
+        'infile': str(unthresh_img_path),
+        'original_stat_type': stattype,
+    }
+
+with open(logdir / 't_to_z_log.json', 'w') as f:
+    json.dump(results, f, indent=4)
+
+## 8: Create concatenated versions of all images 
 
 concat_dir = basedir / 'data-concat'
 if not concat_dir.exists():
     concat_dir.mkdir(parents=True, exist_ok=True)
 
 results = {}
-for hyp in range(1, 10):
+for hyp in [target_hypothesis]:
     print(f'Creating concatenated images for hypothesis {hyp}...')
 
     resampled_images = {
         'unthresh': find_bids_files(
-            datadir, type='unthresh', space='MNI152NLin2009cAsym', hyp=str(hyp)
+            datadir, type='unthresh', space='MNI152NLin2009cAsym', hyp=str(hyp),
+            suffix='zstat'
         ),
         'thresh': [],
     }
@@ -385,12 +495,13 @@ for hyp in range(1, 10):
         f'Found {len(team_ids)} unthresh resampled images to concatenate for hypothesis {hyp}.'
     )
 
-    suffix_dict = {'unthresh': 'stat', 'thresh': 'mask'}
+    suffix_dict = {'unthresh': 'zstat', 'thresh': 'mask'}
     for imgtype in ['unthresh', 'thresh']:
         img_list = []
         for img_path in resampled_images[imgtype]:
             img = nib.load(str(img_path))
             img_list.append(img)
+            img_paths = [p.as_posix() for p in resampled_images[imgtype]]
         # concatenate along 4th dimension
         concat_img = nilearn.image.concat_imgs(img_list)
 
@@ -402,7 +513,8 @@ for hyp in range(1, 10):
         print(
             f'Saved concatenated {imgtype} image for hypothesis {hyp} to {output_path}'
         )
-        results[str(output_path)] = {'team_ids': team_ids}
+        results[str(output_path)] = {'infiles': img_paths}
 
 with open(logdir / 'concatenation_log.json', 'w') as f:
     json.dump(results, f, indent=4)
+
