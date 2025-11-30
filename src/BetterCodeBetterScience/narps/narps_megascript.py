@@ -217,8 +217,8 @@ with open(logdir / 'qc_log.json', 'w') as f:
     json.dump(qc_results, f, indent=4)
 
 
-## 4 - Get binarized thresholded maps 
-# some thresholded masks have continuous values, so we will binarize 
+## 4 - Get binarized thresholded maps
+# some thresholded masks have continuous values, so we will binarize
 # them at a small threshold (1e-4)
 
 print('Creating binarized images...')
@@ -256,7 +256,7 @@ with open(logdir / 'binarization_log.json', 'w') as f:
     json.dump(results, f, indent=4)
 
 
-# 5 - Create rectified images 
+# 5 - Create rectified images
 # some unthresh images need to be rectified (i.e. multiplied by -1)
 # so that they match the hypothesis
 # we infer this based on the match between thresh and unthresh images
@@ -409,13 +409,22 @@ print('Converting unthresh images to z-scores...')
 # first load the spreadsheet to get the stats types
 stats_types_df = pd.read_csv(
     origdir / 'narps_neurovault_images_details_responses_corrected.csv'
-        ) #.set_index('team_id')
+)   # .set_index('team_id')
 stats_types_df.columns = [
-    'Timestamp', 'team_id', 'software',
-    'unthresh_type', 'thresh_type',
-    'template', 'h5', 'h6', 'h9', 'comments']
+    'Timestamp',
+    'team_id',
+    'software',
+    'unthresh_type',
+    'thresh_type',
+    'template',
+    'h5',
+    'h6',
+    'h9',
+    'comments',
+]
 stats_types_df['team_number'] = [
-    team_id_to_number.get(tid, None) for tid in stats_types_df['team_id']]
+    team_id_to_number.get(tid, None) for tid in stats_types_df['team_id']
+]
 
 stat_type_by_team = {}
 for _, row in stats_types_df.iterrows():
@@ -428,18 +437,20 @@ for _, row in stats_types_df.iterrows():
 
 for team, stattype in stat_type_by_team.items():
     team_unthresh_images = find_bids_files(
-        datadir, team=team,type='unthresh', space='MNI152NLin2009cAsym', desc='rectified'
+        datadir,
+        team=team,
+        type='unthresh',
+        space='MNI152NLin2009cAsym',
+        desc='rectified',
     )
     if len(team_unthresh_images) == 0:
         continue
     if len(team_unthresh_images) > 1:
-        print(f'Warning: multiple unthresh images found for team {team}, using first one.')
-    unthresh_img_path = team_unthresh_images[0]
-    output_path = Path(
-        modify_bids_filename(
-            unthresh_img_path, suffix='zstat'
+        print(
+            f'Warning: multiple unthresh images found for team {team}, using first one.'
         )
-    )
+    unthresh_img_path = team_unthresh_images[0]
+    output_path = Path(modify_bids_filename(unthresh_img_path, suffix='zstat'))
     if output_path.exists() and not overwrite:
         continue
     unthresh_img = nib.load(str(unthresh_img_path))
@@ -460,7 +471,7 @@ for team, stattype in stat_type_by_team.items():
 with open(logdir / 't_to_z_log.json', 'w') as f:
     json.dump(results, f, indent=4)
 
-## 8: Create concatenated versions of all images 
+## 8: Create concatenated versions of all images
 
 concat_dir = basedir / 'data-concat'
 if not concat_dir.exists():
@@ -472,8 +483,11 @@ for hyp in [target_hypothesis]:
 
     resampled_images = {
         'unthresh': find_bids_files(
-            datadir, type='unthresh', space='MNI152NLin2009cAsym', hyp=str(hyp),
-            suffix='zstat'
+            datadir,
+            type='unthresh',
+            space='MNI152NLin2009cAsym',
+            hyp=str(hyp),
+            suffix='zstat',
         ),
         'thresh': [],
     }
@@ -517,4 +531,3 @@ for hyp in [target_hypothesis]:
 
 with open(logdir / 'concatenation_log.json', 'w') as f:
     json.dump(results, f, indent=4)
-
