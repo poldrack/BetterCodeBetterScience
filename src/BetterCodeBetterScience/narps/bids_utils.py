@@ -130,9 +130,14 @@ def modify_bids_filename(filename: Union[str, Path], **bids_tags) -> Union[str, 
             ordered_pairs.append((key, value))
             existing_keys.add(key)
     
-    # Add any new keys from bids_tags that weren't in original
+    # Check if suffix should be modified
+    if 'suffix' in bids_tags:
+        suffix = bids_tags['suffix']
+        existing_keys.add('suffix')
+    
+    # Add any new keys from bids_tags that weren't in original (except suffix)
     for key, value in bids_tags.items():
-        if key not in existing_keys:
+        if key not in existing_keys and key != 'suffix':
             ordered_pairs.append((key, value))
     
     # Reconstruct filename maintaining order
