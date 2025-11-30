@@ -1,4 +1,5 @@
 # New Words
+ttests
 pheno
 tsim
 keepdims
