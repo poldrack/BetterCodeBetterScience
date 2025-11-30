@@ -367,6 +367,25 @@ def test_modify_bids_filename_preserve_suffix():
     assert result.endswith("_bold.nii.gz")
 
 
+def test_modify_bids_filename_change_suffix():
+    """Test changing the suffix."""
+    original = "sub-01_task-rest_bold.nii.gz"
+    result = modify_bids_filename(original, suffix="T1w")
+    
+    # Suffix should be at the end, not as suffix-value
+    assert result == "sub-01_task-rest_T1w.nii.gz"
+    assert "suffix-" not in result
+
+
+def test_modify_bids_filename_change_suffix_and_tags():
+    """Test changing both suffix and other tags."""
+    original = "sub-01_task-rest_bold.nii.gz"
+    result = modify_bids_filename(original, task="memory", suffix="T1w")
+    
+    assert result == "sub-01_task-memory_T1w.nii.gz"
+    assert "suffix-" not in result
+
+
 def test_modify_bids_filename_complex_modification():
     """Test complex modification with many changes."""
     original = "sub-01_ses-01_task-rest_acq-mb_bold.nii.gz"
