@@ -12,7 +12,7 @@ chapters:
 - file: project_organization
 # - file: validation
 # - file: performance
-# - file: data_management
+- file: data_management
 # - file: workflows
 # - file: HPC
 # - file: sharing
