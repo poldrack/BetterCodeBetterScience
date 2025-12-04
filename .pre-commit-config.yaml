@@ -5,4 +5,5 @@ repos:
     - id: codespell
       additional_dependencies:
         - tomli
-      exclude: '\.html$'
+      files: ^.*\.(py|md|)$
+      args: ["--ignore-words", "project-words.txt" ]

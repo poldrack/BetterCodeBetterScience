@@ -47,3 +47,18 @@ A rendered version of the complete book is available at [https://poldrack.github
 - Workflow Management
 - High-Performance Computing
 - Sharing Research Objects
+
+
+## Setup to run code
+
+### Database examples
+
+The examples in Chapter 7 require several database systems to be installed. 
+
+#### Mongodb
+
+Install: https://www.mongodb.com/docs/v7.0/administration/install-community/
+
+#### Neo4j
+
+Install: https://neo4j.com/docs/operations-manual/current/installation/
