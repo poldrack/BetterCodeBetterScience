@@ -67,10 +67,10 @@ build-backend = "hatchling.build"
 
 [tool.codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = './book/transcripts,./book/_build/html,.js*,.git*,*.lock,*.bib,.venv*'
+skip = './book/transcripts,./book/_build/html,.js*,.git*,*.lock,*.bib,.venv*,*.ipynb,*.json'
 check-hidden = true
 ignore-regex = '\b(BLOSUM|Shapin)\b'
-# ignore-words-list = ''
+ignore-words = 'project-words.txt'
 
 [tool.pytest.ini_options]
 markers = [

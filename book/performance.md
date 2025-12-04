@@ -88,7 +88,7 @@ def find_duplicates_counter(lst):
 
 ```
 
-That's about a 36% speedup, which is much less than we got moving from our poor algorithm to the better one, but it could be signficant if working with big data, and it also makes for cleaner code.  In general, built-in functions will be faster than hand-written ones as well as being better-tested, so it's always a good idea to use an existing solution if it exists.  Fortunately AI assistants are quite good at recommending optimized versions of code.
+That's about a 36% speedup, which is much less than we got moving from our poor algorithm to the better one, but it could be significant if working with big data, and it also makes for cleaner code.  In general, built-in functions will be faster than hand-written ones as well as being better-tested, so it's always a good idea to use an existing solution if it exists.  Fortunately AI assistants are quite good at recommending optimized versions of code.
 
 
 ### Slow operations in Pandas
@@ -209,5 +209,5 @@ For data-intensive workflows, especially when the data are too large to fit comp
 ## A brief introduction to parallelism and multithreading
 
 
-## Writing paralellized code
+## Writing parallelized code
 
