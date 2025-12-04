@@ -210,6 +210,10 @@ One important feature of a relational databases is that they generally implement
 
 The adherence of relational database systems to these principles helps ensure the integrity of scientific data, in comparison to the use of flat files which do not necessarily achieve these goals.
 
+##### Analytic databases
+
+There is a particular kind of relational database known as an *analytic database* that is specialized for operations that work across many rows in the database, rather than the focus on individual records in a standard relational database.  One widely-used analytic database in the Python ecosystem is [DuckDB](https://duckdb.org/), which supports very fast operations on large datasets, and integrates well with Pandas and other tools. Unlike traditional relational database systems, it doesn't require any specialized server setup.
+
 #### NoSQL databases
 
 While relational databases were the only game in town for many years, there are now a number of other kinds of database, collectively referred to as *NoSQL* databases because they use non-relational data models (like documents, graphs, or key-value pairs) rather than the tables with fixed schemas that define a standard relational database.  Each of these can be very useful for specific problems that match the database's strengths. Some, but not all, NoSQL databases are ACID compliant.  It's important to ensure that one has the right safeguards in place when using a non-compliant database system.
