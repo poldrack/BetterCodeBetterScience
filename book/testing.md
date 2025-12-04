@@ -584,7 +584,7 @@ src/codingforscience/simple_testing/test_distance.py . [ 16%]
 If we are going to rely upon AI tools to generate our tests, we need to be sure that the tests are correct.
 One of my early forays into AI-driven test generation uncovered an interesting example of how this can go wrong.
 
-In our early project that examined the performance of GPT-4 for coding {cite:p}`Poldrack:2023aa`, one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.
+In our early project that examined the performance of GPT-4 for coding [@Poldrack:2023aa], one of the analyses that we performed first asked GPT-4 to do was to generate a set of functions related to common problems in several scientific domains, and then to generate tests to make sure that the function performed correctly.
 One of the functions that was generated was the escape velocity function shown above, for which GPT-4 generated the [following test](https://github.com/poldrack/ai-coding-experiments/blob/main/data/conceptual_prompting/testdirs/conceptual_prompting06/test_answer.py):
 
 
