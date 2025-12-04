@@ -329,3 +329,12 @@ Found 422 publications containing Memory in the title
 One very nice feature of the document store is that not all records have to have the same keys; this provides a great deal of flexibility at data ingestion.  However, too much heterogeneity between documents can make the database hard to work with.  One benefit of homogeneity in the document structure is that it allows indexing, which can greatly increase the speed of queries in large document stores.  For example, if we know that we will often want to search by the `year` field, then we can add an index for this field:
 
 *MORE HERE*
+
+
+### NARPS
+
+The example comes from a paper that we published in 2020 {cite:p}`Botvinik-Nezer:2020aa`, which involved analysis of data from a large study called the Neuroimaging Analysis Replication and Prediction Study (hereafter *NARPS* for short).  The goal of this study was to identify how the results of data analysis varied between different research groups when given the same data.  A relatively large neuroimaging dataset was collected and distributed to groups of researchers, who were asked to test a set of nine hypotheses about brain activity in relation to a monetary gambling task that the participants performed during MRI scanning.  Seventy teams submitted results, which included their answers to the 9 yes/no hypotheses along with a detailed description of their analysis workflow and a number of outputs from intermediate stages of the analysis. The main finding was that there was a striking amount of variability in the results between teams, even though the raw data were identical.
+
+The workflow that I will use here starts with the results that the teams submitted, and ends with preprocessed data that are ready for further statistical analysis.  I wrote much of the original analysis code for the project, which can be found [here](https://github.com/poldrack/narps).  This code was written at the point when I was just becoming interested in software engineering practices for science, and while it represents a first step in that direction, it has *a lot* of problems. In particular, it uses the problematic *God object* anti-pattern that I mentioned in an earlier chapter.  For the purposes of this chapter I have first rewritten the analysis into a monolithic mega-script, which I will then incrementally refactor into a well-structured workflow.  I chose this example because it is relatively complex yet runs quickly on any modern laptop.  
+
+

@@ -30,15 +30,18 @@ Finally, we care about the *efficiency* of the workflow implementation. This inc
 
 It's worth noting that these different desiderata will sometimes conflict with one another (such as configurability versus maintainability), and that no workflow will be perfect.  
 
+## An example workflow
+
+In this chapter I will use a running example to show how to move from a monolithic analysis script to a well-structured and usable workflow that meets most of the desired features outlined above.  
 
 
-### Breaking a workflow into stages
+## Breaking a workflow into stages
 
 good breakpoints between workflow modules include:
 
 - conceptual logic - different stages do different things 
 - points where one might need to restart the computation (e.g. due to computational cost)
-- sections where one might wish to swap in a new method
+- sections where one might wish to swap in a new method or different parameterization
 - points where the output could be reusable elsewhere
 
 the workflow should be stateless when possible

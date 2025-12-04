@@ -60,6 +60,7 @@ dependencies = [
     "statsmodels>=0.14.5",
     "blue>=0.9.1",
     "nilearn>=0.12.1",
+    "fmriprep-docker>=25.2.3",
 ]
 
 [build-system]
