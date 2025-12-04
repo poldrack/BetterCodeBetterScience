@@ -1,7 +1,5 @@
 # Software testing
 
-```{contents}
-```
 
 Tests define the expected behavior of code, and detect when the code doesn't match that expected behavior.
 

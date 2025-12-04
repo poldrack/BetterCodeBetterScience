@@ -1,8 +1,5 @@
 # Coding with AI
 
-```{contents}
-```
-
 ## Using AI coding assistants
 
 The advent of AI coding assistants based on large language models (LLMs) has fundamentally changed the landscape of computer programming.
