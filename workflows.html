@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Better Code, Better Science &#8212; Better Code, Better Science</title>
+    <title>Workflow Management &#8212; Better Code, Better Science</title>
   
   
   
@@ -59,10 +59,9 @@
     <script src="_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'frontmatter';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'workflows';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="introduction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -145,7 +144,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="frontmatter.html">
   
   
   
@@ -170,8 +169,8 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="frontmatter.html">
                     Better Code, Better Science
                 </a>
             </li>
@@ -256,7 +255,7 @@
       
       
       
-      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Ffrontmatter.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Fworkflows.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -286,7 +285,7 @@
       
       
       
-      <li><a href="_sources/frontmatter.md" target="_blank"
+      <li><a href="_sources/workflows.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -370,7 +369,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Better Code, Better Science</h1>
+    <h1>Workflow Management</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -380,12 +379,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#improving-scientific-reproducibility-using-ai-assisted-coding">Improving scientific reproducibility using AI-assisted coding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#table-of-contents">Table of Contents</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgements">Acknowledgements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-to-the-book">Contributing to the book</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#russ-s-first-law-of-scientific-data-management">Russ’s First Law of Scientific Data Management</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-workflow-management-with-makefiles">Simple workflow management with Makefiles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-management-systems-for-complex-workflows">Workflow management systems for complex workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-workflow-management-system-from-scratch">Building a workflow management system from scratch</a></li>
 </ul>
             </nav>
         </div>
@@ -397,37 +394,35 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="better-code-better-science">
-<h1>Better Code, Better Science<a class="headerlink" href="#better-code-better-science" title="Permalink to this heading">#</a></h1>
-<section id="improving-scientific-reproducibility-using-ai-assisted-coding">
-<h2>Improving scientific reproducibility using AI-assisted coding<a class="headerlink" href="#improving-scientific-reproducibility-using-ai-assisted-coding" title="Permalink to this heading">#</a></h2>
-<p>By Russell A. Poldrack, Stanford University</p>
-<p>Making science more reproducible and transparent is key to improving public trust in science.  Because science is increasingly a computational enterprise, improving the quality of scientific research code is essential to making science more reproducible. Increasingly, this code is being written with the help of AI assistants, which can increase productivity but introduces the potential for errors.  This book will provide a thorough guide to using AI-assisted coding techniques to generate scientific code that is readable and robust and that can provide reproducible answers to scientific questions.</p>
-<p>The book is licensed according to the <a class="reference external" href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Generic (CC BY-NC 4.0) License</a>. Please see the terms of that license for more details.</p>
-</section>
-<section id="table-of-contents">
-<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="essential_tools_and_techniques.html">Essential tools and techniques</a></li>
-<li class="toctree-l1"><a class="reference internal" href="software_engineering.html">Principles of software engineering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">Software testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AI_coding_assistants.html">Coding with AI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="project_organization.html">Project structure and management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_management.html">Data Organization and Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+  <section class="tex2jax_ignore mathjax_ignore" id="workflow-management">
+<h1>Workflow Management<a class="headerlink" href="#workflow-management" title="Permalink to this heading">#</a></h1>
+<ul class="simple">
+<li><p>discuss fit-transform model somewhere</p></li>
 </ul>
-</div>
-<section id="acknowledgements">
-<h3>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this heading">#</a></h3>
-<p>I’d like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  <a class="reference external" href="https://github.com/giorgioarcara">Giorgio Arcara</a>, <a class="reference external" href="https://github.com/stebo85">Steffen Bollman</a>, <a class="reference external" href="https://github.com/jwbuckholtz">Joshua Buckholtz</a>, <a class="reference external" href="https://github.com/grantsrb/">Satchel Grant</a>, <a class="reference external" href="https://github.com/yarikoptic">Yaroslav Halchenko</a>, and <a class="reference external" href="https://github.com/jmumford">Jeanette Mumford</a>.</p>
+<p><a class="reference external" href="https://workflowhub.eu/">https://workflowhub.eu/</a></p>
+<section id="russ-s-first-law-of-scientific-data-management">
+<h2>Russ’s First Law of Scientific Data Management<a class="headerlink" href="#russ-s-first-law-of-scientific-data-management" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><p>“Don’t use spreadsheets to manage scientific data.”</p>
+</div></blockquote>
+<p>In this chapter I will talk in detail about best practices for data management, but I start by discussing a data management “anti-pattern”, which is the use of spreadsheets for data management.  Spreadsheet software such as Microsoft Excel is commonly used by researchers for all sorts of data management and processing operations.  Why are spreadsheets problematic?</p>
+<ul class="simple">
+<li><p>They encourage manual manipulation of the data, which makes the operations non-reproducible by definition.</p></li>
+<li><p>Spreadsheet tools will often automatically format data, sometimes changing things in important but unwanted ways.  For example, gene names such as “SEPT2” and “MARCH1” are converted to dates by Microsoft Excel, and some accession numbers (e.g. “2310009E13”) are converted to floating point numbers.  An analysis of published genomics papers <span id="id1">[<a class="reference internal" href="bibliography.html#id7" title="Mark Ziemann, Yotam Eren, and Assam El-Osta. Gene name errors are widespread in the scientific literature. Genome Biol, 17(1):177, Aug 2016. doi:10.1186/s13059-016-1044-7.">Ziemann <em>et al.</em>, 2016</a>]</span> found that roughly twenty percent of supplementary gene lists created using Excel contained errors in gene names due to these conversions.</p></li>
+<li><p>It is very easy to make errors when performing operations on a spreadsheet, and these errors can often go unnoticed.  A well known example occurred in the paper  <a class="reference external" href="https://www.nber.org/papers/w15639">“Growth in the time of debt”</a> by the prominent economists Carmen Reinhart and Kenneth Rogoff. This paper claimed to have found that high levels of national debt led to decreased economic growth, and was used as a basis for promoting austerity programs after the 2008 financial crisis.  However, <a class="reference external" href="https://academic.oup.com/cje/article/38/2/257/1714018">researchers subsequently discovered</a> that the authors had made an error in their Excel spreadsheet, excluding data from several countries; when the full data were used, the relationship between growth and debt became much weaker.</p></li>
+<li><p>Spreadsheet software can sometimes have limitations that can cause problems.  For example, the use of an outdated Microsoft Excel file format (.xls) <a class="reference external" href="https://www.bbc.com/news/technology-54423988">caused underreporting of COVID-19 cases</a> due to limitations on the number of rows in that file format, and the lack of any warnings when additional rows in the imported data files were ignored.</p></li>
+<li><p>Spreadsheets do not easily lend themselves to version control and change tracking, although some spreadsheet tools (such as Google Sheets) do provide the ability to clearly label versions of the data.</p></li>
+</ul>
+<p>I will occasionally use Microsoft Excel to examine a data file, but I think that spreadsheet tools should <em>never</em> be used as part of a scientific data workflow.</p>
 </section>
-<section id="contributing-to-the-book">
-<h3>Contributing to the book<a class="headerlink" href="#contributing-to-the-book" title="Permalink to this heading">#</a></h3>
-<p>This book is meant to be a living open-source document, with the source available online at <a class="github reference external" href="https://github.com/poldrack/BetterCodeBetterScience">poldrack/BetterCodeBetterScience</a>. If you find any errors in the book or want to make a suggestion for how to improve it, please open an issue on the GitHub site. Even better, submit a pull request with your suggested changes!</p>
-<p>See the <a class="reference external" href="https://github.com/poldrack/BetterCodeBetterScience/blob/main/CONTRIBUTING.md">Contributors’ Guide</a> on GitHub for more details about contributing to the book.</p>
+<section id="simple-workflow-management-with-makefiles">
+<h2>Simple workflow management with Makefiles<a class="headerlink" href="#simple-workflow-management-with-makefiles" title="Permalink to this heading">#</a></h2>
 </section>
+<section id="workflow-management-systems-for-complex-workflows">
+<h2>Workflow management systems for complex workflows<a class="headerlink" href="#workflow-management-systems-for-complex-workflows" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="building-a-workflow-management-system-from-scratch">
+<h2>Building a workflow management system from scratch<a class="headerlink" href="#building-a-workflow-management-system-from-scratch" title="Permalink to this heading">#</a></h2>
 </section>
 </section>
 
@@ -461,15 +456,6 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="right-next"
-       href="introduction.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Introduction</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -486,12 +472,10 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#improving-scientific-reproducibility-using-ai-assisted-coding">Improving scientific reproducibility using AI-assisted coding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#table-of-contents">Table of Contents</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgements">Acknowledgements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-to-the-book">Contributing to the book</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#russ-s-first-law-of-scientific-data-management">Russ’s First Law of Scientific Data Management</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-workflow-management-with-makefiles">Simple workflow management with Makefiles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-management-systems-for-complex-workflows">Workflow management systems for complex workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-workflow-management-system-from-scratch">Building a workflow management system from scratch</a></li>
 </ul>
   </nav></div>
 

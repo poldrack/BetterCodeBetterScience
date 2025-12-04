@@ -1,0 +1,752 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Optimizing performance &#8212; Better Code, Better Science</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'performance';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="frontmatter.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Better Code, Better Science</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="frontmatter.html">
+                    Better Code, Better Science
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="essential_tools_and_techniques.html">Essential tools and techniques</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_engineering.html">Principles of software engineering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Software testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AI_coding_assistants.html">Coding with AI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project_organization.html">Project structure and management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_management.html">Data Organization and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/poldrack/BetterCodeBetterScience/issues/new?title=Issue%20on%20page%20%2Fperformance.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/performance.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Optimizing performance</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#avoiding-premature-optimization">Avoiding premature optimization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tradeoffs-in-code-optimization">Tradeoffs in code optimization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-brief-introduction-to-computational-complexity">A brief introduction to computational complexity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-profiling">Code profiling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-sources-of-slow-code-execution">Common sources of slow code execution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-algorithm">Slow algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-operations-in-pandas">Slow operations in Pandas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-suboptimal-object-types">Use of suboptimal object types</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unnecessary-looping">Unnecessary looping</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#suboptimal-api-usage">Suboptimal API usage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-i-o">Slow I/O</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#just-in-time-compilation-with-numba">Just-in-time compilation with Numba</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-einstein-operators">Using Einstein operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-brief-introduction-to-parallelism-and-multithreading">A brief introduction to parallelism and multithreading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-parallelized-code">Writing parallelized code</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="optimizing-performance">
+<h1>Optimizing performance<a class="headerlink" href="#optimizing-performance" title="Permalink to this heading">#</a></h1>
+<section id="avoiding-premature-optimization">
+<h2>Avoiding premature optimization<a class="headerlink" href="#avoiding-premature-optimization" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><p>The real problem is that programmers have spent far too much time worrying about efficiency in the wrong places and at the wrong times; premature optimization is the root of all evil (or at least most of it) in programming. - Donald Knuth</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>often it takes less time to throw more compute at the problem than it does to optimize the code.</p></li>
+</ul>
+</section>
+<section id="tradeoffs-in-code-optimization">
+<h2>Tradeoffs in code optimization<a class="headerlink" href="#tradeoffs-in-code-optimization" title="Permalink to this heading">#</a></h2>
+<p>In their book <em>The Elements of Programming Style</em>, <span id="id1">Kernighan and Plauger [<a class="reference internal" href="bibliography.html#id9" title="Brian W Kernighan and P. J. Plauger. The elements of programming style. McGraw-Hill, New York, 2d ed edition, 1978. ISBN 0070342075.">1978</a>]</span> proposed a set of organizing principles for optimization of existing code, which highlight the tradeoffs involved in optimization:</p>
+<ul class="simple">
+<li><p>“Make it right before you make it faster”</p></li>
+<li><p>“Make it clear before you make it faster”</p></li>
+<li><p>“Keep it right when you make it faster”</p></li>
+</ul>
+<p>That is, there is a tradeoff between accuracy, clarity, and speed that one must navigate when optimizing code.</p>
+</section>
+<section id="a-brief-introduction-to-computational-complexity">
+<h2>A brief introduction to computational complexity<a class="headerlink" href="#a-brief-introduction-to-computational-complexity" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="code-profiling">
+<h2>Code profiling<a class="headerlink" href="#code-profiling" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>execution profiling
+-line_profiler</p></li>
+<li><p>Memory management</p>
+<ul>
+<li><p>memory profiling</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="common-sources-of-slow-code-execution">
+<h2>Common sources of slow code execution<a class="headerlink" href="#common-sources-of-slow-code-execution" title="Permalink to this heading">#</a></h2>
+<section id="slow-algorithm">
+<h3>Slow algorithm<a class="headerlink" href="#slow-algorithm" title="Permalink to this heading">#</a></h3>
+<p>A common source of slow execution is use of an inefficient algorithm.  Let’s say that we want to find duplicate elements within a list.  A simple way to implement this could be perform nested loops to compare each item to each other.  This has computational complexity of <em>O(n^2)</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>import random
+def create_random_list(n):
+    return [random.randint(1, n) for i in range(n)]
+
+def find_duplicates_slow(lst):
+    duplicates = []
+    for i in range(len(lst)):
+        for j in range(i+1, len(lst)):
+            if lst[i] == lst[j] and lst[i] not in duplicates:
+                duplicates.append(lst[i])
+    return duplicates
+
+lst = create_random_list(10000)
+
+%timeit find_duplicates_slow(lst)
+
+833 ms ± 5.85 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div>
+</div>
+<p>We can speed this up substantially by using a dictionary and keeping track of how many times each item appears.  This only requires a single loop, giving it a time complexity of O(n).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>def find_duplicates_fast(lst):
+    seen = {}
+    duplicates = []
+    for item in lst:
+        if item in seen:
+            if seen[item] == 1:
+                duplicates.append(item)
+            seen[item] += 1
+        else:
+            seen[item] = 1
+    return duplicates
+
+%timeit find_duplicates_fast(lst)
+
+446 μs ± 1.06 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+</pre></div>
+</div>
+<p>Notice that the first results are reported in milliseconds and the second in microseconds: That’s a speedup of almost 1900X for our better algorithm!  We could do even better by using the built-in Python <code class="docutils literal notranslate"><span class="pre">Counter</span></code> object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>from collections import Counter
+
+def find_duplicates_counter(lst):
+    duplicates = [item for item, count in Counter(lst).items() if count &gt; 1]
+    return duplicates
+
+%timeit find_duplicates_counter(lst)
+
+327 μs ± 2 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+
+</pre></div>
+</div>
+<p>That’s about a 36% speedup, which is much less than we got moving from our poor algorithm to the better one, but it could be significant if working with big data, and it also makes for cleaner code.  In general, built-in functions will be faster than hand-written ones as well as being better-tested, so it’s always a good idea to use an existing solution if it exists.  Fortunately AI assistants are quite good at recommending optimized versions of code.</p>
+</section>
+<section id="slow-operations-in-pandas">
+<h3>Slow operations in Pandas<a class="headerlink" href="#slow-operations-in-pandas" title="Permalink to this heading">#</a></h3>
+<p>Many researchers use Pandas because of its powerful data manipulation methods, but some of its operations are notoriously slow.  Here we show an example of how incrementally inserting data into an existing data frame can be remarkably slower than using standard python objects and then converting them to a Pandas data frame in a single step:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>import pandas as pd 
+import numpy as np
+import timeit
+
+# generate some random data
+nrows, ncolumns = 1000, 100
+rng = np.random.default_rng(seed=42)
+random_data = rng.random((nrows, ncolumns))
+
+# slow way to fill the data frame
+def fill_df_slow(random_data):
+    nrows, ncolumns = random_data.shape
+    columns = [&#39;column_&#39; + str(i) for i in range(ncolumns)]
+    df = pd.DataFrame(columns=columns)
+
+    for i in range(nrows):
+        df.loc[i] = random_data[i, :]
+    return df
+
+%timeit fill_df_slow(random_data)
+
+121 ms ± 418 μs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre></div>
+</div>
+<p>We can compare this to a function that also loops through each row of data, but instead of adding the data to a data frame it adds them to a dictionary, and then converts the dictionary to a data frame:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span># fill df by creating a dictionary using a dict comprehension and then converting it to a data frame
+def fill_df_fast(random_data):
+    nrows, ncolumns = random_data.shape
+    columns = [&#39;column_&#39; + str(i) for i in range(ncolumns)]
+    df = pd.DataFrame({columns[j]: random_data[:, j] for j in range(ncolumns)})
+    return df
+
+%timeit fill_df_fast(random_data)
+
+255 μs ± 885 ns per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+</pre></div>
+</div>
+<p>Again notice the difference in units between the two measurement.  This method gives us an almost 500X speedup!  We can make it even faster by directly passing the numpy array into pandas:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span># fill df by creating a dictionary and then converting it to a data frame
+def fill_df_superfast(random_data):
+    nrows, ncolumns = random_data.shape
+    columns = [&#39;column_&#39; + str(i) for i in range(ncolumns)]
+    df = pd.DataFrame(random_data, columns=columns)
+    return df
+
+%timeit fill_df_superfast(random_data)
+
+18.7 μs ± 279 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
+</pre></div>
+</div>
+<p>This gives more than 10X speedup compared to the previous solution. In general, one should avoid any operations with data frames that involve looping, and also avoid building data frames incrementally, preferring instead to generate a dict or Numpy array and then convert it into a data frame in one step.</p>
+</section>
+<section id="use-of-suboptimal-object-types">
+<h3>Use of suboptimal object types<a class="headerlink" href="#use-of-suboptimal-object-types" title="Permalink to this heading">#</a></h3>
+<p>Different types of objects in Python may perform better or worse for different types of operation.  For example, while we saw that some operations using Pandas data frames may be slow, it can be quite fast for other operations.  As an example we can look at searching for an item within a list of items. We can compare four different ways of doing this, using the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator with a Python dict, Python list, Pandas Series, or numpy array.  Here are the average execution times for each of these searching over 100,000 values computed using <code class="docutils literal notranslate"><span class="pre">timeit</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Object Type</p></th>
+<th class="head"><p>Execution Time (µs)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dict</p></td>
+<td><p>0.0282</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pandas series</p></td>
+<td><p>0.845</p></td>
+</tr>
+<tr class="row-even"><td><p>Numpy array</p></td>
+<td><p>10.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>list</p></td>
+<td><p>287.0</p></td>
+</tr>
+<tr class="row-even"><td><p>—————-</p></td>
+<td><p>———————</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here we see that dictionaries are by far the fastest objects for searching, with lists being the absolute worst.  When timing matters, it’s usually useful to do some prototype testing across different types of objects to find the most performant.</p>
+</section>
+<section id="unnecessary-looping">
+<h3>Unnecessary looping<a class="headerlink" href="#unnecessary-looping" title="Permalink to this heading">#</a></h3>
+<p>Any time one is working with numpy or Pandas objects, the presence of a loop in the code should count as a bad smell.  These packages have highly optimized vectorized operations, so the use of loops will almost always be orders of magnitude slower.  For example, we can compute the dot product of two arrays using a list comprehension (whicih is effectively a loop):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>def dotprod_by_hand(a, b):
+    return sum([a[i]*b[i] for i in range(len(a))])
+
+npts = 1000
+a = np.random.rand(npts)
+b = np.random.rand(npts)
+
+%timeit dotprod_by_hand(a, b)
+
+109 μs ± 610 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
+</pre></div>
+</div>
+<p>Compare this to the result using the built-in dot product operator in Numpy, which gives a speedup of more than 150X compared to our hand-built code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>%timeit np.dot(a, b)
+
+614 ns ± 1.61 ns per loop (mean ± std. dev. of 7 runs, 1,000,000 loops each)
+</pre></div>
+</div>
+</section>
+<section id="suboptimal-api-usage">
+<h3>Suboptimal API usage<a class="headerlink" href="#suboptimal-api-usage" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>e.g. individual vs batch fetching with pubmed API</p></li>
+</ul>
+</section>
+<section id="slow-i-o">
+<h3>Slow I/O<a class="headerlink" href="#slow-i-o" title="Permalink to this heading">#</a></h3>
+<p>For data-intensive workflows, especially when the data are too large to fit completely in memory, a substantial amount of execution time may be spent waiting for data to be read and/or written to a filesystem or database.</p>
+</section>
+</section>
+<section id="just-in-time-compilation-with-numba">
+<h2>Just-in-time compilation with Numba<a class="headerlink" href="#just-in-time-compilation-with-numba" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="using-einstein-operators">
+<h2>Using Einstein operators<a class="headerlink" href="#using-einstein-operators" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="a-brief-introduction-to-parallelism-and-multithreading">
+<h2>A brief introduction to parallelism and multithreading<a class="headerlink" href="#a-brief-introduction-to-parallelism-and-multithreading" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="writing-parallelized-code">
+<h2>Writing parallelized code<a class="headerlink" href="#writing-parallelized-code" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#avoiding-premature-optimization">Avoiding premature optimization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tradeoffs-in-code-optimization">Tradeoffs in code optimization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-brief-introduction-to-computational-complexity">A brief introduction to computational complexity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-profiling">Code profiling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-sources-of-slow-code-execution">Common sources of slow code execution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-algorithm">Slow algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-operations-in-pandas">Slow operations in Pandas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-suboptimal-object-types">Use of suboptimal object types</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unnecessary-looping">Unnecessary looping</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#suboptimal-api-usage">Suboptimal API usage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#slow-i-o">Slow I/O</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#just-in-time-compilation-with-numba">Just-in-time compilation with Numba</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-einstein-operators">Using Einstein operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-brief-introduction-to-parallelism-and-multithreading">A brief introduction to parallelism and multithreading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-parallelized-code">Writing parallelized code</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Russell Poldrack et al.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
