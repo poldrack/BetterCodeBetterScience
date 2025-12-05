@@ -19,7 +19,6 @@ project:
     - file: AI_coding_assistants.md
     - file: project_organization.md
     - file: data_management.md
-    - file: bibliography.md
 site:
   options:
     logo: logo.png

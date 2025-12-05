@@ -1,7 +1,5 @@
 # Data Organization and Management
 
-```{contents}
-```
 
 Research data are like the water of science: When they stop flowing and dry up, everything withers and ultimately dies.  In this chapter we discuss the principles and practices for good research data management and organization.
 
@@ -51,15 +49,18 @@ The FAIR principles are relatively abstract, in the sense that they don't provid
 
 ## The data lifecycle
 
-An important concept in research data management is the *data lifecycle*, which describes the role of data management in each of the different stages of a research project.  Figure {numref}`Figure {number} <lifecycle-fig>` shows an example of how the [RDMkit project](https://rdmkit.elixir-europe.org/data_life_cycle) outlines the stages of the data lifecycle:
+An important concept in research data management is the *data lifecycle*, which describes the role of data management in each of the different stages of a research project.  [](#lifecycle-fig) shows an example of how the [RDMkit project](https://rdmkit.elixir-europe.org/data_life_cycle) outlines the stages of the data lifecycle. This figure highlights the fact that data management should be part of the discussion at each stage in a project.  In this chapter we will discuss several of the stages in the data lifecycle in detail, though we leave in-depth discussion of data processing and analysis workflows to a later chapter.
 
-:::{figure-md} lifecycle-fig
-<img src="images/data_lifecycle_rdmkit.png" alt="RDMkit Data Lifecycle" width="500px">
+```{figure} images/data_lifecycle_rdmkit.png
+:label: lifecycle-fig
+:align: center
+:width: 500px
 
 A depiction of the data management lifecycle, from the [RDMkit project by ELIXIR](https://rdmkit.elixir-europe.org/data_life_cycle), CC-BY-4.0.
-:::
+```
 
-This figure highlights the fact that data management should be part of the discussion at each stage in a project.  In this chapter we will discuss several of the stages in the data lifecycle in detail, though we leave in-depth discussion of data processing and analysis workflows to a later chapter.
+
+
 
 
 ## Planning a study
@@ -754,13 +755,17 @@ It's worth nothing that using a naming scheme like this requires strict attentio
 
 *Metadata* refers to "data about data", and generally is meant to contain the information that is needed to interpret a dataset.  In principle, someone who obtains a dataset should be able to understand and reuse the data using only the metadata provided alongside the dataset. There are many different types of metadata that might be associated with a study, and it is usually necessary to decide how comprehensive to be in providing detailed metadata.  This will often rely upon the scientific expertise and judgment of the researcher, to determine which particular metadata would be essential for others to usefully interpret and reuse the data.
 
-An important concept in metadata is the *ontology*. In the context of bioinformatics, an ontology is a structured representation of the entities that exist in a domain (defined by a *controlled vocabulary*) and the relationships between these entities. One of the best known examples in the Gene Ontology, which represents classes of biological entities including Molecular Functions, Cellular Components, and Biological Processes.  As an example, Figure {numref}`Figure {number} <GO-fig>`
+An important concept in metadata is the *ontology*. In the context of bioinformatics, an ontology is a structured representation of the entities that exist in a domain (defined by a *controlled vocabulary*) and the relationships between these entities. One of the best known examples in the Gene Ontology, which represents classes of biological entities including Molecular Functions, Cellular Components, and Biological Processes.  As an example, [](#GO-fig) shows a hierarchical depiction for a specific cellular component.
 
-:::{figure-md} GO-fig
-<img src="images/GO_node_of_ranvier.png" alt="Gene Ontology graph for node of Ranvier" width="500px">
+```{figure} images/GO_node_of_ranvier.png
+:label: GO-fig
+:align: center
+:width: 500px
 
 An example of a Gene Ontology graph for the entity "node of Ranvier", which is a component of a neuron.  Obtained from https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0033268.
-:::
+
+```
+
 
 Ontologies are very useful for specifying metadata, because they allow us to know exactly what a particular entry in the metadata means, and thus allow us to establish link between equivalent entities across datasets.  For example, let's say that a researcher wants to query a database for datasets related to insulin signaling in pancreatic beta cells in Type II diabetes, and that there are three relevant datasets in the database.  Without an ontology, each of the teams might use different terms to refer to these cells (such as "pancreatic beta cells", "insulin-producing cells", and "islet beta cells"), making it difficult to link the datasets. However, if each of the datasets were to include metadata linked to a specific ontology (in this case, the identifier `CL:0000169` from the Cell Ontolog, which refers to "type B pancreatic cell"), then it becomes much easier to find and link these datasets.  There are at present a broad range of ontologies available for nearly every scientific domain; the [BioPortal](https://bioportal.bioontology.org/) project provides a tool to search across a wide range of existing ontologies.
 
@@ -860,13 +865,16 @@ Tracking of provenance is non-trivial.  The World Wide Web Consortium (W3C) has 
 - *Activities*: processes that involve using, generating, or modifying entities
 - *Agents*: People, organizations, or artifacts (such as computers) that are responsible for activities
 
-In addition, the model defines a set of relationships between these concepts, as seen in Figure {numref}`Figure {number} <PROV-fig>`:
+In addition, the model defines a set of relationships between these concepts, as seen in [](#PROV-fig):
 
-:::{figure-md} PROV-fig
-<img src="https://www.w3.org/TR/2013/NOTE-prov-primer-20130430/images/key-concepts.png" alt="W3C PROV entities and relations" width="500px">
+```{figure} https://www.w3.org/TR/2013/NOTE-prov-primer-20130430/images/key-concepts.png
+:label: PROV-fig
+:align: center
+:width: 500px
 
 A depiction of the PROV data model entities and relations.  Copyright © [2013] [World Wide Web Consortium](https://www.w3.org/copyright/document-license-2023/).
-:::
+```
+
 
 This data model highlights the breadth of information that needs to be represented in order to accurately record provenance.
 
@@ -1780,11 +1788,15 @@ plt.title(
 )
 ```
 
-:::{figure-md} PathwaySimilarity-fig
-<img src="images/pathway_vs_text_similarity.png" alt="Pathway versus semantic similarity across traits" width="500px">
+```{figure} images/pathway_vs_text_similarity.png
+:label: PathwaySimilarity-fig
+:align: center
+:width: 500px
 
 A scatterplot of biological similarity (estimated as overlap in pathways) versus semantic similarity (estimated as embedding distance of Pubmed abstracts) on the GWAS dataset.
-:::
+```
+
+
 
 There is a small but robust correlation between these two similarity measures. In order to more accurately estimate this association we need to take into account the fact that different documents vary in their overall similarity by including a *random effect* of document within a mixed effects model.  We use the `lmer()` function from the R `lme4` package, via the R magic within Jupyter:
 
