@@ -19,6 +19,11 @@ project:
     - file: book/AI_coding_assistants.md
     - file: book/project_organization.md
     - file: book/data_management.md
+# - file: workflows
+# - file: validation_robustness.md
+# - file: performance
+# - file: HPC
+# - file: sharing
 site:
   options:
     logo: logo.png
