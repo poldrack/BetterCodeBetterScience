@@ -39,6 +39,20 @@ jobs:
         run: npm install -g mystmd
       - name: Build HTML Assets
         run: myst build --html
+      - name: Create redirect from frontmatter to index
+        run: |
+          cat > ./_build/html/frontmatter.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=./index.html">
+            <link rel="canonical" href="./index.html">
+          </head>
+          <body>
+            <p>Redirecting to <a href="./index.html">index page</a>...</p>
+          </body>
+          </html>
+          EOF
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
