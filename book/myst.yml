@@ -1,0 +1,26 @@
+version: 1
+project:
+  title: Better Code, Better Science
+  authors:
+    - name: Russell Poldrack et al.
+  github: poldrack/BetterCodeBetterScience
+  bibliography:
+    - references.bib
+  exports:
+    - format: pdf
+      template: plain_latex_book
+      output: exports/book.pdf
+  toc:
+    - file: frontmatter.md
+    - file: introduction.md
+    - file: essential_tools_and_techniques.md
+    - file: software_engineering.md
+    - file: testing.md
+    - file: AI_coding_assistants.md
+    - file: project_organization.md
+    - file: data_management.md
+site:
+  options:
+    logo: logo.png
+    folders: true
+  template: book-theme

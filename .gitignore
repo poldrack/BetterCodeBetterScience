@@ -5,3 +5,6 @@ __pycache__
 .hypothesis
 .env
 
+
+# MyST build outputs
+_build
