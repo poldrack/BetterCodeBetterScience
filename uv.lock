@@ -310,6 +310,7 @@ dependencies = [
     { name = "mdnewline" },
     { name = "monarch-py" },
     { name = "mysql-connector-python" },
+    { name = "mystmd" },
     { name = "neo4j" },
     { name = "networkx" },
     { name = "nibabel" },
@@ -368,6 +369,7 @@ requires-dist = [
     { name = "mdnewline", specifier = ">=0.1.3" },
     { name = "monarch-py", specifier = ">=1.22.0" },
     { name = "mysql-connector-python", specifier = ">=9.5.0" },
+    { name = "mystmd", specifier = ">=1.7.0" },
     { name = "neo4j", specifier = ">=6.0.3" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "nibabel", specifier = ">=5.3.2" },
@@ -2829,6 +2831,19 @@ wheels = [
 ]
 
 [[package]]
+name = "mystmd"
+version = "1.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nodeenv" },
+    { name = "platformdirs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/11/b0/dcfc213a2936849f44f35db092f5b0ed4bf9a8ecffe5ea3d84448a340709/mystmd-1.7.0.tar.gz", hash = "sha256:562ef282a3249510c13bc7957bf59296bf141fbf6ab5682a969a8d0f34f891de", size = 2775785, upload-time = "2025-12-04T08:14:13.168Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/0f/aed65662a4e0a5a550fe3f4f73191d6a99983f0f9e628da8c9fec29c6a44/mystmd-1.7.0-py3-none-any.whl", hash = "sha256:9986a1b5efb80ea589685b2a663b2d44203c5389dd639958b8b2e2b713ab3a05", size = 2807251, upload-time = "2025-12-04T08:14:11.293Z" },
+]
+
+[[package]]
 name = "narwhals"
 version = "2.13.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3589,11 +3604,11 @@ wheels = [
 
 [[package]]
 name = "platformdirs"
-version = "4.5.0"
+version = "4.2.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/61/33/9611380c2bdb1225fdef633e2a9610622310fed35ab11dac9620972ee088/platformdirs-4.5.0.tar.gz", hash = "sha256:70ddccdd7c99fc5942e9fc25636a8b34d04c24b335100223152c2803e4063312", size = 21632, upload-time = "2025-10-08T17:44:48.791Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/52/0763d1d976d5c262df53ddda8d8d4719eedf9594d046f117c25a27261a19/platformdirs-4.2.2.tar.gz", hash = "sha256:38b7b51f512eed9e84a22788b4bce1de17c0adb134d6becb09836e37d8654cd3", size = 20916, upload-time = "2024-05-15T03:18:23.372Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/cb/ac7874b3e5d58441674fb70742e6c374b28b0c7cb988d37d991cde47166c/platformdirs-4.5.0-py3-none-any.whl", hash = "sha256:e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3", size = 18651, upload-time = "2025-10-08T17:44:47.223Z" },
+    { url = "https://files.pythonhosted.org/packages/68/13/2aa1f0e1364feb2c9ef45302f387ac0bd81484e9c9a4c5688a322fbdfd08/platformdirs-4.2.2-py3-none-any.whl", hash = "sha256:2d7a1657e36a80ea911db832a8a6ece5ee53d8de21edd5cc5879af6530b1bfee", size = 18146, upload-time = "2024-05-15T03:18:21.209Z" },
 ]
 
 [[package]]
