@@ -5,20 +5,20 @@ project:
     - name: Russell Poldrack et al.
   github: poldrack/BetterCodeBetterScience
   bibliography:
-    - references.bib
+    - book/references.bib
   exports:
     - format: pdf
       template: plain_latex_book
       output: exports/book.pdf
   toc:
-    - file: frontmatter.md
-    - file: introduction.md
-    - file: essential_tools_and_techniques.md
-    - file: software_engineering.md
-    - file: testing.md
-    - file: AI_coding_assistants.md
-    - file: project_organization.md
-    - file: data_management.md
+    - file: book/frontmatter.md
+    - file: book/introduction.md
+    - file: book/essential_tools_and_techniques.md
+    - file: book/software_engineering.md
+    - file: book/testing.md
+    - file: book/AI_coding_assistants.md
+    - file: book/project_organization.md
+    - file: book/data_management.md
 site:
   options:
     logo: logo.png
