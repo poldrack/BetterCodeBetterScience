@@ -2,7 +2,7 @@ version: 1
 project:
   title: Better Code, Better Science
   authors:
-    - name: Russell Poldrack et al.
+    - name: Russell Poldrack
   github: poldrack/BetterCodeBetterScience
   bibliography:
     - book/references.bib
