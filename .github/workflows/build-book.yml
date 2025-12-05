@@ -33,7 +33,7 @@ jobs:
       - name: Install MariaDB Connector/C
         run: sudo apt-get update && sudo apt-get install -y libmariadb-dev  
 
-        - name: Install dependencies
+      - name: Install dependencies
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv sync
