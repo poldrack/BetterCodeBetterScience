@@ -37,7 +37,7 @@ jobs:
           
       - name: Build book
         run: |
-          uv run jupyter-book build book/
+          cd book && uv run myst build --html
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
