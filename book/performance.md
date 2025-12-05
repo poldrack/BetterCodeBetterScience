@@ -193,7 +193,7 @@ Compare this to the result using the built-in dot product operator in Numpy, whi
 
 ### Suboptimal API usage
 
-- e.g. individual vs batch fetching with pubmed API
+- e.g., individual vs batch fetching with pubmed API
 
 ### Slow I/O
 
