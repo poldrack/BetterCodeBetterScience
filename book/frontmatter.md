@@ -18,6 +18,12 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 I'd like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  [Giorgio Arcara](https://github.com/giorgioarcara), [Steffen Bollman](https://github.com/stebo85), [Joshua Buckholtz](https://github.com/jwbuckholtz), [Satchel Grant](https://github.com/grantsrb/), [Yaroslav Halchenko](https://github.com/yarikoptic), and [Jeanette Mumford](https://github.com/jmumford).
 
+### AI usage statement
+
+All narrative text in this book was human-generated.  Generative AI tools were used for research and technical review.
+
+Code presented in this book was generated via human-AI collaboration, using a combination of chatbots, IDE autosuggestion, and agentic coding tools.
+
 ### Contributing to the book
 
 This book is meant to be a living open-source document, with the source available online at https://github.com/poldrack/BetterCodeBetterScience. If you find any errors in the book or want to make a suggestion for how to improve it, please open an issue on the GitHub site. Even better, submit a pull request with your suggested changes!
