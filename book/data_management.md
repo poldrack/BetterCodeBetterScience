@@ -974,7 +974,7 @@ create(ok): my_datalad_repo (dataset)
 
 ```
 
-This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad subdataset within our main git repo.  We then download some data files from another project using the `datalad download-url` function, which will both download the data and save them into the datalad dataset:
+This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
 
 ```bash
 ➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
@@ -1023,7 +1023,7 @@ Date:   Mon Dec 15 13:40:29 2025 -0800
       https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 ```
 
-Here we see the commit messages that were automatically created by DataLad for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.  If one wishes to download a large number of files, there is also a `datalad addurls` command that can download multiple files based on a single text file containing the relevant URLs and information.
+Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
 
 #### Modifying files
 
@@ -1189,6 +1189,7 @@ action summary:
 ```
 
 One can also push data using DataLad to a range of other remote hosts; see the [DataLad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
+
 
 
 ## Archiving data
