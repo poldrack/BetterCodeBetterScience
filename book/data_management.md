@@ -966,16 +966,19 @@ Let's say that we want to create a new dataset on our local computer that will b
 
 ```bash
 ➤  datalad create -d . my_datalad_repo
+
 add(ok): my_datalad_repo (dataset)
 add(ok): .gitmodules (file)
 save(ok): . (dataset)
 create(ok): my_datalad_repo (dataset)
+
 ```
 
 This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad subdataset within our main git repo.  We then download some data files from another project using the `datalad download-url` function, which will both download the data and save them into the datalad dataset:
 
 ```bash
 ➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
+
 [INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
 download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/demographics.csv (file)
 add(ok): data/demographics.csv (file)
@@ -984,7 +987,9 @@ add(ok): my_datalad_repo (dataset)
 add(ok): .gitmodules (file)
 save(ok): . (dataset)
 
+
 ➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
+
 [INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
 download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/meaningful_variables_clean.csv (file)
 add(ok): data/meaningful_variables_clean.csv (file)
@@ -1026,6 +1031,7 @@ Now let's say that we want to make a change to one of the files and save the cha
 
 ```bash
 ➤  datalad unlock my_datalad_repo/data/demographics.csv
+
 unlock(ok): my_datalad_repo/data/demographics.csv (file)
 ```
 
@@ -1040,19 +1046,19 @@ We can now use `datalad status` to see that the file has been modified:
 
 ```bash
 ➤  datalad status
- modified: book/data_management.md (file)
+
  modified: my_datalad_repo (dataset)
  ```
 
 And we can then save it using `datalad save`:
 ```bash
-➤  datalad save -m "removed Motivation variables from demographics.csv"
+➤  datalad save -d . -m "Modified demographics.csv" my_datalad_repo/data/demographics.csv
 
 add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
 save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  save (ok: 1)
 ```
 
 DataLad doesn't have a staging area like `git` does, so there is no need to first add and then commit the file; `datalad save` is equivalent to adding and then committing the changes. If we then check the status we see that there are no changes waiting to be saved:
