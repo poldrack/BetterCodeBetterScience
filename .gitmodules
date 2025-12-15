@@ -1,4 +1,0 @@
-[submodule "my_datalad_repo"]
-	path = my_datalad_repo
-	url = ./my_datalad_repo
-	datalad-id = abcaf73f-c80a-4cb2-a025-250722233dab
