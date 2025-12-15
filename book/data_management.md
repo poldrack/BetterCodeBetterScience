@@ -1025,16 +1025,14 @@ Here we see the commit messages that were automatically created by DataLad for d
 Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by DataLad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
 
 ```bash
-➤  cd my_datlad_repo
-➤  datalad unlock data/demographics.csv
-
-unlock(ok): data/demographics.csv (file)
+➤  datalad unlock my_datalad_repo/data/demographics.csv
+unlock(ok): my_datalad_repo/data/demographics.csv (file)
 ```
 
 We then use a Python script to make the change, which in this case is removing some columns from the dataset:
 
 ```bash
-➤  python ../src/BetterCodeBetterScience/modify_data.py data/demographics.csv
+➤  python src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
 
 ```
 
@@ -1042,8 +1040,9 @@ We can now use `datalad status` to see that the file has been modified:
 
 ```bash
 ➤  datalad status
- modified: data/demographics.csv (file)
-```
+ modified: book/data_management.md (file)
+ modified: my_datalad_repo (dataset)
+ ```
 
 And we can then save it using `datalad save`:
 ```bash
@@ -1184,7 +1183,6 @@ action summary:
 ```
 
 One can also push data using DataLad to a range of other remote hosts; see the [DataLad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
-
 
 
 ## Archiving data
