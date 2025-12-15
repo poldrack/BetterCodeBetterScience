@@ -1,10 +1,11 @@
 clean:
 	- rm -rf book/_build
 
-build: clean
-	uv run jupyter-book build book/
+build-html: clean
+	myst build --html
+	npx serve _build/html
 
-pdf:
+build-pdf:
 	jupyter-book build book/ --builder pdflatex
 
 pipinstall:
