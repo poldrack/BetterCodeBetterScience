@@ -16,7 +16,7 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 ### Acknowledgements
 
-I'd like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  [Giorgio Arcara](https://github.com/giorgioarcara), [Steffen Bollman](https://github.com/stebo85), [Joshua Buckholtz](https://github.com/jwbuckholtz), [Satchel Grant](https://github.com/grantsrb/), [Yaroslav Halchenko](https://github.com/yarikoptic), and [Jeanette Mumford](https://github.com/jmumford).
+I'd like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  [Giorgio Arcara](https://github.com/giorgioarcara), [Steffen Bollman](https://github.com/stebo85), [Joshua Buckholtz](https://github.com/jwbuckholtz), [Satchel Grant](https://github.com/grantsrb/), [Yaroslav Halchenko](https://github.com/yarikoptic), [Chris Markiewicz](https://github.com/effigies) and [Jeanette Mumford](https://github.com/jmumford).
 
 ### AI usage statement
 
