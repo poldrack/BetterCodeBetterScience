@@ -65,7 +65,7 @@ dataclass
 dataclasses
 dataframe
 datalad
-Datalad
+DataLad
 DATALAD
 dataurl
 davinci

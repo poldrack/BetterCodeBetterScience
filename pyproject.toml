@@ -61,6 +61,7 @@ dependencies = [
     "blue>=0.9.1",
     "nilearn>=0.12.1",
     "fmriprep-docker>=25.2.3",
+    "mystmd>=1.7.0",
 ]
 
 [build-system]
@@ -69,10 +70,10 @@ build-backend = "hatchling.build"
 
 [tool.codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = './book/transcripts,./book/_build/html,.js*,.git*,*.lock,*.bib,.venv*'
+skip = './book/transcripts,./book/_build/html,.js*,.git*,*.lock,*.bib,.venv*,*.ipynb,*.json'
 check-hidden = true
 ignore-regex = '\b(BLOSUM|Shapin)\b'
-# ignore-words-list = ''
+ignore-words = 'project-words.txt'
 
 [tool.pytest.ini_options]
 markers = [

@@ -1,7 +1,5 @@
 # Data Organization and Management
 
-```{contents}
-```
 
 Research data are like the water of science: When they stop flowing and dry up, everything withers and ultimately dies.  In this chapter we discuss the principles and practices for good research data management and organization.
 
@@ -51,15 +49,18 @@ The FAIR principles are relatively abstract, in the sense that they don't provid
 
 ## The data lifecycle
 
-An important concept in research data management is the *data lifecycle*, which describes the role of data management in each of the different stages of a research project.  Figure {numref}`Figure {number} <lifecycle-fig>` shows an example of how the [RDMkit project](https://rdmkit.elixir-europe.org/data_life_cycle) outlines the stages of the data lifecycle:
+An important concept in research data management is the *data lifecycle*, which describes the role of data management in each of the different stages of a research project.  [](#lifecycle-fig) shows an example of how the [RDMkit project](https://rdmkit.elixir-europe.org/data_life_cycle) outlines the stages of the data lifecycle. This figure highlights the fact that data management should be part of the discussion at each stage in a project.  In this chapter we will discuss several of the stages in the data lifecycle in detail, though we leave in-depth discussion of data processing and analysis workflows to a later chapter.
 
-:::{figure-md} lifecycle-fig
-<img src="images/data_lifecycle_rdmkit.png" alt="RDMkit Data Lifecycle" width="500px">
+```{figure} images/data_lifecycle_rdmkit.png
+:label: lifecycle-fig
+:align: center
+:width: 500px
 
 A depiction of the data management lifecycle, from the [RDMkit project by ELIXIR](https://rdmkit.elixir-europe.org/data_life_cycle), CC-BY-4.0.
-:::
+```
 
-This figure highlights the fact that data management should be part of the discussion at each stage in a project.  In this chapter we will discuss several of the stages in the data lifecycle in detail, though we leave in-depth discussion of data processing and analysis workflows to a later chapter.
+
+
 
 
 ## Planning a study
@@ -209,6 +210,10 @@ One important feature of a relational databases is that they generally implement
 - *Durability*:  Transactions are durable, such that once they are written they will be permanent despite failures such as power outages or system crashes (as long as the server is not damaged).
 
 The adherence of relational database systems to these principles helps ensure the integrity of scientific data, in comparison to the use of flat files which do not necessarily achieve these goals.
+
+##### Analytic databases
+
+There is a particular kind of relational database known as an *analytic database* that is specialized for operations that work across many rows in the database, rather than the focus on individual records in a standard relational database.  One widely-used analytic database in the Python ecosystem is [DuckDB](https://duckdb.org/), which supports very fast operations on large datasets, and integrates well with Pandas and other tools. Unlike traditional relational database systems, it doesn't require any specialized server setup.
 
 #### NoSQL databases
 
@@ -750,13 +755,17 @@ It's worth nothing that using a naming scheme like this requires strict attentio
 
 *Metadata* refers to "data about data", and generally is meant to contain the information that is needed to interpret a dataset.  In principle, someone who obtains a dataset should be able to understand and reuse the data using only the metadata provided alongside the dataset. There are many different types of metadata that might be associated with a study, and it is usually necessary to decide how comprehensive to be in providing detailed metadata.  This will often rely upon the scientific expertise and judgment of the researcher, to determine which particular metadata would be essential for others to usefully interpret and reuse the data.
 
-An important concept in metadata is the *ontology*. In the context of bioinformatics, an ontology is a structured representation of the entities that exist in a domain (defined by a *controlled vocabulary*) and the relationships between these entities. One of the best known examples in the Gene Ontology, which represents classes of biological entities including Molecular Functions, Cellular Components, and Biological Processes.  As an example, Figure {numref}`Figure {number} <GO-fig>`
+An important concept in metadata is the *ontology*. In the context of bioinformatics, an ontology is a structured representation of the entities that exist in a domain (defined by a *controlled vocabulary*) and the relationships between these entities. One of the best known examples in the Gene Ontology, which represents classes of biological entities including Molecular Functions, Cellular Components, and Biological Processes.  As an example, [](#GO-fig) shows a hierarchical depiction for a specific cellular component.
 
-:::{figure-md} GO-fig
-<img src="images/GO_node_of_ranvier.png" alt="Gene Ontology graph for node of Ranvier" width="500px">
+```{figure} images/GO_node_of_ranvier.png
+:label: GO-fig
+:align: center
+:width: 500px
 
 An example of a Gene Ontology graph for the entity "node of Ranvier", which is a component of a neuron.  Obtained from https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0033268.
-:::
+
+```
+
 
 Ontologies are very useful for specifying metadata, because they allow us to know exactly what a particular entry in the metadata means, and thus allow us to establish link between equivalent entities across datasets.  For example, let's say that a researcher wants to query a database for datasets related to insulin signaling in pancreatic beta cells in Type II diabetes, and that there are three relevant datasets in the database.  Without an ontology, each of the teams might use different terms to refer to these cells (such as "pancreatic beta cells", "insulin-producing cells", and "islet beta cells"), making it difficult to link the datasets. However, if each of the datasets were to include metadata linked to a specific ontology (in this case, the identifier `CL:0000169` from the Cell Ontolog, which refers to "type B pancreatic cell"), then it becomes much easier to find and link these datasets.  There are at present a broad range of ontologies available for nearly every scientific domain; the [BioPortal](https://bioportal.bioontology.org/) project provides a tool to search across a wide range of existing ontologies.
 
@@ -856,13 +865,16 @@ Tracking of provenance is non-trivial.  The World Wide Web Consortium (W3C) has 
 - *Activities*: processes that involve using, generating, or modifying entities
 - *Agents*: People, organizations, or artifacts (such as computers) that are responsible for activities
 
-In addition, the model defines a set of relationships between these concepts, as seen in Figure {numref}`Figure {number} <PROV-fig>`:
+In addition, the model defines a set of relationships between these concepts, as seen in [](#PROV-fig):
 
-:::{figure-md} PROV-fig
-<img src="https://www.w3.org/TR/2013/NOTE-prov-primer-20130430/images/key-concepts.png" alt="W3C PROV entities and relations" width="500px">
+```{figure} https://www.w3.org/TR/2013/NOTE-prov-primer-20130430/images/key-concepts.png
+:label: PROV-fig
+:align: center
+:width: 500px
 
 A depiction of the PROV data model entities and relations.  Copyright © [2013] [World Wide Web Consortium](https://www.w3.org/copyright/document-license-2023/).
-:::
+```
+
 
 This data model highlights the breadth of information that needs to be represented in order to accurately record provenance.
 
@@ -942,98 +954,91 @@ When the relevant data are small (e.g. smaller than a few megabytes) and stored 
 
 However, git does not work well for version control on larger datasets using binary data files.  Git is able to efficiently store version information about code because it tracks the specific differences in the code between versions (known as a *diff*), and only stores the differences.  Thus, if one has a very large code file and changes one line, only that one line difference is stored in the git database.  However, with binary data this strategy is not effective, and git has to store the entire new dataset each time, leading to bloated repositories and very slow performance. 
 
-### Using Datalad for version control on larger datasets
+### Using DataLad for version control on larger datasets
 
-A solution to this problem is to use a version control tool that is specifically designed for large data.  There are several tools that address this problem; we will focus on [Datalad](https://www.datalad.org/), which is a data management system that functions very similarly to git.  It is based on a tool called [git-annex](https://git-annex.branchable.com/), but provides much greater ease of use for researchers.  (Full disclosure: Our group collaborates with the Datalad group and our grants have supported some of their development work.)
+A solution to this problem is to use a version control tool that is specifically designed for large data.  There are several tools that address this problem; we will focus on [DataLad](https://www.datalad.org/), which is a data management system that functions very similarly to git.  It is based on a tool called [git-annex](https://git-annex.branchable.com/), but provides much greater ease of use for researchers.  (Full disclosure: Our group collaborates with the DataLad group and our grants have supported some of their development work.)
 
-An important note:  Datalad is quite powerful but has a significant learning curve, and takes a bit of time to get accustomed to.  In particular, its use of symbolic links can sometimes confuse new users. Having said that, let's look at some simple examples.
+An important note:  DataLad is quite powerful but has a significant learning curve, and takes a bit of time to get accustomed to.  In particular, its use of symbolic links can sometimes confuse new users. Having said that, let's look at some simple examples.
 
-#### Creating a local Datalad dataset
+#### Creating a local DataLad dataset
 
-Let's say that we want to create a new dataset on our local computer that will be tracked by Datalad.  We first create a new repository:
+Let's say that we want to create a new dataset on our local computer that will be tracked by DataLad.  We first create a new repository:
 
 ```bash
-➤  datalad create my_datalad_repo
+➤  datalad create -d . my_datalad_repo
 
-create(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
+create(ok): my_datalad_repo (dataset)
+
 ```
 
-This creates a new directory, called `my_datalad_repo` and sets it up as a Datalad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
+This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
 
 ```bash
-➤  cd my_datalad_repo
-➤  mkdir data
-➤  datalad download-url --dataset . -O data/ \
-  https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
-
-[INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
-download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/meaningful_variables_clean.csv (file)
-add(ok): data/meaningful_variables_clean.csv (file)
-save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  download_url (ok: 1)
-  save (ok: 1)
-
-➤  datalad download-url --dataset . -O data/ \
-  https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
+➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 
 [INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
 download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/demographics.csv (file)
 add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
 save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  download_url (ok: 1)
-  save (ok: 1)
+
+
+➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
+
+[INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
+download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/meaningful_variables_clean.csv (file)
+add(ok): data/meaningful_variables_clean.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
 ```
 
-A Datalad dataset is also a `git` repository, which we can see if we use the `git log` command:
+A DataLad dataset is also a `git` repository, which we can see if we use the `git log` command:
 
 ```bash
 ➤  git log
 
-commit a5696c1a32d69dd24781652d04902047c5d3df50 (HEAD -> main)
+commit 948cc31262fcddda3bfc56b222687710861c57d1 (HEAD -> text/datamgmt-Nov3)
 Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:13:22 2025 -0800
-
-    [DATALAD] Download URLs
-
-    URLs:
-      https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
-
-commit 2603a1fb98f00d6cdd029194f010a845d73cdc7c
-Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:13:20 2025 -0800
+Date:   Mon Dec 15 13:40:52 2025 -0800
 
     [DATALAD] Download URLs
 
     URLs:
       https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
 
-commit 95b9016840e1d35bef0edf3afa06e41fdaaefce4
+commit 9b4b8b29e08a21974dc52e3026405b878078f07b
 Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:12:08 2025 -0800
+Date:   Mon Dec 15 13:40:29 2025 -0800
 
-    [DATALAD] new dataset
+    [DATALAD] Download URLs
+
+    URLs:
+      https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 ```
 
-Here we see the commit messages that were automatically created by Datalad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
+Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
 
 #### Modifying files
 
-Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by Datalad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
+Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by DataLad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
 
 ```bash
-➤  datalad unlock data/demographics.csv
+➤  datalad unlock my_datalad_repo/data/demographics.csv
 
-unlock(ok): data/demographics.csv (file)
+unlock(ok): my_datalad_repo/data/demographics.csv (file)
 ```
 
 We then use a Python script to make the change, which in this case is removing some columns from the dataset:
 
 ```bash
-➤  python ../src/BetterCodeBetterScience/modify_data.py data/demographics.csv
+➤  python src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
 
 ```
 
@@ -1041,21 +1046,22 @@ We can now use `datalad status` to see that the file has been modified:
 
 ```bash
 ➤  datalad status
- modified: data/demographics.csv (file)
-```
+
+ modified: my_datalad_repo (dataset)
+ ```
 
 And we can then save it using `datalad save`:
 ```bash
-➤  datalad save -m "removed Motivation variables from demographics.csv"
+➤  datalad save -d . -m "Modified demographics.csv" my_datalad_repo/data/demographics.csv
 
 add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
 save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  save (ok: 1)
 ```
 
-Datalad doesn't have a staging area like `git` does, so there is no need to first add and then commit the file; `datalad save` is equivalent to adding and then committing the changes. If we then check the status we see that there are no changes waiting to be saved:
+DataLad doesn't have a staging area like `git` does, so there is no need to first add and then commit the file; `datalad save` is equivalent to adding and then committing the changes. If we then check the status we see that there are no changes waiting to be saved:
 
 ```bash
 ➤  datalad status
@@ -1063,11 +1069,60 @@ Datalad doesn't have a staging area like `git` does, so there is no need to firs
 nothing to save, working tree clean
 ```
 
+##### Using `datalad run`
+
+Although the previous example was meant to provide background on how datalad works, in practice there is actually a much easier way to accomplish these steps, which is by using the `datalad run` command. This command will automatically take care of checking out the relevant files, running the command, and then checking the files back in, generating a commit message that tracks the specific command that was used:
+
+```bash
+➤  datalad run -i my_datalad_repo/data/demographics.csv -o my_datalad_repo/data/demographics.csv -- uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
+[INFO   ] Making sure inputs are available (this may take some time)
+unlock(ok): my_datalad_repo/data/demographics.csv (file)
+[INFO   ] == Command start (output follows) =====
+      Built bettercodebetterscience @ file:///Users/poldrack/Dropbox/code/BetterCode
+Uninstalled 1 package in 1ms
+Installed 1 package in 1ms
+[INFO   ] == Command exit (modification check follows) =====
+run(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience (dataset) [uv run src/BetterCodeBetterScience/modif...]
+add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
+
+# show the most recent commit
+➤  git log -1
+commit 3ef3b94a0abffec6a8db7570a97339f48ee728ed (HEAD -> text/datamgmt-Nov3)
+Author: Russell Poldrack <poldrack@gmail.com>
+Date:   Mon Dec 15 13:28:06 2025 -0800
+
+    [DATALAD RUNCMD] uv run src/BetterCodeBetterScience/modif...
+
+    === Do not change lines below ===
+    {
+     "chain": [],
+     "cmd": "uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv",
+     "exit": 0,
+     "extra_inputs": [],
+     "inputs": [
+      "my_datalad_repo/data/demographics.csv"
+     ],
+     "outputs": [
+      "my_datalad_repo/data/demographics.csv"
+     ],
+     "pwd": "."
+    }
+    ^^^ Do not change lines above ^^^
+
+```
+
+If one uses DataLad for data versioning then the `datalad run` command can be very helpful for running commands on those data.
+
+
 #### Pushing data to a remote repository
 
-Datalad is a particularly powerful tool for sharing data across systems.  It allows one to push or pull data from a number of different remote storage systems; in this example we will use the [Open Science Framework (OSF)](https://osf.io/) as our storage location, because it is particularly easy to use with Datalad.
+DataLad is a particularly powerful tool for sharing data across systems.  It allows one to push or pull data from a number of different remote storage systems; in this example we will use the [Open Science Framework (OSF)](https://osf.io/) as our storage location, because it is particularly easy to use with DataLad.
 
-We first need to install and set up the `datalad-osf` Python package, per [the Datalad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use Datalad to authenticate with OSF:
+We first need to install and set up the `datalad-osf` Python package, per [the DataLad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use DataLad to authenticate with OSF:
 
 ```bash
 ➤  datalad osf-credentials                                                1 ↵
@@ -1076,7 +1131,7 @@ token:
 osf_credentials(ok): [authenticated as Russell Poldrack <poldrack@stanford.edu>]
 ```
 
-Having authenticated with OSF, we can now create a new OSF project using Datalad:
+Having authenticated with OSF, we can now create a new OSF project using DataLad:
 
 ```bash
 ➤  datalad create-sibling-osf --title datalad-test-project -s osf
@@ -1133,7 +1188,7 @@ action summary:
      523    1276   58237 data/demographics.csv
 ```
 
-One can also push data using Datalad to a range of other remote hosts; see the [Datalad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
+One can also push data using DataLad to a range of other remote hosts; see the [DataLad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
 
 
 
@@ -1776,11 +1831,15 @@ plt.title(
 )
 ```
 
-:::{figure-md} PathwaySimilarity-fig
-<img src="images/pathway_vs_text_similarity.png" alt="Pathway versus semantic similarity across traits" width="500px">
+```{figure} images/pathway_vs_text_similarity.png
+:label: PathwaySimilarity-fig
+:align: center
+:width: 500px
 
 A scatterplot of biological similarity (estimated as overlap in pathways) versus semantic similarity (estimated as embedding distance of Pubmed abstracts) on the GWAS dataset.
-:::
+```
+
+
 
 There is a small but robust correlation between these two similarity measures. In order to more accurately estimate this association we need to take into account the fact that different documents vary in their overall similarity by including a *random effect* of document within a mixed effects model.  We use the `lmer()` function from the R `lme4` package, via the R magic within Jupyter:
 

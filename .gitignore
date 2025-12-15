@@ -4,4 +4,11 @@ __pycache__
 .coverage
 .hypothesis
 .env
+._*
 
+data
+exports
+notebooks
+
+# MyST build outputs
+_build

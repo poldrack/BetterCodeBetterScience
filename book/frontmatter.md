@@ -16,7 +16,13 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 ### Acknowledgements
 
-I'd like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  [Giorgio Arcara](https://github.com/giorgioarcara), [Steffen Bollman](https://github.com/stebo85), [Joshua Buckholtz](https://github.com/jwbuckholtz), [Satchel Grant](https://github.com/grantsrb/), [Yaroslav Halchenko](https://github.com/yarikoptic), and [Jeanette Mumford](https://github.com/jmumford).
+I'd like to acknowledge the following individuals for their helpful comments/suggestions/pull requests on the book:  [Giorgio Arcara](https://github.com/giorgioarcara), [Steffen Bollman](https://github.com/stebo85), [Joshua Buckholtz](https://github.com/jwbuckholtz), [Satchel Grant](https://github.com/grantsrb/), [Yaroslav Halchenko](https://github.com/yarikoptic), [Chris Markiewicz](https://github.com/effigies) and [Jeanette Mumford](https://github.com/jmumford).
+
+### AI usage statement
+
+All narrative text in this book was human-generated.  Generative AI tools were used for research and technical review.
+
+Code presented in this book was generated via human-AI collaboration, using a combination of chatbots, IDE autosuggestion, and agentic coding tools.
 
 ### Contributing to the book
 
