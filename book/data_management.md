@@ -965,39 +965,33 @@ An important note:  DataLad is quite powerful but has a significant learning cur
 Let's say that we want to create a new dataset on our local computer that will be tracked by DataLad.  We first create a new repository:
 
 ```bash
-➤  datalad create my_datalad_repo
-
-create(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo (dataset)
+➤  datalad create -d . my_datalad_repo
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
+create(ok): my_datalad_repo (dataset)
 ```
 
-This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
+This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad subdataset within our main git repo.  We then download some data files from another project using the `datalad download-url` function, which will both download the data and save them into the datalad dataset:
 
 ```bash
-➤  cd my_datalad_repo
-➤  mkdir data
-➤  datalad download-url --dataset . -O data/ \
-  https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
-
-[INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
-download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/meaningful_variables_clean.csv (file)
-add(ok): data/meaningful_variables_clean.csv (file)
-save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  download_url (ok: 1)
-  save (ok: 1)
-
-➤  datalad download-url --dataset . -O data/ \
-  https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
-
+➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 [INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
 download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/demographics.csv (file)
 add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
 save(ok): . (dataset)
-action summary:
-  add (ok: 1)
-  download_url (ok: 1)
-  save (ok: 1)
+
+➤  datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
+[INFO   ] Downloading 'https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv' into '/Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/'
+download_url(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo/data/meaningful_variables_clean.csv (file)
+add(ok): data/meaningful_variables_clean.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
 ```
 
 A DataLad dataset is also a `git` repository, which we can see if we use the `git log` command:
@@ -1005,38 +999,33 @@ A DataLad dataset is also a `git` repository, which we can see if we use the `gi
 ```bash
 ➤  git log
 
-commit a5696c1a32d69dd24781652d04902047c5d3df50 (HEAD -> main)
+commit 948cc31262fcddda3bfc56b222687710861c57d1 (HEAD -> text/datamgmt-Nov3)
 Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:13:22 2025 -0800
-
-    [DATALAD] Download URLs
-
-    URLs:
-      https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
-
-commit 2603a1fb98f00d6cdd029194f010a845d73cdc7c
-Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:13:20 2025 -0800
+Date:   Mon Dec 15 13:40:52 2025 -0800
 
     [DATALAD] Download URLs
 
     URLs:
       https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
 
-commit 95b9016840e1d35bef0edf3afa06e41fdaaefce4
+commit 9b4b8b29e08a21974dc52e3026405b878078f07b
 Author: Russell Poldrack <poldrack@gmail.com>
-Date:   Sun Nov 16 12:12:08 2025 -0800
+Date:   Mon Dec 15 13:40:29 2025 -0800
 
-    [DATALAD] new dataset
+    [DATALAD] Download URLs
+
+    URLs:
+      https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 ```
 
-Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
+Here we see the commit messages that were automatically created by DataLad for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.  If one wishes to download a large number of files, there is also a `datalad addurls` command that can download multiple files based on a single text file containing the relevant URLs and information.
 
 #### Modifying files
 
 Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by DataLad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
 
 ```bash
+➤  cd my_datlad_repo
 ➤  datalad unlock data/demographics.csv
 
 unlock(ok): data/demographics.csv (file)
@@ -1074,6 +1063,55 @@ DataLad doesn't have a staging area like `git` does, so there is no need to firs
 
 nothing to save, working tree clean
 ```
+
+##### Using `datalad run`
+
+Although the previous example was meant to provide background on how datalad works, in practice there is actually a much easier way to accomplish these steps, which is by using the `datalad run` command. This command will automatically take care of checking out the relevant files, running the command, and then checking the files back in, generating a commit message that tracks the specific command that was used:
+
+```bash
+➤  datalad run -i my_datalad_repo/data/demographics.csv -o my_datalad_repo/data/demographics.csv -- uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
+[INFO   ] Making sure inputs are available (this may take some time)
+unlock(ok): my_datalad_repo/data/demographics.csv (file)
+[INFO   ] == Command start (output follows) =====
+      Built bettercodebetterscience @ file:///Users/poldrack/Dropbox/code/BetterCode
+Uninstalled 1 package in 1ms
+Installed 1 package in 1ms
+[INFO   ] == Command exit (modification check follows) =====
+run(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience (dataset) [uv run src/BetterCodeBetterScience/modif...]
+add(ok): data/demographics.csv (file)
+save(ok): my_datalad_repo (dataset)
+add(ok): my_datalad_repo (dataset)
+add(ok): .gitmodules (file)
+save(ok): . (dataset)
+
+# show the most recent commit
+➤  git log -1
+commit 3ef3b94a0abffec6a8db7570a97339f48ee728ed (HEAD -> text/datamgmt-Nov3)
+Author: Russell Poldrack <poldrack@gmail.com>
+Date:   Mon Dec 15 13:28:06 2025 -0800
+
+    [DATALAD RUNCMD] uv run src/BetterCodeBetterScience/modif...
+
+    === Do not change lines below ===
+    {
+     "chain": [],
+     "cmd": "uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv",
+     "exit": 0,
+     "extra_inputs": [],
+     "inputs": [
+      "my_datalad_repo/data/demographics.csv"
+     ],
+     "outputs": [
+      "my_datalad_repo/data/demographics.csv"
+     ],
+     "pwd": "."
+    }
+    ^^^ Do not change lines above ^^^
+
+```
+
+If one uses DataLad for data versioning then the `datalad run` command can be very helpful for running commands on those data.
+
 
 #### Pushing data to a remote repository
 
