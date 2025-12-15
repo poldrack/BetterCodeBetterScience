@@ -37,5 +37,7 @@ Individuals who make line-level contributions (such as fixing typos) will be lis
 
 Contributors who create significant new sections or chapters may be listed as coauthors.  Individuals who wish to be listed as a coauthor should discuss this with the maintainer prior to contributing, to avoid any misunderstandings. 
 
+The main author (Russell Poldrack) will remain the sole holder of the copyright of this text and may relicense the text for commercial reuse.  
+
 This Contributors Guide is based on the template from https://github.com/nayafia/contributing-template (CC0).
 
