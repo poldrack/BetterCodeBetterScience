@@ -8,8 +8,11 @@ project:
     - book/references.bib
   exports:
     - format: pdf
-      template: plain_latex_book
+      template: https://github.com/myst-templates/plain_typst_book.git 
       output: exports/book.pdf
+    - format: md
+    - format: docx
+      template: https://github.com/myst-templates/docx_default.git
   toc:
     - file: book/frontmatter.md
     - file: book/introduction.md
