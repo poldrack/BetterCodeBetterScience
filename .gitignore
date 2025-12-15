@@ -4,7 +4,10 @@ __pycache__
 .coverage
 .hypothesis
 .env
+._*
 
+data
+exports
 
 # MyST build outputs
 _build
