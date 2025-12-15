@@ -954,15 +954,15 @@ When the relevant data are small (e.g. smaller than a few megabytes) and stored 
 
 However, git does not work well for version control on larger datasets using binary data files.  Git is able to efficiently store version information about code because it tracks the specific differences in the code between versions (known as a *diff*), and only stores the differences.  Thus, if one has a very large code file and changes one line, only that one line difference is stored in the git database.  However, with binary data this strategy is not effective, and git has to store the entire new dataset each time, leading to bloated repositories and very slow performance. 
 
-### Using Datalad for version control on larger datasets
+### Using DataLad for version control on larger datasets
 
-A solution to this problem is to use a version control tool that is specifically designed for large data.  There are several tools that address this problem; we will focus on [Datalad](https://www.datalad.org/), which is a data management system that functions very similarly to git.  It is based on a tool called [git-annex](https://git-annex.branchable.com/), but provides much greater ease of use for researchers.  (Full disclosure: Our group collaborates with the Datalad group and our grants have supported some of their development work.)
+A solution to this problem is to use a version control tool that is specifically designed for large data.  There are several tools that address this problem; we will focus on [DataLad](https://www.datalad.org/), which is a data management system that functions very similarly to git.  It is based on a tool called [git-annex](https://git-annex.branchable.com/), but provides much greater ease of use for researchers.  (Full disclosure: Our group collaborates with the DataLad group and our grants have supported some of their development work.)
 
-An important note:  Datalad is quite powerful but has a significant learning curve, and takes a bit of time to get accustomed to.  In particular, its use of symbolic links can sometimes confuse new users. Having said that, let's look at some simple examples.
+An important note:  DataLad is quite powerful but has a significant learning curve, and takes a bit of time to get accustomed to.  In particular, its use of symbolic links can sometimes confuse new users. Having said that, let's look at some simple examples.
 
-#### Creating a local Datalad dataset
+#### Creating a local DataLad dataset
 
-Let's say that we want to create a new dataset on our local computer that will be tracked by Datalad.  We first create a new repository:
+Let's say that we want to create a new dataset on our local computer that will be tracked by DataLad.  We first create a new repository:
 
 ```bash
 ➤  datalad create my_datalad_repo
@@ -970,7 +970,7 @@ Let's say that we want to create a new dataset on our local computer that will b
 create(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience/my_datalad_repo (dataset)
 ```
 
-This creates a new directory, called `my_datalad_repo` and sets it up as a Datalad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
+This creates a new directory, called `my_datalad_repo` and sets it up as a DataLad dataset.  We then go into the directory and create a subdirectory called `data`, and then download some data files from another project.  We do this using the `datalad download-url` function, which will both download the data and save them to the datalad dataset:
 
 ```bash
 ➤  cd my_datalad_repo
@@ -1000,7 +1000,7 @@ action summary:
   save (ok: 1)
 ```
 
-A Datalad dataset is also a `git` repository, which we can see if we use the `git log` command:
+A DataLad dataset is also a `git` repository, which we can see if we use the `git log` command:
 
 ```bash
 ➤  git log
@@ -1030,11 +1030,11 @@ Date:   Sun Nov 16 12:12:08 2025 -0800
     [DATALAD] new dataset
 ```
 
-Here we see the commit messages that were automatically created by Datalad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
+Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
 
 #### Modifying files
 
-Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by Datalad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
+Now let's say that we want to make a change to one of the files and save the changes to the dataset.  Files tracked by DataLad are read-only ("locked") by default.  If we want to edit them, then we need to use `datalad unlock` to unlock the file:
 
 ```bash
 ➤  datalad unlock data/demographics.csv
@@ -1067,7 +1067,7 @@ action summary:
   save (ok: 1)
 ```
 
-Datalad doesn't have a staging area like `git` does, so there is no need to first add and then commit the file; `datalad save` is equivalent to adding and then committing the changes. If we then check the status we see that there are no changes waiting to be saved:
+DataLad doesn't have a staging area like `git` does, so there is no need to first add and then commit the file; `datalad save` is equivalent to adding and then committing the changes. If we then check the status we see that there are no changes waiting to be saved:
 
 ```bash
 ➤  datalad status
@@ -1077,9 +1077,9 @@ nothing to save, working tree clean
 
 #### Pushing data to a remote repository
 
-Datalad is a particularly powerful tool for sharing data across systems.  It allows one to push or pull data from a number of different remote storage systems; in this example we will use the [Open Science Framework (OSF)](https://osf.io/) as our storage location, because it is particularly easy to use with Datalad.
+DataLad is a particularly powerful tool for sharing data across systems.  It allows one to push or pull data from a number of different remote storage systems; in this example we will use the [Open Science Framework (OSF)](https://osf.io/) as our storage location, because it is particularly easy to use with DataLad.
 
-We first need to install and set up the `datalad-osf` Python package, per [the Datalad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use Datalad to authenticate with OSF:
+We first need to install and set up the `datalad-osf` Python package, per [the DataLad documentation](https://docs.datalad.org/projects/osf/en/latest/settingup.html).  We also need to create an account on the OSF site, and obtain a Personal Access Token for login.  We can then use DataLad to authenticate with OSF:
 
 ```bash
 ➤  datalad osf-credentials                                                1 ↵
@@ -1088,7 +1088,7 @@ token:
 osf_credentials(ok): [authenticated as Russell Poldrack <poldrack@stanford.edu>]
 ```
 
-Having authenticated with OSF, we can now create a new OSF project using Datalad:
+Having authenticated with OSF, we can now create a new OSF project using DataLad:
 
 ```bash
 ➤  datalad create-sibling-osf --title datalad-test-project -s osf
@@ -1145,7 +1145,7 @@ action summary:
      523    1276   58237 data/demographics.csv
 ```
 
-One can also push data using Datalad to a range of other remote hosts; see the [Datalad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
+One can also push data using DataLad to a range of other remote hosts; see the [DataLad documentation](https://handbook.datalad.org/en/latest/basics/101-138-sharethirdparty.html) for more on this.
 
 
 
