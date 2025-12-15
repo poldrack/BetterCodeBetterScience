@@ -1023,7 +1023,7 @@ Date:   Mon Dec 15 13:40:29 2025 -0800
       https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
 ```
 
-Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking.
+Here we see the commit messages that were automatically created by DataLad, first for creating the new dataset and then for downloading the URLS.  The `datalad download-url` function adds the URL to the log, which is useful for provenance tracking. If one wishes to download a large number of files, there is also a [`datalad addurls`](https://docs.datalad.org/en/stable/generated/man/datalad-addurls.html) command that can download multiple files based on a single text file (TSV, JSON, etc) containing the relevant URLs and information.
 
 #### Modifying files
 
