@@ -1071,7 +1071,7 @@ nothing to save, working tree clean
 
 ##### Using `datalad run`
 
-Although the previous example was meant to provide background on how datalad works, in practice there is actually a much easier way to accomplish these steps, which is by using the `datalad run` command. This command will automatically take care of checking out the relevant files, running the command, and then checking the files back in, generating a commit message that tracks the specific command that was used:
+Although the previous example was meant to provide background on how DataLad works, in practice there is actually a much easier way to accomplish these steps, which is by using the [`datalad run`](https://docs.datalad.org/en/stable/generated/man/datalad-run.html) command. This command will automatically take care of fetching and unlocking the relevant files, running the command, and then committing the files back in, generating a commit message that tracks the specific command that was used:
 
 ```bash
 ➤  datalad run -i my_datalad_repo/data/demographics.csv -o my_datalad_repo/data/demographics.csv -- uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
