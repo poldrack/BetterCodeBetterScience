@@ -200,6 +200,11 @@ Compare this to the result using the built-in dot product operator in Numpy, whi
 For data-intensive workflows, especially when the data are too large to fit completely in memory, a substantial amount of execution time may be spent waiting for data to be read and/or written to a filesystem or database.
 
 
+### Caching/lazy loading
+- functools cache decorator
+
+
+
 ## Just-in-time compilation with Numba
 
 
@@ -208,6 +213,7 @@ For data-intensive workflows, especially when the data are too large to fit comp
 
 ## A brief introduction to parallelism and multithreading
 
+## preloading data using threads
 
 ## Writing parallelized code
 
