@@ -13,8 +13,7 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 See table of contents in the sidebar to the left.
 
-```
-{tableofcontents}
+```{tableofcontents}
 ```
 
 ### Acknowledgements
