@@ -69,7 +69,7 @@ User stories are also useful for thinking through the potential impact of new fe
 Perhaps the most common example of violations of YAGNI comes about in the development of visualization tools.
 In this example, the developer might decide to create an visualizer to show how the original dataset is being converted into the new format, with interactive features that would allow the user to view features of individual files.
 The question that you should always ask yourself is: What user stories would this feature address? If it's difficult to come up with stories that make clear how the feature would help solve particular problems for users, then the feature is probably not needed. "If you build it, they will come" might work in baseball, but it rarely works in scientific software.
-This is the reason that one of us (RP) regularly tells his trainees to post a note in their workspace with one simple mantra: "MVP".
+This is the reason that I regularly tells my trainees to post a note in their workspace with one simple mantra: "MVP".
 
 
 ## Refactoring code
@@ -954,7 +954,7 @@ def get_subject_label(file):
         return None
 ```
 
-When one of us asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence.
+When I asked the question "Should there ever be a file path that doesn't include a subject label?", the answer was "No", meaning that this code allows what amounts to an error to occur without announcing its presence.
 When we looked at the place where this function was used in the code, there was no check for whether the output was `None`, meaning that such an error would go unnoticed until it caused an error later when `subject_label` was assumed to be a string.
 Also note that the docstring for this function is misleading, as it states that a message will be printed if the return value is `None`, but no message is actually printed.
 In general, printing a message is a poor way to signal the potential presence of a problem, particularly if the code has a large amount of text output in which the message might be lost.
