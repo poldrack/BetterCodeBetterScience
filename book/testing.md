@@ -881,7 +881,7 @@ def test_get_PubmedIDs_for_query_check_valid(ids):
 The result is the same, but we now have a set of ids that we can reuse in subsequent tests, so that we don't have to make repeated queries.
 It's important to note while using a session-scoped fixture: If any of the subsequent tests modify the fixture, those modifications will persist, which will break the isolation between tests.
 We could prevent this by removing the `scope="session"` argument, which would then default to the standard scope which is within a specific function.
-If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g. `my_ids = ids.copy()`) so that the global fixture object won't be modified.
+If you wish to use session-scoped fixtures and need to modify them within the test function, then it is best to first create a copy of the fixture object (e.g., `my_ids = ids.copy()`) so that the global fixture object won't be modified.
 
 ## Mocking
 
@@ -973,7 +973,7 @@ def test_get_PubmedIDs_for_query_check_valid_mocked(mock_pubmed_api):
 ```
 
 Note that while mocking can be useful for testing specific components by saving time and increasing robustness, integration tests and smoke tests should usually be run without mocking, in order to catch any errors that arise through interaction with the relevant components that are being mocked.
-In fact, it's always a good idea to have tests that specifically assess the usage of the external service and the system's response to failures in that service (e.g. by using features of the testing framework that allow one to shut down access to the network).
+In fact, it's always a good idea to have tests that specifically assess the usage of the external service and the system's response to failures in that service (e.g., by using features of the testing framework that allow one to shut down access to the network).
 
 ## Parametrized tests
 
@@ -1192,7 +1192,7 @@ def test_linear_regression_without_validation(X, y):
 ```
 
 The `@given` decorator contains commands that will generate two arrays of the same size, which are then used as our X and y variables.
-The main purpose of the test is to see whether the function successfully executes (i.e. a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.
+The main purpose of the test is to see whether the function successfully executes (i.e., a smoke test), but we include a minimal assertion to make sure that it returns a value that is not None.
 We will turn off the validation in order to see what happens if the linear regression function is given invalid data.
 Running this test, we see that the test fails, with the following output:
 
