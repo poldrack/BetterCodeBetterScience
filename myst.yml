@@ -30,5 +30,5 @@ project:
 site:
   options:
     logo: logo.png
-    folders: true
+#    folders: true
   template: book-theme
