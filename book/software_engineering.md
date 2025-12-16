@@ -14,7 +14,7 @@ In this chapter we will focus on some of the "big ideas" from software engineeri
 
 One might ask why we are spending an entire chapter talking about software engineering; when it's likely that AI tools going to write much of the code in our projects going forward.
 First, think back to the point we made in Chapter 1: Programming is not equivalent to writing code.
-Even if the AI system can write computer code (e.g. in Python), a human needs to describe the problem(s) that the software is meant to solve, and to iterate with the code to debug any failures to solve the problem.
+Even if the AI system can write computer code (e.g., in Python), a human needs to describe the problem(s) that the software is meant to solve, and to iterate with the code to debug any failures to solve the problem.
 This requires that a human write the specification that tells the computer how to solve the problem: we may have traded Python for English as the programming language of choice, but nonetheless the human needs to precisely specify the goals of the software.
 Thus, an understanding of the software development process will remain essential even as AI assistants write an increasing amount of code.
 
@@ -193,10 +193,10 @@ This fallacy is particularly likely to occur when one uses names that are too si
 > "A name should describe the concept it represents."
 
 The reader should be able to accurately infer from the name what is being represented.
-This implies the common proscription against single-letter variable names, except in cases where the context makes very clear what its function is (e.g. as a counter in a compact loop).
+This implies the common proscription against single-letter variable names, except in cases where the context makes very clear what its function is (e.g., as a counter in a compact loop).
 More generally, when creating a variable name it's worth thinking about what kind of confusion might occur, and also who the intended audiences are.
 For example, it can be particularly useful to select terms that are common within the relevant scientific domain when available.
-Other important guidelines for understandability are using the right pluralization (e.g. a variable with a pluralized name should contain more than one thing, and vice versa for variables with a single name) and the right part of speech (for example, functions should generally use verbs while variables and classes should generally use nouns).
+Other important guidelines for understandability are using the right pluralization (e.g., a variable with a pluralized name should contain more than one thing, and vice versa for variables with a single name) and the right part of speech (for example, functions should generally use verbs while variables and classes should generally use nouns).
 
 ##### Specificity
 
@@ -222,7 +222,7 @@ We would generally suggest to err on the side of using names that are too long v
 > "A name should be easy to use in common speech."
 
 Pronounceability is primarily important for cognitive reasons: We are much more likely to remember things that are meaningful to us compared to things that don't have obvious meaning.
-In addition, an unpronounceable name makes communicating about the object with others (e.g. in a code review) very difficult.
+In addition, an unpronounceable name makes communicating about the object with others (e.g., in a code review) very difficult.
 So while `bfufftots` might seem like a clever acronym for "bandpass filter using FFT on time series", `filter_timeseries_bandpass` is probably more effective and will certainly be clearer to readers.
 
 ##### Austerity
@@ -370,7 +370,7 @@ For example:
 ###### Known flaws or TODO items
 
 It's often the case that there are remaining known issues with code that the developer has not yet had the time to address.
-These should be noted with a consistent heading (e.g. "TODO") so that they can be easily searched for.
+These should be noted with a consistent heading (e.g., "TODO") so that they can be easily searched for.
 For example:
 
 ```python
@@ -391,8 +391,8 @@ n_replicates = 500
 
 ### Avoiding "code smells" and "anti-patterns"
 
-There are two related concepts that are used to describe the appearance of potentially problematic code The “anti-pattern” is a riff on the concept of a *design pattern*, which is a recommended solution (i.e. a "best practice") for a common programming problem [@Gamma:1995aa].
-An anti-pattern is conversely a commonly used but bad solution (i.e. a "worst practice") for a common programming problem.
+There are two related concepts that are used to describe the appearance of potentially problematic code The “anti-pattern” is a riff on the concept of a *design pattern*, which is a recommended solution (i.e., a "best practice") for a common programming problem [@Gamma:1995aa].
+An anti-pattern is conversely a commonly used but bad solution (i.e., a "worst practice") for a common programming problem.
 In the Python world these are well known from the [The Little Book of Python Anti-Patterns](https://docs.quantifiedcode.com/python-anti-patterns/), which lays out many different anti-patterns common in Python coding.
 The second idea, that of the "code smell", has been popularized by Martin Fowler in his well-known book *Refactoring: Improving The Design of Existing Code *[@Fowler:1999aa].
 Just as a bad smell from food can give us an intuitive sense that the good might be spoiled, code smells are intuitive reactions to code that suggest that there might be a problem that could be a target for refactoring.
@@ -458,7 +458,7 @@ def proportion_significant(data):
 ```
 
 What does "3.09" refer to? A statistically literate reader might infer that this was meant to refer to the 99.9th percentile of the standard normal (Z) distribution, but couldn't be certain without talking to the developer.
-Another particular problem with floating point magic numbers is that they often are rounded (i.e. 3.09 rather than 3.090232306167813), which could lead to imprecision in the results in some contexts.
+Another particular problem with floating point magic numbers is that they often are rounded (i.e., 3.09 rather than 3.090232306167813), which could lead to imprecision in the results in some contexts.
 An additional problem with this particular function is that the value can't be changed by the user of the function.
 It would be better compute the value formally based on an explicit input of the probability, and then assign it to a named variable that makes clear what it means:
 
@@ -766,7 +766,7 @@ Out: 299792458
 
 #### Creating immutable variables
 
-We would generally like to define constants in such a way that their value is *immutable*, i.e. it is not allowed to be modified.
+We would generally like to define constants in such a way that their value is *immutable*, i.e., it is not allowed to be modified.
 Unfortunately, importing a variable from a module doesn't prevent it from being modified:
 
 ```
@@ -1073,7 +1073,7 @@ Examples of such variables include:
 
 - Counts (>= 0; in some cases an upper limit may also be plausible, such as a count of the number of planets in the solar system)
 - Elapsed time (> 0)
-- Discrete values (e.g. atomic numbers in the periodic table, or mass numbers for a particular element)
+- Discrete values (e.g., atomic numbers in the periodic table, or mass numbers for a particular element)
 
 For example:
 
@@ -1237,7 +1237,7 @@ The use of an existing package counts as technical debt because there is uncerta
 A package that is not actively maintained can:
 
 - become dysfunctional with newer Python releases
-- come in conflict with newer versions of other packages, e.g. relying upon a function in another package that becomes deprecated 
+- come in conflict with newer versions of other packages, e.g., relying upon a function in another package that becomes deprecated 
 - introduce security risks
 - fail to address bugs or errors in the code that are discovered by users
 

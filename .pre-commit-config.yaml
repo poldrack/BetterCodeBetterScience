@@ -1,4 +1,13 @@
 repos:
+  - repo: local
+    hooks:
+    - id: fix-latin-abbrev
+      name: Fix Latin abbreviations (e.g., i.e.)
+      entry: sed -i -e 's/\(\<\(e\.g\.\|i\.e\.\)\) /\1, /g'
+      language: system
+      files: ^.*/.*\.md$
+      types: [markdown]
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:

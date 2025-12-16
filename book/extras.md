@@ -4,7 +4,7 @@
 
 ## for essentials
 
-- discuss databases - e.g. sqlite example
+- discuss databases - e.g., sqlite example
 
 
 ## from AI-assisted coding chapter

@@ -36,7 +36,7 @@ In this section we will assume that the researcher has a basic knowledge of the 
 Here we will focus on the ways in which version control tools like `git` can serve as important tools to improve scientific coding.
 While there are numerous graphical user interfaces (GUIs) for git (including those offered by various IDEs), we will focus on its use via the command line interface (CLI).
 Every researcher should have a basic knowledge of the `git` CLI, since this is a ubiquitous interface available across all OSes and environments.
-The CLI is sometimes the only interface that is available to the researcher, e.g. in a remote session on an HPC system or in the cloud.
+The CLI is sometimes the only interface that is available to the researcher, e.g., in a remote session on an HPC system or in the cloud.
 Moreover, the CLI provides an immediate exposure to available commands (run `git --help`) and options for each command (run `git COMMAND --help`), allowing users to discover a command or option that might not (yet) be exposed by any particular GUI tool.
 
 ### How version control works
@@ -253,7 +253,7 @@ Thinking about the commit message can be helpful in considering when to commit; 
 
 #### Avoid blanket add/commit operations
 
-Another common `git` "anti-pattern" (i.e. a commonly used but bad solution to a common problem) is to simply add all files using `git add .` (which adds all files in the current directory, including those that have not been added) or `git add -A` (which does the similar thing recursively for the entire directory tree).
+Another common `git` "anti-pattern" (i.e., a commonly used but bad solution to a common problem) is to simply add all files using `git add .` (which adds all files in the current directory, including those that have not been added) or `git add -A` (which does the similar thing recursively for the entire directory tree).
 This kind of "blanket add/commit" is problematic for at least two reasons.
 First, there are often files that we don't want to add to version control, such as files containing credentials or files with details about the local system configuration.
 While we would usually want to add these files to our `.gitignore` file (which prevents them from being added), it's best practice to explicitly add files that we are working on.
@@ -273,7 +273,7 @@ It's useful to first examine how this might be done without version control.
 Suppose a developer has a codebase and wants to try out a major change, such as changing the database backend used in the project.
 They would usually save a copy of all of the source files (perhaps with a timestamped label), and then start working on the problem.
 If at some point they wish to completely abandon the new project, they can always go back to the copy of the original.
-But what if they want to abandon the latest part (e.g. a specific database) without necessarily abandoning the rest of the work that it took to get there? Unless they are saving copies at every step (which quickly becomes a bookkeeping nightmare), this will be very challenging to pull off.
+But what if they want to abandon the latest part (e.g., a specific database) without necessarily abandoning the rest of the work that it took to get there? Unless they are saving copies at every step (which quickly becomes a bookkeeping nightmare), this will be very challenging to pull off.
 On the other hand, with a solid version control workflow these problems are trivial to solve, because these systems are built exactly in order to solve this bookkeeping problem.
 
 
@@ -283,7 +283,7 @@ We will start first with a simple example that only involves the `main` branch o
 Later we will suggest that working directly in the main branch is not optimal, but it's common for many research projects with a single developer so we will start there, fitting with our mantra that we should never let the perfect be the enemy of the good.
 
 Let's say that we wish to try changing out the database backend for our project, which will require changes to several of the source files.
-Starting with a clean working tree (i.e. no uncommitted changes or untracked files not included in `.gitignore`), we would first create a new tag so that we can easily find the last commit in case we decide that we want to revert back to it:
+Starting with a clean working tree (i.e., no uncommitted changes or untracked files not included in `.gitignore`), we would first create a new tag so that we can easily find the last commit in case we decide that we want to revert back to it:
 
 ```bash
 git tag v0.2-pre-db-change
@@ -371,7 +371,7 @@ One often finds the need to install an older version of a particular dependency,
 Without virtual environments, managing different dependencies across projects can become impossible.
 If one project requires Python ≤3.9 while another needs Python ≥3.12, conflicts arise that virtual environments can easily resolve.
 Second, because the virtual environment specifies the exact version of each dependency and allows these to be exported, it is possible for other users on different machines to exactly recreate the package environment required by the author (assuming that those package versions are available on the users's operating system).
-This can greatly enhance the reproducibility of computational analyses across systems, and can also ease the implementation of software across multiple machines (e.g. when one wants to move code from a local machine into the cloud).
+This can greatly enhance the reproducibility of computational analyses across systems, and can also ease the implementation of software across multiple machines (e.g., when one wants to move code from a local machine into the cloud).
 On shared computing systems (such as academic computing clusters), virtual environments let users install their own packages without needing admin access.
 
 A virtual environment is at its heart simply a directory structure that contains a specified set of executables and software dependencies.
@@ -501,7 +501,7 @@ It not only stores dependencies but also metadata about the project, making it u
 #### Locking dependencies in uv
 
 Computational reproducibility requires that we be able to exactly recreate an environment, including the specific versions of all packages.
-If you look at the `pyproject.toml` file you will see that it doesn't specify exact versions for Python or the dependencies; instead, it specifies a lower bound; i.e. "numpy>=__DECIMAL_0__.3" means that the numpy version should be at least __DECIMAL_0__.3, but could be higher if a newer version became available.
+If you look at the `pyproject.toml` file you will see that it doesn't specify exact versions for Python or the dependencies; instead, it specifies a lower bound; i.e., "numpy>=__DECIMAL_0__.3" means that the numpy version should be at least __DECIMAL_0__.3, but could be higher if a newer version became available.
 This is often fine, but for purposes of reproducibility we often wish to record the exact package versions that were used for a particular analysis.
 This is commonly done using a `requirements.txt` file, and `uv` allows exporting the current environment to such a file:
 

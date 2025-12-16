@@ -2,7 +2,7 @@
 
 There was a time when becoming a scientist meant developing and honing a set of very specific laboratory skills: a cell biologist would learn to culture cells and perform assays, a materials scientist would learn to use high-powered microscopes, and a sociologist would learn to develop surveys.
 Each might also perform data analysis during the course of their research, but in most cases this was done using software packages that allowed them to enter their data and specify their analyses using a graphical user interface.
-While many researchers knew how to program a computer, and for some fields it was necessary (e.g. to control recording instruments or run computer simulations), it was relatively uncommon for most scientists to spend a significant proportion of their day writing code.
+While many researchers knew how to program a computer, and for some fields it was necessary (e.g., to control recording instruments or run computer simulations), it was relatively uncommon for most scientists to spend a significant proportion of their day writing code.
 
 How times have changed! In nearly every part of science today, working at the highest level requires the ability to write code.
 While the preferred languages differ between different fields of science, it is rare for a graduate student to make it through graduate school today without having to spend some time writing code.
@@ -218,7 +218,7 @@ There are a number of different methods that are implemented in different softwa
 One of the commonly used open source software packages, AFNI, provided a tool called *3DClustSim* that used simulation to estimate a statistical correction for multiple comparisons.
 This tool was commonly used in the neuroimaging literature, even by researchers who otherwise did not use the AFNI software, and the lore developed that 3DClustSim was less conservative than other tools.
 When Anders Eklund and Tom Nichols [@Eklund:2016aa] analyzed the performance of several different tools for multiple test correction, they identified a bug in the way that the 3DClustSim tool performed a particular rescaling operation, which led in some cases to inflated false positive rates.
-This bug had existed in the code for 15 years, and almost certainly was being leveraged by researchers to obtain "better" results (i.e. results with more seeming discoveries).
+This bug had existed in the code for 15 years, and almost certainly was being leveraged by researchers to obtain "better" results (i.e., results with more seeming discoveries).
 Had the bug led to much more conservative results compared to other standard methods, it is likely that users would have complained and the problem would have been investigated; in the event, no users complained about getting more apparent discoveries in their analyses.
 
 ### How not to fool ourselves
@@ -241,7 +241,7 @@ One solution is to set aside a portion of the data (which we call the "discovery
 This allows the researcher to use the discovery dataset to develop the analysis code, ensuring that the code is well matched to the features of the dataset.
 As long as contact with the validation dataset is scrupulously avoided during the discovery phase, this can prevent analyses of the validation dataset from being biased by the specific features of those data.
 The main challenge of this approach comes about when the dataset is not large enough to split into two parts.
-One adaptation of this approach is to use pilot data or data that were discarded in the initial phase of data cleaning (e.g. due to data quality issues) as the discovery sample, realizing that these data will likely differ in systematic ways from the validation set.
+One adaptation of this approach is to use pilot data or data that were discarded in the initial phase of data cleaning (e.g., due to data quality issues) as the discovery sample, realizing that these data will likely differ in systematic ways from the validation set.
 
 **TODO**:
 - Another solution is to modify the data in order to blind the researcher.  TBD
