@@ -309,7 +309,9 @@ dependencies = [
     { name = "mariadb" },
     { name = "matplotlib" },
     { name = "mdnewline" },
+    { name = "mne" },
     { name = "monarch-py" },
+    { name = "mongomock" },
     { name = "mysql-connector-python" },
     { name = "mystmd" },
     { name = "neo4j" },
@@ -370,7 +372,9 @@ requires-dist = [
     { name = "mariadb", specifier = ">=1.1.14" },
     { name = "matplotlib", specifier = ">=3.9.2" },
     { name = "mdnewline", specifier = ">=0.1.3" },
+    { name = "mne", specifier = ">=1.11.0" },
     { name = "monarch-py", specifier = ">=1.22.0" },
+    { name = "mongomock", specifier = ">=4.3.0" },
     { name = "mysql-connector-python", specifier = ">=9.5.0" },
     { name = "mystmd", specifier = ">=1.7.0" },
     { name = "neo4j", specifier = ">=6.0.3" },
@@ -2438,6 +2442,18 @@ wheels = [
 ]
 
 [[package]]
+name = "lazy-loader"
+version = "0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6f/6b/c875b30a1ba490860c93da4cabf479e03f584eba06fe5963f6f6644653d8/lazy_loader-0.4.tar.gz", hash = "sha256:47c75182589b91a4e1a85a136c074285a5ad4d9f39c63e0d7fb76391c4574cd1", size = 15431, upload-time = "2024-04-05T13:03:12.261Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/60/d497a310bde3f01cb805196ac61b7ad6dc5dcf8dce66634dc34364b20b4f/lazy_loader-0.4-py3-none-any.whl", hash = "sha256:342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc", size = 12097, upload-time = "2024-04-05T13:03:10.514Z" },
+]
+
+[[package]]
 name = "linkml"
 version = "1.9.3"
 source = { registry = "https://pypi.org/simple" }
@@ -2729,6 +2745,26 @@ wheels = [
 ]
 
 [[package]]
+name = "mne"
+version = "1.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "decorator" },
+    { name = "jinja2" },
+    { name = "lazy-loader" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "pooch" },
+    { name = "scipy" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9b/4f/ed4c27b6179665235a7ce3a738b24a05cafe9fa67f728994361598b27c2f/mne-1.11.0.tar.gz", hash = "sha256:0a89b8fc44133b81218a35cdcba74ad0f8ae2e265136249b365b9ce04864c688", size = 7152794, upload-time = "2025-11-21T19:34:45.907Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/60/a9b51009f6df38b491a874b3ca5db1ce37395c6327faca1008e71e9814e6/mne-1.11.0-py3-none-any.whl", hash = "sha256:993f25b0c92e563c23cb272c42c6c0298be10f40ed50abe4dd2deeba8d184ac2", size = 7451119, upload-time = "2025-11-21T19:34:43.463Z" },
+]
+
+[[package]]
 name = "monarch-py"
 version = "1.23.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2753,6 +2789,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c5/68/b58fef34f91e890eb1c1f96557351343ac176370c18f2338214e786988fe/monarch_py-1.23.1.tar.gz", hash = "sha256:65457c61dfc4526342c4025bcc286f7e465e4b3ddf6bfe343daa44898ce29d64", size = 741806, upload-time = "2025-12-10T04:04:02.909Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/be/3b/6b13ac39ed9e714c75214ae9d6bb70f272ea65c36e37b8a396ebff20e2da/monarch_py-1.23.1-py3-none-any.whl", hash = "sha256:9cba9cad1c88745fba19b699a5e81aee653802568997c700e7d1707b863aecd1", size = 71086, upload-time = "2025-12-10T04:04:01.81Z" },
+]
+
+[[package]]
+name = "mongomock"
+version = "4.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pytz" },
+    { name = "sentinels" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4d/a4/4a560a9f2a0bec43d5f63104f55bc48666d619ca74825c8ae156b08547cf/mongomock-4.3.0.tar.gz", hash = "sha256:32667b79066fabc12d4f17f16a8fd7361b5f4435208b3ba32c226e52212a8c30", size = 135862, upload-time = "2024-11-16T11:23:25.957Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/4d/8bea712978e3aff017a2ab50f262c620e9239cc36f348aae45e48d6a4786/mongomock-4.3.0-py2.py3-none-any.whl", hash = "sha256:5ef86bd12fc8806c6e7af32f21266c61b6c4ba96096f85129852d1c4fec1327e", size = 64891, upload-time = "2024-11-16T11:23:24.748Z" },
 ]
 
 [[package]]
@@ -3648,6 +3698,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
+name = "pooch"
+version = "1.8.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "platformdirs" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c6/77/b3d3e00c696c16cf99af81ef7b1f5fe73bd2a307abca41bd7605429fe6e5/pooch-1.8.2.tar.gz", hash = "sha256:76561f0de68a01da4df6af38e9955c4c9d1a5c90da73f7e40276a5728ec83d10", size = 59353, upload-time = "2024-06-06T16:53:46.224Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/87/77cc11c7a9ea9fd05503def69e3d18605852cd0d4b0d3b8f15bbeb3ef1d1/pooch-1.8.2-py3-none-any.whl", hash = "sha256:3529a57096f7198778a5ceefd5ac3ef0e4d06a6ddaf9fc2d609b806f25302c47", size = 64574, upload-time = "2024-06-06T16:53:44.343Z" },
 ]
 
 [[package]]
@@ -4788,6 +4852,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fd/3a/aec9b02217bb79b87bbc1a21bc6abc51e3d5dcf65c30487ac96c0908c722/Send2Trash-1.8.3.tar.gz", hash = "sha256:b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf", size = 17394, upload-time = "2024-04-07T00:01:09.267Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/b0/4562db6223154aa4e22f939003cb92514c79f3d4dccca3444253fd17f902/Send2Trash-1.8.3-py3-none-any.whl", hash = "sha256:0c31227e0bd08961c7665474a3d1ef7193929fedda4233843689baa056be46c9", size = 18072, upload-time = "2024-04-07T00:01:07.438Z" },
+]
+
+[[package]]
+name = "sentinels"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/9b/07195878aa25fe6ed209ec74bc55ae3e3d263b60a489c6e73fdca3c8fe05/sentinels-1.1.1.tar.gz", hash = "sha256:3c2f64f754187c19e0a1a029b148b74cf58dd12ec27b4e19c0e5d6e22b5a9a86", size = 4393, upload-time = "2025-08-12T07:57:50.26Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/49/65/dea992c6a97074f6d8ff9eab34741298cac2ce23e2b6c74fb7d08afdf85c/sentinels-1.1.1-py3-none-any.whl", hash = "sha256:835d3b28f3b47f5284afa4bf2db6e00f2dc5f80f9923d4b7e7aeeeccf6146a11", size = 3744, upload-time = "2025-08-12T07:57:48.858Z" },
 ]
 
 [[package]]

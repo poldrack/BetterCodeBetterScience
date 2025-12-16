@@ -62,6 +62,8 @@ dependencies = [
     "nilearn>=0.12.1",
     "fmriprep-docker>=25.2.3",
     "mystmd>=1.7.0",
+    "mne>=1.11.0",
+    "mongomock>=4.3.0",
 ]
 
 [build-system]
