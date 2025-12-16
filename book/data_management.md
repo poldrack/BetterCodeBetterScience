@@ -97,7 +97,7 @@ Before discussing different options, it is useful to lay out the important consi
 - *Collaboration*: Do multiple researchers need to access the data? Do they need to be able to modify the dataset concurrently?
 - *Storage capacity*: Is the solution sufficient to store the relevant amount of data for the study?  Is it scalable over time?
 - *Performance*: Is the solution fast enough to enable the required processing and analysis steps?
-- *Accessibility*: Is the storage system accessible to the system where the compute will be performed (e.g. local computer, HPC cluster, cloud system)?
+- *Accessibility*: Is the storage system accessible to the system where the compute will be performed (e.g., local computer, HPC cluster, cloud system)?
 - *Security*: Does the system meet the security and compliance requirements for the particular dataset? Does it allow appropriate access control?
 - *Redundancy*: Is the system robust to disasters, ranging from the failure of one hard drive to a catastrophic flood or fire?  Does it provide the required backup capability?
 - *Cost*: Does the cost of the solution fit within the researcher's budget?  Are there hidden costs that must be taken into account?
@@ -263,7 +263,7 @@ There are various types of checksums, such as MD5 (used in the example above) or
 
 Disasters can occur that can render data irretrievable, from a major flood or earthquake to a cup of coffee spilled onto a laptop.  It is essential to maintain a backup of the original data for disaster recovery purposes.  This backup should be located on a system that is geographically separate from the main storage, such as a cloud server.
 
-Many researchers store their data using RAID systems (which stands for "redundant array of independent disks"), which can provide some degree of resilience against disk failure.  Depending on the RAID configuration, these systems can survive the failure of one or more individual disks without data loss. However, storage on a RAID system is not a suitable replacement for backup, as these systems can still fail (e.g. due to a fire or flood that damages multiple disks).  
+Many researchers store their data using RAID systems (which stands for "redundant array of independent disks"), which can provide some degree of resilience against disk failure.  Depending on the RAID configuration, these systems can survive the failure of one or more individual disks without data loss. However, storage on a RAID system is not a suitable replacement for backup, as these systems can still fail (e.g., due to a fire or flood that damages multiple disks).  
 
 ## Data access
 
@@ -519,7 +519,7 @@ Here we see that loading the CSV file takes almost 9 times as long as the Parque
 Spreadsheet software such as Microsoft Excel is commonly used by researchers for all sorts of data management and processing operations.  Why are spreadsheets problematic?
 
 - They encourage manual manipulation of the data, which makes the operations non-reproducible by definition.
-- Spreadsheet tools will often automatically format data, sometimes changing things in important but unwanted ways.  For example, gene names such as "SEPT2" and "MARCH1" are converted to dates by Microsoft Excel, and some accession numbers (e.g. "2310009E13") are converted to floating point numbers.  An analysis of published genomics papers {cite:p}`Ziemann:2016aa` found that roughly twenty percent of supplementary gene lists created using Excel contained errors in gene names due to these conversions.
+- Spreadsheet tools will often automatically format data, sometimes changing things in important but unwanted ways.  For example, gene names such as "SEPT2" and "MARCH1" are converted to dates by Microsoft Excel, and some accession numbers (e.g., "2310009E13") are converted to floating point numbers.  An analysis of published genomics papers {cite:p}`Ziemann:2016aa` found that roughly twenty percent of supplementary gene lists created using Excel contained errors in gene names due to these conversions.
 - It is very easy to make errors when performing operations on a spreadsheet, and these errors can often go unnoticed.  A well known example occurred in the paper  ["Growth in the time of debt"](https://www.nber.org/papers/w15639) by the prominent economists Carmen Reinhart and Kenneth Rogoff. This paper claimed to have found that high levels of national debt led to decreased economic growth, and was used as a basis for promoting austerity programs after the 2008 financial crisis.  However, [researchers subsequently discovered](https://academic.oup.com/cje/article/38/2/257/1714018) that the authors had made an error in their Excel spreadsheet, excluding data from several countries; when the full data were used, the relationship between growth and debt became much weaker. 
 - Spreadsheet software can sometimes have limitations that can cause problems.  For example, the use of an outdated Microsoft Excel file format (.xls) [caused underreporting of COVID-19 cases](https://www.bbc.com/news/technology-54423988) due to limitations on the number of rows in that file format, and the lack of any warnings when additional rows in the imported data files were ignored.
 - Spreadsheets do not easily lend themselves to version control and change tracking, although some spreadsheet tools (such as Google Sheets) do provide the ability to clearly label versions of the data.
@@ -693,7 +693,7 @@ print(adj_df.to_markdown())
 
 There are a number of different file formats for graph data, used variously across different software packages.  For example, the `networkx` package supports 13 different graph formats!  The decision about which format to use will likely depend on the specific software packages that you plan to use. I have had good luck with both *GraphML* and *Pajek* formats. 
 
-For large networks that are dense (i.e. networks where most connections are nonzero) or weighted (i.e. the edges have continuous weights) it might make more sense to save the network as an adjacency matrix, making sure to also save the associated node labels.  This allows taking advantage of the efficiency of formats like Zarr, though it will incur the overhead of having to load the adjacency matrix into the graph engine.
+For large networks that are dense (i.e., networks where most connections are nonzero) or weighted (i.e., the edges have continuous weights) it might make more sense to save the network as an adjacency matrix, making sure to also save the associated node labels.  This allows taking advantage of the efficiency of formats like Zarr, though it will incur the overhead of having to load the adjacency matrix into the graph engine.
 
 ### Specialized data formats
 
@@ -720,7 +720,7 @@ In this section we discuss data organization. The most important principle of da
 
 One common decision that we need to make when managing data is to save data in more smaller files versus fewer larger files.  The right answer to this question depends in part on how we will have to access the data.  If we only need to access a small portion of the data and we can easily determine which file to open to obtain those data, then it probably makes sense to save many small files.  However, if we need to combine data across many small files, then it likely makes sense to save the data as one large file.  For example, in the [data management notebook](src/BetterCodeBetterScience/data_management.ipynb) there is an example where we create a large (10000 x 100000) matrix of random numbers, and save them either to a single file or to a separate file for each row.  When loading these data, the loading of the single file is about 5 times faster than loading the individual files.
 
-Another consideration about the number of files has to do with storage systems that are commonly used on high-performance computing systems.  On these systems, it is common to have separate quotas for total space used (e.g. in terabytes) as well as for the number of *inodes*, which are structures that store information about files and folders on a UNIX filesystem. Thus, generating many small files (e.g. millions) can sometimes cause problems on these systems. For this reason, we generally err on the side of generating fewer larger files versus more smaller files when working on high-performance computing systems.
+Another consideration about the number of files has to do with storage systems that are commonly used on high-performance computing systems.  On these systems, it is common to have separate quotas for total space used (e.g., in terabytes) as well as for the number of *inodes*, which are structures that store information about files and folders on a UNIX filesystem. Thus, generating many small files (e.g., millions) can sometimes cause problems on these systems. For this reason, we generally err on the side of generating fewer larger files versus more smaller files when working on high-performance computing systems.
 
 ### Data file/folder naming conventions
 
@@ -749,7 +749,7 @@ print(key_values)
 
 This is very useful because it allows one to easily query a large set of files for particular key-value pairs, and also allows one to easily parse the key-value pairs for a particular file.  
 
-It's worth nothing that using a naming scheme like this requires strict attention to naming hygiene.  In particular, it's essential to ensure that the delimiter characters ("-" and "_") don't accidentally get used within the values.  For example, if one were using an analysis called "IS-RSA", using this for the description (e.g. "'sub-001_sess-1A_desc-IS-RSA_corr.zarr") would cause file parsing to fail.  
+It's worth nothing that using a naming scheme like this requires strict attention to naming hygiene.  In particular, it's essential to ensure that the delimiter characters ("-" and "_") don't accidentally get used within the values.  For example, if one were using an analysis called "IS-RSA", using this for the description (e.g., "'sub-001_sess-1A_desc-IS-RSA_corr.zarr") would cause file parsing to fail.  
 
 ## Metadata
 
@@ -807,7 +807,7 @@ While metadata is generally meant to be used by computers, it is also important 
 A *data dictionary* provides information about each of the variables in a dataset. These are meant to be human readable, though it can often be useful to share them in a machine-readable format (such as JSON) so that they can also be used in programmatic ways.  A data dictionary includes information such as:
 
 - an understandable description of the variable 
-- the data type (e.g. string, integer, Boolean)
+- the data type (e.g., string, integer, Boolean)
 - the allowable range of values
 
 For example, a study of immune system function in human participants might include the following in its data dictionary:
@@ -950,7 +950,7 @@ In the case of original data we never want to allow any changes, but for derived
 
 ### Using git for data version control
 
-When the relevant data are small (e.g. smaller than a few megabytes) and stored in a text format (such as CSV/TSV), one can simply use git to track changes in the data.  (We will discuss in a later chapter why Github is not an optimal platform for sharing data, at least not on its own.). 
+When the relevant data are small (e.g., smaller than a few megabytes) and stored in a text format (such as CSV/TSV), one can simply use git to track changes in the data.  (We will discuss in a later chapter why Github is not an optimal platform for sharing data, at least not on its own.). 
 
 However, git does not work well for version control on larger datasets using binary data files.  Git is able to efficiently store version information about code because it tracks the specific differences in the code between versions (known as a *diff*), and only stores the differences.  Thus, if one has a very large code file and changes one line, only that one line difference is stored in the git database.  However, with binary data this strategy is not effective, and git has to store the entire new dataset each time, leading to bloated repositories and very slow performance. 
 
@@ -1230,7 +1230,7 @@ We start by uploading the GWAS data and adding them to a document store, using *
 2) The columns contain scalar values (and thus do not contain composite values such as sets of values)
 3) There are not multiple columns that contain the same kind of data
 
-In this case, looking at the data we see that several columns contain multiple values for genes, due to the fact that some single nucleotide polymorphisms (SNPs) are located in intergenic space and thu can be mapped to multiple genes.  These values separated by commas (e.g. "FADS2, FADS1").  To normalize this, we can *explode* the data frame, which involves separating out these values into separate rows, which have otherwise identical contents.  
+In this case, looking at the data we see that several columns contain multiple values for genes, due to the fact that some single nucleotide polymorphisms (SNPs) are located in intergenic space and thu can be mapped to multiple genes.  These values separated by commas (e.g., "FADS2, FADS1").  To normalize this, we can *explode* the data frame, which involves separating out these values into separate rows, which have otherwise identical contents.  
 
 ```python
 gwas_data = get_exploded_gwas_data()
@@ -1293,7 +1293,7 @@ Note that this function uses an *upsert* operation, which is a combination of in
 
 ### Annotating gene sets
 
-Remember that our goal in this analysis is to identify the biological overlap between traits. We could do this by assessing the degree to which they are associated with the same genes, but this would miss out on the fact that genes work together in networks that are often associated with the function of specific biological pathways.  Given a particular set of genes, we can use bioinformatics tools to identify the biological processes that are associated with that set of genes. In this case I used the  [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) tool from ELIXIR, which comes with a handy [Python package](https://pypi.org/project/gprofiler-official/).   This tool returns a set of pathways that are statistically enriched for each gene set, each of which is defined by a unique identifier that refers to a particular ontology such as the Gene Ontology.   For example, the 877 genes associated with the "platelet count" trait are involved in a range of biological processes and pathways, which range from the very general (e.g. GO:0005515, referring to "protein binding") to the very specific (e.g. GO:0007599, referring to "hemostasis", which is the stopping of bleeding).  
+Remember that our goal in this analysis is to identify the biological overlap between traits. We could do this by assessing the degree to which they are associated with the same genes, but this would miss out on the fact that genes work together in networks that are often associated with the function of specific biological pathways.  Given a particular set of genes, we can use bioinformatics tools to identify the biological processes that are associated with that set of genes. In this case I used the  [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) tool from ELIXIR, which comes with a handy [Python package](https://pypi.org/project/gprofiler-official/).   This tool returns a set of pathways that are statistically enriched for each gene set, each of which is defined by a unique identifier that refers to a particular ontology such as the Gene Ontology.   For example, the 877 genes associated with the "platelet count" trait are involved in a range of biological processes and pathways, which range from the very general (e.g., GO:0005515, referring to "protein binding") to the very specific (e.g., GO:0007599, referring to "hemostasis", which is the stopping of bleeding).  
 
 We can use `g:Profiler` to obtain the annotation for the gene set associated with each trait:
 
