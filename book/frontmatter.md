@@ -11,8 +11,7 @@ The book is licensed according to the [Creative Commons Attribution-NonCommercia
 
 ## Table of Contents
 
-```{tableofcontents}
-```
+See table of contents in the sidebar to the left.
 
 ### Acknowledgements
 
