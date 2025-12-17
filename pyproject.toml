@@ -64,11 +64,16 @@ dependencies = [
     "mystmd>=1.7.0",
     "mne>=1.11.0",
     "mongomock>=4.3.0",
+    "linkcheckmd>=1.4.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+# add script entry points here
+[project.scripts]
+check-links = "BetterCodeBetterScience.check_links:main"
 
 [tool.codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file

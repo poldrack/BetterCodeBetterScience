@@ -8,6 +8,9 @@ build-html: clean
 build-pdf:
 	jupyter-book build book/ --builder pdflatex
 
+check-links:
+	check-links	
+
 pipinstall:
 	uv pip install -r pyproject.toml
 	uv pip install -e .
