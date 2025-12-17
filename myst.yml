@@ -34,5 +34,3 @@ site:
     hide_myst_branding: true
 #    folders: true
   template: book-theme
-  files:
-    - book/transcripts/*.html
