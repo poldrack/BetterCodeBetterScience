@@ -27,13 +27,12 @@ project:
 # - file: performance
 # - file: HPC
 # - file: sharing
-    - file: book/transcripts/accelperm_transcripts.html
-      hidden: true
-    - file: book/transcripts/fastlabel_transcripts.html
-      hidden: true
+
 site:
   options:
     logo: logo.png
     hide_myst_branding: true
 #    folders: true
   template: book-theme
+  files:
+    - book/transcripts/*.html
