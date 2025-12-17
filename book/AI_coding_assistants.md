@@ -293,7 +293,7 @@ Depending on the kind of account that you have, you may need to pay for API acce
 
 It might be tempting to avoid the extra hassle of specifying the API key as an environment variable by simply pasting it directly into the code, but you should **never** do this.
 Even if you think the code may be private, it's all too easy for it to become public in the future, at which point someone could easily steal your key and rack up lots of charges.
-See the section in Chapter 3 on [Coding Portably](https://poldrack.github.io/BetterCodeBetterScience/software_engineering.html#coding-portably) for more on the ways to solve this problem.
+See the section in Chapter 3 on [Coding Portably](https://poldrack.github.io/BetterCodeBetterScience/software-engineering/#coding-portably) for more on the ways to solve this problem.
 
 Now that we have the client specified, we can submit a prompt and examine the result:
 
