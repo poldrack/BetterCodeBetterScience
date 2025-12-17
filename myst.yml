@@ -27,8 +27,10 @@ project:
 # - file: performance
 # - file: HPC
 # - file: sharing
+
 site:
   options:
     logo: logo.png
+    hide_myst_branding: true
 #    folders: true
   template: book-theme

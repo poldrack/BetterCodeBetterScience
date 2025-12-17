@@ -12,3 +12,6 @@ notebooks
 
 # MyST build outputs
 _build
+
+# backup files from latin checker
+*.md-e
