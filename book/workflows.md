@@ -66,6 +66,56 @@ but sometimes state is required
 - running it multiple time should give same answer as running it once
 - 
 
+- somewhere talk about in-place operations and their challenges
+
+- local mutation - never change an object that is passed in as an argument
+    - always copy
+    - if the package uses copy-on-write then this is cheap (only copied metadata)
+    - this is not default in pandas 1.x but coming in 2.x
+        - google says it's possible using pd.options.mode.copy_on_write = True - need to confirm
+    - need to check for other frameworks
+
+- lazy frames (polars)
+
+- any function that must mutate in place should do so clearly
+    - e.g. normalize_(x) (apparently pytorch style for mutating functions?)
+    - or using "inplace" in the function name
+
+
+- can encode state in type (e.g. a lightweight class that tracks state ,e.g. "NormalizedArray")
+- or track stage explicitly (e.g. Dataset(stage='normalized', data=array))
+
+- use zarr to save each pipeline step as a new group:
+
+dataset.zarr/
+├── raw/
+│   └── signal
+├── zscored/
+│   └── signal
+├── filtered/
+│   └── signal
+
+- can also store parameters as attrs in zarr
+- e.g. z.attrs.update({
+    "stage": "zscore",
+    "mean_method": "time",
+    "std_ddof": 1,
+})
+
+
+also look at arrow for columnar data - look into arrow immutability
+
+
+## Deferred execution
+
+- dask, xarray
+
+## Checkpointing
+
+- pipeline state should be files on disk, not in memory
+- functions don't pass large objects in memory, they simply pass file names
+- for modern formats like parquet (others?) reading is very fast so the penalty is minimal
+
 ## Precomputing expensive/common operations
 
 
@@ -102,6 +152,9 @@ https://workflowhub.eu/
 
 
 ## Logging
+
+
+## Report generation
 
 
  
