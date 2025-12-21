@@ -1,6 +1,6 @@
 # Workflow Management
 
-In most parts of science today, data processing and analysis comprises many different steps.  We will refer to such a set of steps as a computational *workflow* (or, interchangeably, *pipeline*). If you have been doing science for very long, you have very likely encountered a *mega-script* that implements such a workflow. Usually written in a scripting language like *Bash*, this is a script that may be hundreds or even thousands of lines long that runs a single workflow from start to end.  Often these scripts are handed down to new trainees over generations, such that users become afraid to make any changes lest the entire house of cards comes crashing down.  I think that most of us can agree that this is not an optimal workflow, and in this chapter I will discuss in detail how to move from a mega-script to a workflow that will meet all of the requirements that are required to provide robust and reliable answers to our scientific questions.
+In most parts of science today, data processing and analysis comprises many different steps.  We will refer to such a set of steps as a computational *workflow*. If you have been doing science for very long, you have very likely encountered a *mega-script* that implements such a workflow. Usually written in a scripting language like *Bash*, this is a script that may be hundreds or even thousands of lines long that runs a single workflow from start to end.  Often these scripts are handed down to new trainees over generations, such that users become afraid to make any changes lest the entire house of cards comes crashing down.  I think that most of us can agree that this is not an optimal workflow, and in this chapter I will discuss in detail how to move from a mega-script to a workflow that will meet all of the requirements that are required to provide robust and reliable answers to our scientific questions.
 
 ## What do we want from a scientific workflow?
 
@@ -30,19 +30,128 @@ Finally, we care about the *efficiency* of the workflow implementation. This inc
 
 It's worth noting that these different desiderata will sometimes conflict with one another (such as configurability versus maintainability), and that no workflow will be perfect.  
 
-## An example workflow
+### Pipelines versus workflows
 
-In this chapter I will use a running example to show how to move from a monolithic analysis script to a well-structured and usable workflow that meets most of the desired features outlined above.  
+The terms *workflow* and *pipeline* are sometimes used interchangeable, but in this chapter I will use them to refer to different kinds of applications. I will use *workflow* as the more general term to refer to any set of analysis procedures that are implemented as separate modules.  I will use the term *pipeline* to refer more specifically to a data analysis workflow where the several operations are combined into a single command through the use of *pipes*, which are a syntactic construct that feed the output of one process directly into the next process as input.  Some readers may be familiar with pipes from the UNIX filesystem, where they are represented by the vertical bar "|".  For example, let's say that we had a log file that contains the follow entries:
+
+```bash
+2024-01-15 10:23:45 ERROR: Database connection failed
+2024-01-15 10:24:12 ERROR: Invalid user input
+2024-01-15 10:25:33 ERROR: Database connection failed
+2024-01-15 10:26:01 INFO: Request processed
+2024-01-15 10:27:15 ERROR: Database connection failed
+```
+
+and that we wanted to generate a summary of errors. We could use the following pipeline:
+
+```bash
+grep "ERROR" app.log | sed 's/.*ERROR: //' | sort | uniq -c | sort -rn > error_summary.txt
+
+```
+
+where:
+
+- `grep "ERROR" app.log` extracts line containing the word "ERROR"
+- `sed 's/.*ERROR: //'` replaces everything up to the actual message with an empty string
+- `sort` sorts the rows alphabetically
+- `uniq -c` counts the number of appearances of each unique error message
+- `sort -rn`  sorts the rows in numerical order
+- `> error_summary.txt` redirects the output into a file called `error_summary.txt`
+
+#### Method chaining
+
+One way that simple pipelines can be built in Python is using *method chaining*, where the output of one class method is redirected into the next class method.  This is commonly used to perform data transformations in `pandas`, as it allows composing multiple transformations into a single command.  As an example, we will work with the Eisenberg et al. dataset that we used in a previous chapter, to compute the probability of having ever been arrested separately for males and females in the sample. To do this we need to perform a number of operations:
+
+- drop any observations that have missing values for the `Sex` or `ArrestedChargedLifeCount` variables
+- replace the numeric values in the `Sex` variable with text labels
+- create a new variable called `EverArrested` that binarizes the counts in the ArrestedChargedLifeCount variable
+- group the data by the `Sex` variable
+- select the column that we want to compute the mean of (`EverArrested`)
+- compute the mean
+
+We can do this in a single command using method chaining in `pandas`.  It's useful to format the code in a way that makes the pipeline steps explicit, by putting parentheses around the operation; in Python, any commands within parentheses are combined into a single command, which can be useful for making complex code more readable:
+
+```python
+arrest_stats_by_sex = (df
+    .dropna(subset=['Sex', 'ArrestedChargedLifeCount'])
+    .replace({'Sex': {0: 'Male', 1: 'Female'}})
+    .assign(EverArrested=lambda x: (x['ArrestedChargedLifeCount'] > 0).astype(int))
+    .groupby('Sex')
+    ['EverArrested']
+    .mean()
+)
+print(arrest_stats_by_sex)
+```
+```bash
+Sex
+Female    0.156489
+Male      0.274131
+Name: EverArrested, dtype: float64
+```
+
+Note that `pandas` data frames also include an explicit `.pipe` method that allows using arbitrary functions within a pipeline.  While these kinds of pipelines can be useful for simple data processing operations, they can become very difficult to debug, so I would generally avoid using complex functions within a method chain.
 
 
-## Breaking a workflow into stages
+## An example of a complex workflow
 
-good breakpoints between workflow modules include:
+In this chapter we will focus primarily on complex workflows that have many stages. I will use a running example to show how to move from a monolithic analysis script to a well-structured and usable workflow that meets most of the desired features outlined above.  For this example I will use an analysis of single-cell RNA-sequencing data to determine how gene expression in immune system cells changes with age. This analysis will utilize a [large openly available dataset](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1) that includes data from about 1.3 million immune system cells for about 35K transcripts.  I chose this particular example for several reasons:
 
-- conceptual logic - different stages do different things 
-- points where one might need to restart the computation (e.g. due to computational cost)
-- sections where one might wish to swap in a new method or different parameterization
-- points where the output could be reusable elsewhere
+- It is a realistic example of a workflow that a researcher might actually perform.
+- The data are large enough to call for a real workflow management scheme, but small enough to be processed on a single laptop (assuming it has decent memory). 
+- The workflow has many different steps, some of which can take a significant amount of time (over 30 minutes)
+- There is an established Python library ([scanpy](https://scanpy.readthedocs.io/en/stable/)) that implements the necessary workflow components.
+- It's an example outside of my own research domain, to help demonstrate the applicability of the book's ideas across a broader set of data types.
+
+### Starting point: One huge notebook
+
+I developed the initial version of this workflow in a way that many researchers would do so: By creating a Jupyter notebook that implements the entire workflow, which can be found [here]().  Although I don't usually prefer to do code generation using a chatbot, I did most of the coding for this example using the Google Gemini 3.0 chatbot, for a couple of reasons.  First, this model seemed particularly knowledgeable about this kind of analysis and the relevant packages.  Second, I found it useful to read the commentary about why particular analysis steps were being selected.  For debugging I used a mixture of the Gemini 3.0 chatbot and the VSCode Copilot agent, depending on the nature of the problem; for problems specific to the RNA-seq analysis tools I used Gemini, while for standard Python/Pandas issues I used Copilot. The total execution time for this notebook is about two hours on an M3 Max Macbook Pro.  
+
+#### The problem of in-place operations
+
+What I found as I developed the workflow is that I increasingly ran into problems that arose because the state of particular objects had changed.  This occurred for two reasons at different points.  In some cases it occurred because I saved a new version of the object to the same name, resulting in an object with different structure than before.  
+
+#### Converting from Jupyter notebook to a runnable python script
+
+- had to prevent plots from being displayed because this blocked execution
+- used copilot to find and fix all plotting commands to save them to file rather than showing
+
+## Decomposing a complex workflow
+
+The first thing we need to do with a large monolithic workflow is to determine how to decompose it into coherent modules.  There are various reasons that one might choose a particular breakpoint between modules.  First and foremost, there are usually different stages that do conceptually different things.  In our example, we can break the workflow into several high-level processes:
+
+- Data (down)loading
+- Data filtering (removing subjects or cell types with insufficient observations)
+- Quality control
+    - identifying bad cells on the basis of mitochondrial, ribosomal, or hemoglobin genes or hemoglobin contamination
+    - identifying "doublets" (multiple cells identified as one)
+- Preprocessing
+    - Count normalization
+    - Log transformation
+    - Identification of high-variance features
+    - Filtering of nuisance genes
+- Dimensionality reduction
+- UMAP generation
+- Clustering
+- Pseudobulking
+- Differential expression analysis
+- Pathway enrichment analysis (GSEA)
+- Overrepresentation analysis (Enrichr)
+- Predictive modeling
+
+In addition to a conceptual breakdown, there are also other reasons that one might to further decompose the workflow:
+
+- There may be points where one might need to restart the computation (e.g. due to computational cost)
+- There may be sections where one might wish to swap in a new method or different parameterization
+- There may be points where the output could be reusable elsewhere
+
+
+
+## Stateless workflows
+
+I asked Claude Code to help modularize the monolithic workflow, using a prompt that provided the conceptual breakdown described above.  The resulting code (found at XXX) ran correctly, but crashed about two hours into the process due to a resource issue that appeared to be due to asking for too many CPU cores in the differential expression analysis.  This left me in the situation of having to rerun the entire two hours of preliminary workflow simply to get to a point where I could test my fix for the differential expression component, which is not a particularly efficient way of coding.  The problem here is that the workflow execution is *stateful*, in the sense that the previous steps need to be rerun prior to performing the current step in order to establish the required objects in memory.  The solution to this problem is to implement the workflow in a *stateless* way, which doesn't require that earlier steps be rerun if they have already been completed.  One way to do this is by implementing a process called *checkpointing*, in which intermediate results are stored for each step.  These can then be used to start the workflow at any point without having to rerun all of the previous steps.  
+
+
+
 
 the workflow should be stateless when possible
 
