@@ -173,23 +173,28 @@ def run_with_checkpoint(
 
     from_cache = False
     error_message = None
+    save_succeeded = False
 
     try:
         if checkpoint_file.exists() and not force:
             print(f"[{step_name}] Loading from checkpoint: {checkpoint_file.name}")
             from_cache = True
             result = load_checkpoint(checkpoint_file)
+            save_succeeded = True  # Loading counts as success
         else:
             print(f"[{step_name}] Executing...")
             result = func(*args, **kwargs)
 
             print(f"[{step_name}] Saving checkpoint: {checkpoint_file.name}")
             save_checkpoint(result, checkpoint_file)
+            save_succeeded = True  # Only mark success after save completes
 
         return result
 
-    except Exception as e:
-        error_message = str(e)
+    except BaseException as e:
+        # Catch all exceptions including KeyboardInterrupt, SystemExit
+        if not save_succeeded:
+            error_message = f"{type(e).__name__}: {e}"
         raise
 
     finally:
@@ -253,6 +258,7 @@ def run_with_checkpoint_multi(
 
     from_cache = False
     error_message = None
+    save_succeeded = False
 
     try:
         all_exist = all(fp.exists() for fp in checkpoint_files.values())
@@ -260,7 +266,9 @@ def run_with_checkpoint_multi(
         if all_exist and not force:
             print(f"[{step_name}] Loading from checkpoints...")
             from_cache = True
-            return {key: load_checkpoint(fp) for key, fp in checkpoint_files.items()}
+            result = {key: load_checkpoint(fp) for key, fp in checkpoint_files.items()}
+            save_succeeded = True  # Loading counts as success
+            return result
 
         print(f"[{step_name}] Executing...")
         results = func(*args, **kwargs)
@@ -276,10 +284,13 @@ def run_with_checkpoint_multi(
                 raise KeyError(f"Function result missing key: {key}")
             save_checkpoint(results[key], filepath)
 
+        save_succeeded = True  # Only mark success after all saves complete
         return results
 
-    except Exception as e:
-        error_message = str(e)
+    except BaseException as e:
+        # Catch all exceptions including KeyboardInterrupt, SystemExit
+        if not save_succeeded:
+            error_message = f"{type(e).__name__}: {e}"
         raise
 
     finally:
