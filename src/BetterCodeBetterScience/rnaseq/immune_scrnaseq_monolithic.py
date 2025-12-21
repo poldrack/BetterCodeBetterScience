@@ -68,11 +68,13 @@ datadir = Path('/Users/poldrack/data_unsynced/BCBS/immune_aging/')
 # %%
 
 datadir = Path('/Users/poldrack/data_unsynced/BCBS/immune_aging/')
+figure_dir = datadir / 'workflow/figures'
+figure_dir.mkdir(parents=True, exist_ok=True)
 
 # %%
-datafile = datadir / 'a3f5651f-cd1a-4d26-8165-74964b79b4f2.h5ad'
-url = 'https://datasets.cellxgene.cziscience.com/a3f5651f-cd1a-4d26-8165-74964b79b4f2.h5ad'
 dataset_name = 'OneK1K'
+datafile = datadir / f'dataset-{dataset_name}_subset-immune_raw.h5ad'
+url = 'https://datasets.cellxgene.cziscience.com/a3f5651f-cd1a-4d26-8165-74964b79b4f2.h5ad'
 
 if not datafile.exists():
     cmd = f'wget -O {datafile.as_posix()} {url}'
@@ -116,7 +118,7 @@ plt.grid(axis='y', alpha=0.5)
 
 # Optional: Draw a vertical line at the propsoed cutoff
 # This helps you visualize how many donors you would lose.
-cutoff_percentile = 10  # e.g., 10th percentile
+cutoff_percentile = 1  # e.g., 1st percentile
 min_cells_per_donor = int(
     scoreatpercentile(donor_cell_counts.values, cutoff_percentile)
 )
@@ -132,7 +134,8 @@ plt.axvline(
 )
 plt.legend()
 
-plt.show()
+plt.savefig(figure_dir / 'donor_cell_counts_distribution.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %%
 print(
@@ -164,7 +167,7 @@ counts_per_donor = pd.crosstab(adata.obs['donor_id'], adata.obs['cell_type'])
 # Keep if >= 10 cells in at least 90% of donors
 
 min_cells = 10
-percent_donors = 0.9
+percent_donors = 0.95
 donor_count = counts_per_donor.shape[0]
 cell_types_to_keep = counts_per_donor.columns[
     (counts_per_donor >= min_cells).sum(axis=0)
@@ -270,14 +273,19 @@ p1 = sc.pl.violin(
     ['total_counts', 'n_genes_by_counts', 'pct_counts_mt'],
     jitter=0.4,
     multi_panel=True,
+    show=False,
 )
+plt.savefig(figure_dir / 'qc_violin_plots.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # 2. Scatter plot to spot doublets and dying cells
 # High mito + low genes = dying cell
 # High counts + high genes = potential doublet
 sc.pl.scatter(
-    adata, x='total_counts', y='n_genes_by_counts', color='pct_counts_mt'
+    adata, x='total_counts', y='n_genes_by_counts', color='pct_counts_mt', show=False
 )
+plt.savefig(figure_dir / 'qc_scatter_doublets.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # ####  Check Hemoglobin (RBC contamination)
@@ -293,7 +301,8 @@ plt.title('Hemoglobin Content Distribution')
 plt.xlabel('% Hemoglobin Counts')
 plt.axvline(5, color='red', linestyle='--', label='5% Cutoff')
 plt.legend()
-plt.show()
+plt.savefig(figure_dir / 'hemoglobin_distribution.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # #### Create a copy of the data and apply QC cutoffs
@@ -398,7 +407,9 @@ print(adata_qc.obs['predicted_doublet'].value_counts())
 #
 
 # %%
-sc.pl.umap(adata_qc, color=['doublet_score', 'predicted_doublet'], size=20)
+sc.pl.umap(adata_qc, color=['doublet_score', 'predicted_doublet'], size=20, show=False)
+plt.savefig(figure_dir / 'doublet_detection_umap.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # #### Filter doublets
@@ -410,7 +421,7 @@ print(f'found {adata_qc.obs["predicted_doublet"].sum()} predicted doublets')
 
 # Filter the data to keep only singlets (False)
 # write back to adata for simplicity
-adata = adata_qc[not adata_qc.obs['predicted_doublet'], :]
+adata = adata_qc[adata_qc.obs['predicted_doublet'] == False, :] #noqa: E712
 print(f'Remaining cells: {adata.n_obs}')
 
 # %% [markdown]
@@ -536,7 +547,9 @@ except ImportError:
 # %%
 # Reality check: Check if PC1 is just "Cell Size":
 
-sc.pl.pca(adata, color=['total_counts', 'cell_type'], components=['1,2'])
+sc.pl.pca(adata, color=['total_counts', 'cell_type'], components=['1,2'], show=False)
+plt.savefig(figure_dir / 'pca_cell_type.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # PC1 separates cell types and isn't driven only by the number of cells.
@@ -552,7 +565,9 @@ sc.pp.neighbors(adata, n_neighbors=30, n_pcs=40, use_rep=use_rep)
 sc.tl.umap(adata, init_pos='X_pca_harmony')
 
 # %%
-sc.pl.umap(adata, color='total_counts')
+sc.pl.umap(adata, color='total_counts', show=False)
+plt.savefig(figure_dir / 'umap_total_counts.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 
 # %% [markdown]
@@ -574,7 +589,9 @@ sc.tl.leiden(
 
 # %%
 # Plot UMAP colored by Donor (to check integration) and Clusters
-sc.pl.umap(adata, color=['cell_type', 'leiden_1.0'], wspace=0.3)
+sc.pl.umap(adata, color=['cell_type', 'leiden_1.0'], wspace=0.3, show=False)
+plt.savefig(figure_dir / 'umap_cell_type_leiden.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %%
 # compute overlap between clusters and cell types
@@ -701,7 +718,9 @@ print(f'Remaining samples: {pb_adata.n_obs}')
 # Optional: Visualize the 'depth' of your new pseudobulk samples
 
 pb_adata.obs['total_counts'] = np.array(pb_adata.X.sum(axis=1)).flatten()
-sc.pl.violin(pb_adata, ['n_cells', 'total_counts'], multi_panel=True)
+sc.pl.violin(pb_adata, ['n_cells', 'total_counts'], multi_panel=True, show=False)
+plt.savefig(figure_dir / 'pseudobulk_violin.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # ### Differential expression with age
@@ -720,7 +739,6 @@ pb_adata.obs['age'] = ages
 
 
 # %%
-
 
 # Assume pb_adata is your pseudobulk object from the previous step
 # 1. Extract counts and metadata
@@ -924,7 +942,8 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.0)
 plt.grid(axis='x', alpha=0.3)
 plt.tight_layout()
 
-plt.show()
+plt.savefig(figure_dir / 'gsea_pathways.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # ### Enrichr analysis for overrepresentation
@@ -1027,7 +1046,8 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.0)
 plt.grid(axis='x', alpha=0.3)
 plt.tight_layout()
 
-plt.show()
+plt.savefig(figure_dir / 'enrichr_pathways.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # ### Age prediction from gene expression
@@ -1134,7 +1154,8 @@ plt.title(
 plt.legend()
 plt.grid(alpha=0.3)
 plt.tight_layout()
-plt.show()
+plt.savefig(figure_dir / 'age_prediction_performance.png', dpi=300, bbox_inches='tight')
+plt.close()
 
 # %% [markdown]
 # #### Baseline model: Sex only
