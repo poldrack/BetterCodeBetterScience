@@ -80,3 +80,14 @@ pre-commit run --all-files
 - Code examples should follow PEP8
 - Avoid introducing new dependencies when possible
 - Custom words for codespell are in `project-words.txt`
+
+## Coding guidelines
+
+## Notes for Development
+
+- Think about the problem before generating code.
+- Write code that is clean and modular. Prefer shorter functions/methods over longer ones.
+- Prefer reliance on widely used packages (such as numpy, pandas, and scikit-learn); avoid unknown packages from Github.
+- Do not include *any* code in `__init__.py` files.
+- Use pytest for testing.
+- Use functions rather than classes for tests. Use pytest fixtures to share resources between tests.
