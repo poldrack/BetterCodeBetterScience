@@ -23,18 +23,21 @@ The workflow uses two main data storage locations in AnnData:
    - Steps 4-6: Contains normalized, log-transformed expression data (after preprocessing)
    - Used for: QC metrics, normalization, HVG selection, PCA, neighbor graph, UMAP, clustering
 
-2. **`layers["counts"]`** - Raw counts layer (no longer used):
-   - Previously created at end of Step 3 (QC) - now removed
-   - Step 7 (pseudobulking) now loads step 3 checkpoint directly to get raw counts from `.X`
+2. **`layers["counts"]`** - Raw counts layer:
+   - Created at end of Step 3 (QC) for HVG selection in step 4
+   - Deleted after step 4 before step 5 checkpoint is saved
+   - Step 7 (pseudobulking) loads step 3 checkpoint directly to get raw counts from `.X`
 
 **Optimization implemented:**
-- Removed `layers["counts"]` creation from step 3 (QC)
-- Step 7 (pseudobulking) now loads the step 3 checkpoint to get raw counts from `.X`
-- This eliminates redundant storage of raw counts in `layers["counts"]` for steps 3-6 checkpoints
+- `layers["counts"]` is created in step 3 (needed for HVG selection in step 4)
+- After step 4 (preprocessing), the counts layer is deleted before step 5 saves its checkpoint
+- Step 7 (pseudobulking) loads the step 3 checkpoint to get raw counts from `.X`
+- This eliminates redundant storage of raw counts in steps 5-6 checkpoints
 
 **Storage savings:**
-- Steps 3-6 checkpoints now store only `.X` (not both `.X` and `layers["counts"]`)
-- Combined with gzip compression, this roughly halves the expression data storage for these checkpoints
+- Step 3 checkpoint stores both `.X` (raw counts) and `layers["counts"]` (needed for step 4)
+- Steps 5-6 checkpoints store only `.X` (counts layer deleted after step 4)
+- Combined with gzip compression, this reduces storage for steps 5-6 checkpoints
 
 After Step 7, the pseudobulk AnnData is a separate object with only aggregated counts in `.X` (no layers needed). Steps 8-11 use pickle/parquet files, not h5ad.
 

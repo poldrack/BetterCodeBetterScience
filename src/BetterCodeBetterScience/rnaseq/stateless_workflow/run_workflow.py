@@ -303,6 +303,12 @@ def run_stateless_workflow(
             log_parameters=step4_params,
         )
 
+        # Remove counts layer after preprocessing to save space in subsequent checkpoints
+        # (counts layer was needed for HVG selection but is no longer needed)
+        if "counts" in adata.layers:
+            del adata.layers["counts"]
+            print("Removed counts layer to save checkpoint space")
+
         # =====================================================================
         # STEP 5: Dimensionality Reduction
         # =====================================================================

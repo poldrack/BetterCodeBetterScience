@@ -316,8 +316,9 @@ def run_qc_pipeline(
     adata = detect_doublets_per_donor(adata, expected_doublet_rate)
     adata = filter_doublets(adata)
 
-    # Note: Raw counts remain in .X at this point.
-    # They will be accessed from this checkpoint during pseudobulking (step 7).
-    # This avoids redundant storage of counts in layers["counts"] for steps 4-6.
+    # Save raw counts for HVG selection (step 4) and pseudobulking (step 7)
+    # Note: Raw counts are also in .X at this point, which will be used
+    # by pseudobulking when loading this checkpoint directly.
+    adata.layers["counts"] = adata.X.copy()
 
     return adata
