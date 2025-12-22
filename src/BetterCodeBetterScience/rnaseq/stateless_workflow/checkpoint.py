@@ -22,6 +22,60 @@ if TYPE_CHECKING:
     )
 
 
+def bids_checkpoint_name(
+    dataset_name: str,
+    step_number: int,
+    description: str,
+    extension: str = "h5ad",
+) -> str:
+    """Generate a BIDS-compliant checkpoint filename.
+
+    Parameters
+    ----------
+    dataset_name : str
+        Name of the dataset (e.g., "OneK1K")
+    step_number : int
+        Step number in the workflow
+    description : str
+        Description of the checkpoint content (e.g., "filtered", "qc", "preprocessed")
+    extension : str
+        File extension without the dot (e.g., "h5ad", "pkl", "parquet")
+
+    Returns
+    -------
+    str
+        BIDS-formatted filename like "dataset-OneK1K_step-02_desc-filtered.h5ad"
+    """
+    return f"dataset-{dataset_name}_step-{step_number:02d}_desc-{description}.{extension}"
+
+
+def parse_bids_checkpoint_name(filename: str) -> dict[str, str | int]:
+    """Parse a BIDS-formatted checkpoint filename.
+
+    Parameters
+    ----------
+    filename : str
+        BIDS-formatted filename
+
+    Returns
+    -------
+    dict
+        Dictionary with keys: dataset, step_number, description, extension
+    """
+    import re
+
+    pattern = r"dataset-([^_]+)_step-(\d+)_desc-([^.]+)\.(.+)"
+    match = re.match(pattern, filename)
+    if match:
+        return {
+            "dataset": match.group(1),
+            "step_number": int(match.group(2)),
+            "description": match.group(3),
+            "extension": match.group(4),
+        }
+    return {}
+
+
 def get_file_type(filepath: Path) -> str:
     """Determine file type from extension.
 
@@ -65,7 +119,7 @@ def save_checkpoint(data: Any, filepath: Path) -> None:
     if file_type == "h5ad":
         if not isinstance(data, ad.AnnData):
             raise TypeError(f"Expected AnnData for .h5ad file, got {type(data)}")
-        data.write(filepath)
+        data.write(filepath, compression="gzip")
     elif file_type == "parquet":
         if not isinstance(data, pd.DataFrame):
             raise TypeError(f"Expected DataFrame for .parquet file, got {type(data)}")
@@ -124,6 +178,7 @@ def run_with_checkpoint(
     func: Callable,
     *args,
     force: bool = False,
+    skip_save: bool = False,
     execution_log: ExecutionLog | None = None,
     step_number: int | None = None,
     log_parameters: dict[str, Any] | None = None,
@@ -133,7 +188,7 @@ def run_with_checkpoint(
 
     If the checkpoint file exists and force=False, loads and returns
     the cached result. Otherwise, executes the function, saves the
-    result, and returns it.
+    result (unless skip_save=True), and returns it.
 
     Parameters
     ----------
@@ -147,6 +202,8 @@ def run_with_checkpoint(
         Positional arguments for func
     force : bool
         If True, ignore existing checkpoint and re-run
+    skip_save : bool
+        If True, don't save checkpoint after running (still loads if exists)
     execution_log : ExecutionLog, optional
         Execution log to record step details
     step_number : int, optional
@@ -168,7 +225,7 @@ def run_with_checkpoint(
             step_number=step_number,
             step_name=step_name,
             parameters=log_parameters,
-            checkpoint_file=str(checkpoint_file),
+            checkpoint_file=str(checkpoint_file) if not skip_save else None,
         )
 
     from_cache = False
@@ -185,9 +242,10 @@ def run_with_checkpoint(
             print(f"[{step_name}] Executing...")
             result = func(*args, **kwargs)
 
-            print(f"[{step_name}] Saving checkpoint: {checkpoint_file.name}")
-            save_checkpoint(result, checkpoint_file)
-            save_succeeded = True  # Only mark success after save completes
+            if not skip_save:
+                print(f"[{step_name}] Saving checkpoint: {checkpoint_file.name}")
+                save_checkpoint(result, checkpoint_file)
+            save_succeeded = True  # Mark success after execution (and optional save)
 
         return result
 
@@ -210,6 +268,7 @@ def run_with_checkpoint_multi(
     func: Callable,
     *args,
     force: bool = False,
+    skip_save: bool = False,
     execution_log: ExecutionLog | None = None,
     step_number: int | None = None,
     log_parameters: dict[str, Any] | None = None,
@@ -231,6 +290,8 @@ def run_with_checkpoint_multi(
         Positional arguments for func
     force : bool
         If True, ignore existing checkpoints and re-run
+    skip_save : bool
+        If True, don't save checkpoints after running (still loads if exists)
     execution_log : ExecutionLog, optional
         Execution log to record step details
     step_number : int, optional
@@ -253,7 +314,7 @@ def run_with_checkpoint_multi(
             step_number=step_number,
             step_name=step_name,
             parameters=log_parameters,
-            checkpoint_file=str(checkpoint_files_str),
+            checkpoint_file=str(checkpoint_files_str) if not skip_save else None,
         )
 
     from_cache = False
@@ -278,13 +339,14 @@ def run_with_checkpoint_multi(
                 f"Function must return dict for multi-checkpoint, got {type(results)}"
             )
 
-        print(f"[{step_name}] Saving checkpoints...")
-        for key, filepath in checkpoint_files.items():
-            if key not in results:
-                raise KeyError(f"Function result missing key: {key}")
-            save_checkpoint(results[key], filepath)
+        if not skip_save:
+            print(f"[{step_name}] Saving checkpoints...")
+            for key, filepath in checkpoint_files.items():
+                if key not in results:
+                    raise KeyError(f"Function result missing key: {key}")
+                save_checkpoint(results[key], filepath)
 
-        save_succeeded = True  # Only mark success after all saves complete
+        save_succeeded = True  # Mark success after execution (and optional saves)
         return results
 
     except BaseException as e:
@@ -327,6 +389,7 @@ def clear_checkpoints_from_step(checkpoint_dir: Path, from_step: int) -> list[Pa
     """Remove checkpoints from a specific step onwards.
 
     Useful for invalidating downstream results when re-running an upstream step.
+    Supports both legacy naming (step02_*) and BIDS naming (dataset-*_step-02_*).
 
     Parameters
     ----------
@@ -341,13 +404,23 @@ def clear_checkpoints_from_step(checkpoint_dir: Path, from_step: int) -> list[Pa
         List of removed files
     """
     removed = []
-    for filepath in checkpoint_dir.glob("step*"):
-        try:
-            step_num = int(filepath.name.split("_")[0].replace("step", ""))
-            if step_num >= from_step:
-                filepath.unlink()
-                removed.append(filepath)
-                print(f"Removed: {filepath.name}")
-        except (ValueError, IndexError):
-            continue
+    for filepath in checkpoint_dir.glob("*"):
+        step_num = None
+        # Try BIDS format first
+        parsed = parse_bids_checkpoint_name(filepath.name)
+        if parsed:
+            step_num = parsed["step_number"]
+        else:
+            # Try legacy format (step02_*)
+            try:
+                if filepath.name.startswith("step"):
+                    step_num = int(filepath.name.split("_")[0].replace("step", ""))
+            except (ValueError, IndexError):
+                pass
+
+        if step_num is not None and step_num >= from_step:
+            filepath.unlink()
+            removed.append(filepath)
+            print(f"Removed: {filepath.name}")
+
     return removed

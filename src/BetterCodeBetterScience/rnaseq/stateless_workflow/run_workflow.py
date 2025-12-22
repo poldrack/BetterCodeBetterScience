@@ -44,7 +44,10 @@ from BetterCodeBetterScience.rnaseq.modular_workflow.quality_control import (
     run_qc_pipeline,
 )
 from BetterCodeBetterScience.rnaseq.stateless_workflow.checkpoint import (
+    bids_checkpoint_name,
     clear_checkpoints_from_step,
+    load_checkpoint,
+    parse_bids_checkpoint_name,
     run_with_checkpoint,
     run_with_checkpoint_multi,
 )
@@ -98,17 +101,21 @@ def _run_overrepresentation_as_dict(
     }
 
 
+DEFAULT_CHECKPOINT_STEPS = frozenset({2, 3, 5})
+
+
 def run_stateless_workflow(
     datadir: Path,
     dataset_name: str = "OneK1K",
     url: str = "https://datasets.cellxgene.cziscience.com/a3f5651f-cd1a-4d26-8165-74964b79b4f2.h5ad",
     cell_type_for_de: str = "central memory CD4-positive, alpha-beta T cell",
     force_from_step: int | None = None,
+    checkpoint_steps: set[int] | None = None,
 ) -> dict:
     """Run the complete immune aging scRNA-seq analysis workflow with checkpointing.
 
-    Each step saves its output to a checkpoint file. On subsequent runs,
-    completed steps are skipped by loading from checkpoints.
+    Only specified steps save checkpoints. On subsequent runs, steps with
+    existing checkpoints are skipped by loading from checkpoints.
 
     Parameters
     ----------
@@ -122,12 +129,28 @@ def run_stateless_workflow(
         Cell type to use for differential expression
     force_from_step : int, optional
         If provided, clears checkpoints from this step onwards and re-runs
+    checkpoint_steps : set[int], optional
+        Set of step numbers that should save checkpoints. Defaults to {2, 3, 5}.
+        Step 3 is always required (provides raw counts for pseudobulking).
 
     Returns
     -------
     dict
         Dictionary containing all results
     """
+    # Setup checkpoint steps
+    if checkpoint_steps is None:
+        checkpoint_steps = set(DEFAULT_CHECKPOINT_STEPS)
+    else:
+        checkpoint_steps = set(checkpoint_steps)
+
+    # Step 3 is required for pseudobulking (provides raw counts)
+    if 3 not in checkpoint_steps:
+        print("Warning: Step 3 is required for pseudobulking. Adding to checkpoint_steps.")
+        checkpoint_steps.add(3)
+
+    print(f"Checkpointing enabled for steps: {sorted(checkpoint_steps)}")
+
     # Setup directories
     figure_dir = datadir / "workflow/figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
@@ -152,6 +175,7 @@ def run_stateless_workflow(
             url=url,
             cell_type_for_de=cell_type_for_de,
             force_from_step=force_from_step,
+            checkpoint_steps=sorted(checkpoint_steps),
         ),
     )
 
@@ -205,8 +229,9 @@ def run_stateless_workflow(
 
         adata = run_with_checkpoint(
             "filtering",
-            checkpoint_dir / "step02_filtered.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 2, "filtered"),
             _load_and_filter,
+            skip_save=2 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=2,
             log_parameters=step2_params,
@@ -234,7 +259,7 @@ def run_stateless_workflow(
 
         adata = run_with_checkpoint(
             "quality_control",
-            checkpoint_dir / "step03_qc.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 3, "qc"),
             run_qc_pipeline,
             adata,
             min_genes=step3_params["min_genes"],
@@ -244,6 +269,7 @@ def run_stateless_workflow(
             max_hb_pct=step3_params["max_hb_pct"],
             expected_doublet_rate=step3_params["expected_doublet_rate"],
             figure_dir=figure_dir,
+            skip_save=3 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=3,
             log_parameters=step3_params,
@@ -265,12 +291,13 @@ def run_stateless_workflow(
 
         adata = run_with_checkpoint(
             "preprocessing",
-            checkpoint_dir / "step04_preprocessed.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 4, "preprocessed"),
             run_preprocessing_pipeline,
             adata,
             target_sum=step4_params["target_sum"],
             n_top_genes=step4_params["n_top_genes"],
             batch_key=step4_params["batch_key"],
+            skip_save=4 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=4,
             log_parameters=step4_params,
@@ -291,13 +318,14 @@ def run_stateless_workflow(
 
         adata = run_with_checkpoint(
             "dimensionality_reduction",
-            checkpoint_dir / "step05_dimreduced.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 5, "dimreduced"),
             run_dimensionality_reduction_pipeline,
             adata,
             batch_key=step5_params["batch_key"],
             n_neighbors=step5_params["n_neighbors"],
             n_pcs=step5_params["n_pcs"],
             figure_dir=figure_dir,
+            skip_save=5 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=5,
             log_parameters=step5_params,
@@ -314,11 +342,12 @@ def run_stateless_workflow(
 
         adata = run_with_checkpoint(
             "clustering",
-            checkpoint_dir / "step06_clustered.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 6, "clustered"),
             run_clustering_pipeline,
             adata,
             resolution=step6_params["resolution"],
             figure_dir=figure_dir,
+            skip_save=6 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=6,
             log_parameters=step6_params,
@@ -333,6 +362,12 @@ def run_stateless_workflow(
         print("STEP 7: PSEUDOBULKING")
         print("=" * 60)
 
+        # Load step 3 checkpoint to get raw counts (stored in .X)
+        # This avoids redundant storage of counts in layers["counts"] for steps 4-6
+        step3_checkpoint = checkpoint_dir / bids_checkpoint_name(dataset_name, 3, "qc")
+        adata_raw_counts = load_checkpoint(step3_checkpoint)
+        print(f"Loaded raw counts from step 3 checkpoint: {adata_raw_counts.shape}")
+
         step7_params = {
             "group_col": "cell_type",
             "donor_col": "donor_id",
@@ -342,14 +377,16 @@ def run_stateless_workflow(
 
         pb_adata = run_with_checkpoint(
             "pseudobulking",
-            checkpoint_dir / "step07_pseudobulk.h5ad",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 7, "pseudobulk"),
             run_pseudobulk_pipeline,
-            adata,
+            adata_raw_counts,  # Use step 3 data with raw counts in .X
             group_col=step7_params["group_col"],
             donor_col=step7_params["donor_col"],
             metadata_cols=step7_params["metadata_cols"],
             min_cells=step7_params["min_cells"],
             figure_dir=figure_dir,
+            layer=None,  # Use .X directly (raw counts)
+            skip_save=7 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=7,
             log_parameters=step7_params,
@@ -373,9 +410,12 @@ def run_stateless_workflow(
         de_outputs = run_with_checkpoint_multi(
             "differential_expression",
             {
-                "stat_res": checkpoint_dir / "step08_stat_res.pkl",
-                "de_results": checkpoint_dir / "step08_de_results.parquet",
-                "counts_df": checkpoint_dir / "step08_counts.parquet",
+                "stat_res": checkpoint_dir
+                / bids_checkpoint_name(dataset_name, 8, "statres", "pkl"),
+                "de_results": checkpoint_dir
+                / bids_checkpoint_name(dataset_name, 8, "deresults", "parquet"),
+                "counts_df": checkpoint_dir
+                / bids_checkpoint_name(dataset_name, 8, "counts", "parquet"),
             },
             _run_differential_expression_as_dict,
             pb_adata,
@@ -383,6 +423,7 @@ def run_stateless_workflow(
             design_factors=step8_params["design_factors"],
             var_to_feature=var_to_feature,
             n_cpus=step8_params["n_cpus"],
+            skip_save=8 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=8,
             log_parameters=step8_params,
@@ -409,12 +450,13 @@ def run_stateless_workflow(
 
         gsea_results = run_with_checkpoint(
             "gsea",
-            checkpoint_dir / "step09_gsea.pkl",
+            checkpoint_dir / bids_checkpoint_name(dataset_name, 9, "gsea", "pkl"),
             run_gsea_pipeline,
             de_results,
             gene_sets=step9_params["gene_sets"],
             n_top=step9_params["n_top"],
             figure_dir=figure_dir,
+            skip_save=9 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=9,
             log_parameters=step9_params,
@@ -438,8 +480,10 @@ def run_stateless_workflow(
         enr_outputs = run_with_checkpoint_multi(
             "overrepresentation",
             {
-                "enr_up": checkpoint_dir / "step10_enr_up.pkl",
-                "enr_down": checkpoint_dir / "step10_enr_down.pkl",
+                "enr_up": checkpoint_dir
+                / bids_checkpoint_name(dataset_name, 10, "enrup", "pkl"),
+                "enr_down": checkpoint_dir
+                / bids_checkpoint_name(dataset_name, 10, "enrdown", "pkl"),
             },
             _run_overrepresentation_as_dict,
             de_results,
@@ -447,6 +491,7 @@ def run_stateless_workflow(
             padj_threshold=step10_params["padj_threshold"],
             n_top=step10_params["n_top"],
             figure_dir=figure_dir,
+            skip_save=10 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=10,
             log_parameters=step10_params,
@@ -475,12 +520,14 @@ def run_stateless_workflow(
 
         prediction_results = run_with_checkpoint(
             "predictive_modeling",
-            checkpoint_dir / "step11_prediction.pkl",
+            checkpoint_dir
+            / bids_checkpoint_name(dataset_name, 11, "prediction", "pkl"),
             run_predictive_modeling_pipeline,
             counts_df_ct,
             metadata_ct,
             n_splits=step11_params["n_splits"],
             figure_dir=figure_dir,
+            skip_save=11 not in checkpoint_steps,
             execution_log=execution_log,
             step_number=11,
             log_parameters=step11_params,
@@ -511,6 +558,8 @@ def run_stateless_workflow(
 def list_checkpoints(datadir: Path) -> list[tuple[str, Path]]:
     """List all checkpoint files in the workflow directory.
 
+    Supports both BIDS naming (dataset-*_step-*_desc-*) and legacy naming (step*_*).
+
     Parameters
     ----------
     datadir : Path
@@ -519,20 +568,37 @@ def list_checkpoints(datadir: Path) -> list[tuple[str, Path]]:
     Returns
     -------
     list[tuple[str, Path]]
-        List of (step_name, file_path) tuples
+        List of (step_name, file_path) tuples, sorted by step number
     """
     checkpoint_dir = datadir / "workflow/checkpoints"
     if not checkpoint_dir.exists():
         return []
 
     checkpoints = []
-    for filepath in sorted(checkpoint_dir.glob("step*")):
-        step_name = (
-            filepath.stem.split("_", 1)[1] if "_" in filepath.stem else filepath.stem
-        )
-        checkpoints.append((step_name, filepath))
+    for filepath in checkpoint_dir.glob("*"):
+        if filepath.is_dir():
+            continue
 
-    return checkpoints
+        # Try BIDS format first
+        parsed = parse_bids_checkpoint_name(filepath.name)
+        if parsed:
+            step_num = parsed["step_number"]
+            step_name = parsed["description"]
+            checkpoints.append((step_num, step_name, filepath))
+        else:
+            # Try legacy format (step02_*)
+            if filepath.name.startswith("step"):
+                try:
+                    parts = filepath.stem.split("_", 1)
+                    step_num = int(parts[0].replace("step", ""))
+                    step_name = parts[1] if len(parts) > 1 else filepath.stem
+                    checkpoints.append((step_num, step_name, filepath))
+                except (ValueError, IndexError):
+                    continue
+
+    # Sort by step number and return as (step_name, filepath) tuples
+    checkpoints.sort(key=lambda x: x[0])
+    return [(step_name, filepath) for _, step_name, filepath in checkpoints]
 
 
 def print_checkpoint_status(datadir: Path) -> None:

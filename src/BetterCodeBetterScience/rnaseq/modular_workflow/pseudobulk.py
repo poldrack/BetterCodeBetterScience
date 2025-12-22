@@ -157,6 +157,7 @@ def run_pseudobulk_pipeline(
     metadata_cols: list[str] | None = None,
     min_cells: int = 10,
     figure_dir: Path | None = None,
+    layer: str | None = None,
 ) -> ad.AnnData:
     """Run complete pseudobulking pipeline.
 
@@ -174,6 +175,8 @@ def run_pseudobulk_pipeline(
         Minimum cells per pseudobulk sample
     figure_dir : Path, optional
         Directory to save figures
+    layer : str, optional
+        Layer to use for counts. If None, uses .X directly.
 
     Returns
     -------
@@ -188,7 +191,7 @@ def run_pseudobulk_pipeline(
         adata,
         group_col=group_col,
         donor_col=donor_col,
-        layer="counts",
+        layer=layer,
         metadata_cols=metadata_cols,
     )
 

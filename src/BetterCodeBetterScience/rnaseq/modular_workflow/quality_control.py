@@ -316,7 +316,8 @@ def run_qc_pipeline(
     adata = detect_doublets_per_donor(adata, expected_doublet_rate)
     adata = filter_doublets(adata)
 
-    # Save raw counts for later use
-    adata.layers["counts"] = adata.X.copy()
+    # Note: Raw counts remain in .X at this point.
+    # They will be accessed from this checkpoint during pseudobulking (step 7).
+    # This avoids redundant storage of counts in layers["counts"] for steps 4-6.
 
     return adata
