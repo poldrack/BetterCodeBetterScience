@@ -70,7 +70,7 @@ def setup_file_logging(log_dir: Path) -> tuple[Path, logging.FileHandler]:
     return log_file, file_handler
 
 
-@flow(name="immune_aging_scrna_workflow", log_prints=True)
+@flow(name="immune_aging_scrna_workflow", log_prints=False)
 def run_workflow(
     datadir: Path,
     dataset_name: str = "OneK1K",
@@ -511,7 +511,7 @@ def run_workflow(
     return all_results
 
 
-@flow(name="analyze_single_cell_type", log_prints=True)
+@flow(name="analyze_single_cell_type", log_prints=False)
 def analyze_single_cell_type(
     datadir: Path,
     cell_type: str,

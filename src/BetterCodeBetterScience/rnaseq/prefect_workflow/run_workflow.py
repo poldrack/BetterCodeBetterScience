@@ -7,14 +7,8 @@ Or with arguments:
     python -m BetterCodeBetterScience.rnaseq.prefect_workflow.run_workflow --force-from 8
 """
 
-# Set numba environment variables BEFORE any imports
-# NUMBA_CAPTURED_ERRORS='old_style' allows print in nopython functions
-# See: https://github.com/ray-project/ray/issues/44714
-import os
-
-os.environ["NUMBA_CAPTURED_ERRORS"] = "old_style"
-
 import argparse
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
