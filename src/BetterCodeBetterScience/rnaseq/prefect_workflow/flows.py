@@ -37,8 +37,7 @@ def run_workflow(
 ) -> dict[str, Any]:
     """Run the complete immune aging scRNA-seq workflow with Prefect.
 
-    Steps 1-7 run sequentially (shared preprocessing).
-    Steps 8-11 run in parallel for each cell type.
+    All steps run sequentially to minimize memory usage.
 
     Parameters
     ----------
@@ -204,10 +203,10 @@ def run_workflow(
     )
 
     # =========================================================================
-    # STEPS 8-11: Per-Cell-Type Analysis (Parallel)
+    # STEPS 8-11: Per-Cell-Type Analysis (Sequential)
     # =========================================================================
     logger.info("=" * 60)
-    logger.info("STEPS 8-11: PER-CELL-TYPE ANALYSIS")
+    logger.info("STEPS 8-11: PER-CELL-TYPE ANALYSIS (SEQUENTIAL)")
     logger.info("=" * 60)
 
     # Get all cell types from pseudobulk
@@ -227,82 +226,75 @@ def run_workflow(
             f"{skipped_cell_types}"
         )
 
-    logger.info(f"Analyzing {len(valid_cell_types)} cell types")
+    logger.info(f"Analyzing {len(valid_cell_types)} cell types sequentially")
 
-    # Step 8: Submit all DE tasks in parallel
-    logger.info("Submitting differential expression tasks...")
-    de_futures = {}
-    for cell_type in valid_cell_types:
-        de_futures[cell_type] = differential_expression_task.submit(
-            pb_adata=pb_adata,
-            cell_type=cell_type,
-            var_to_feature=var_to_feature,
-            output_dir=results_dir,
-            design_factors=["age_scaled", "sex"],
-            n_cpus=4,  # Reduced per-task to allow parallelism
-        )
-
-    # Steps 9-11: Submit pathway/enrichment/prediction tasks as DE completes
-    gsea_futures = {}
-    enrichr_futures = {}
-    prediction_futures = {}
-
-    for cell_type in valid_cell_types:
-        # Wait for DE to complete for this cell type
-        de_result = de_futures[cell_type].result()
-
-        # Get metadata for this cell type (for predictive modeling)
-        pb_adata_ct = pb_adata[pb_adata.obs["cell_type"] == cell_type].copy()
-        pb_adata_ct.obs["age"] = (
-            pb_adata_ct.obs["development_stage"]
-            .str.extract(r"(\d+)-year-old")[0]
-            .astype(float)
-        )
-        metadata_ct = pb_adata_ct.obs.copy()
-
-        # Submit steps 9, 10, 11 in parallel for this cell type
-        gsea_futures[cell_type] = pathway_analysis_task.submit(
-            de_results=de_result["de_results"],
-            cell_type=cell_type,
-            output_dir=results_dir,
-            gene_sets=["MSigDB_Hallmark_2020"],
-            n_top=10,
-        )
-
-        enrichr_futures[cell_type] = overrepresentation_task.submit(
-            de_results=de_result["de_results"],
-            cell_type=cell_type,
-            output_dir=results_dir,
-            gene_sets=["MSigDB_Hallmark_2020"],
-            padj_threshold=0.05,
-            n_top=10,
-        )
-
-        prediction_futures[cell_type] = predictive_modeling_task.submit(
-            counts_df=de_result["counts_df"],
-            metadata=metadata_ct,
-            cell_type=cell_type,
-            output_dir=results_dir,
-            n_splits=5,
-        )
-
-    # Collect all results
-    logger.info("Collecting results...")
+    # Initialize results
     all_results = {
         "adata": adata,
         "pb_adata": pb_adata,
         "per_cell_type": {},
     }
 
-    for cell_type in valid_cell_types:
+    # Process each cell type sequentially
+    for i, cell_type in enumerate(valid_cell_types):
+        logger.info(f"\n[{i + 1}/{len(valid_cell_types)}] Processing: {cell_type}")
+
         try:
+            # Step 8: Differential Expression
+            de_result = differential_expression_task(
+                pb_adata=pb_adata,
+                cell_type=cell_type,
+                var_to_feature=var_to_feature,
+                output_dir=results_dir,
+                design_factors=["age_scaled", "sex"],
+                n_cpus=8,
+            )
+
+            # Get metadata for this cell type (for predictive modeling)
+            pb_adata_ct = pb_adata[pb_adata.obs["cell_type"] == cell_type].copy()
+            pb_adata_ct.obs["age"] = (
+                pb_adata_ct.obs["development_stage"]
+                .str.extract(r"(\d+)-year-old")[0]
+                .astype(float)
+            )
+            metadata_ct = pb_adata_ct.obs.copy()
+
+            # Step 9: Pathway Analysis (GSEA)
+            gsea_result = pathway_analysis_task(
+                de_results=de_result["de_results"],
+                cell_type=cell_type,
+                output_dir=results_dir,
+                gene_sets=["MSigDB_Hallmark_2020"],
+                n_top=10,
+            )
+
+            # Step 10: Overrepresentation Analysis (Enrichr)
+            enrichr_result = overrepresentation_task(
+                de_results=de_result["de_results"],
+                cell_type=cell_type,
+                output_dir=results_dir,
+                gene_sets=["MSigDB_Hallmark_2020"],
+                padj_threshold=0.05,
+                n_top=10,
+            )
+
+            # Step 11: Predictive Modeling
+            prediction_result = predictive_modeling_task(
+                counts_df=de_result["counts_df"],
+                metadata=metadata_ct,
+                cell_type=cell_type,
+                output_dir=results_dir,
+                n_splits=5,
+            )
+
             all_results["per_cell_type"][cell_type] = {
-                "de": de_futures[cell_type].result(),
-                "gsea": gsea_futures[cell_type].result(),
-                "enrichment": enrichr_futures[cell_type].result(),
-                "prediction": prediction_futures[cell_type].result(),
+                "de": de_result,
+                "gsea": gsea_result,
+                "enrichment": enrichr_result,
+                "prediction": prediction_result,
             }
             logger.info(f"Completed analysis for: {cell_type}")
+
         except Exception as e:
             logger.error(f"Failed analysis for {cell_type}: {e}")
             all_results["per_cell_type"][cell_type] = {"error": str(e)}
@@ -401,20 +393,20 @@ def analyze_single_cell_type(
     )
     metadata_ct = pb_adata_ct.obs.copy()
 
-    # Run parallel tasks
-    gsea_future = pathway_analysis_task.submit(
+    # Run tasks sequentially
+    gsea_result = pathway_analysis_task(
         de_results=de_result["de_results"],
         cell_type=cell_type,
         output_dir=results_dir,
     )
 
-    enrichr_future = overrepresentation_task.submit(
+    enrichr_result = overrepresentation_task(
         de_results=de_result["de_results"],
         cell_type=cell_type,
         output_dir=results_dir,
     )
 
-    prediction_future = predictive_modeling_task.submit(
+    prediction_result = predictive_modeling_task(
         counts_df=de_result["counts_df"],
         metadata=metadata_ct,
         cell_type=cell_type,
@@ -424,7 +416,7 @@ def analyze_single_cell_type(
     return {
         "cell_type": cell_type,
         "de": de_result,
-        "gsea": gsea_future.result(),
-        "enrichment": enrichr_future.result(),
-        "prediction": prediction_future.result(),
+        "gsea": gsea_result,
+        "enrichment": enrichr_result,
+        "prediction": prediction_result,
     }
