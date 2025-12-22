@@ -42,7 +42,8 @@ The workflow uses two main data storage locations in AnnData:
 After Step 7, the pseudobulk AnnData is a separate object with only aggregated counts in `.X` (no layers needed). Steps 8-11 use pickle/parquet files, not h5ad.
 
 **Selective checkpointing:**
-- Added `checkpoint_steps` parameter to `run_stateless_workflow()` (default: `{2, 3, 5}`)
+- Added `checkpoint_steps` parameter to `run_stateless_workflow()` (default: `{2, 3, 5, 9, 10, 11}`)
 - Only specified steps save checkpoints; other steps run without saving
 - Step 3 is always required (provides raw counts for pseudobulking)
+- Steps 9-11 included by default as they produce small pickle files
 - Added `skip_save` parameter to `run_with_checkpoint()` and `run_with_checkpoint_multi()`

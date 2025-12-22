@@ -101,7 +101,7 @@ def _run_overrepresentation_as_dict(
     }
 
 
-DEFAULT_CHECKPOINT_STEPS = frozenset({2, 3, 5})
+DEFAULT_CHECKPOINT_STEPS = frozenset({2, 3, 5, 9, 10, 11})
 
 
 def run_stateless_workflow(
@@ -130,7 +130,7 @@ def run_stateless_workflow(
     force_from_step : int, optional
         If provided, clears checkpoints from this step onwards and re-runs
     checkpoint_steps : set[int], optional
-        Set of step numbers that should save checkpoints. Defaults to {2, 3, 5}.
+        Set of step numbers that should save checkpoints. Defaults to {2, 3, 5, 9, 10, 11}.
         Step 3 is always required (provides raw counts for pseudobulking).
 
     Returns
