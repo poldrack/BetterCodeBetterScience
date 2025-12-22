@@ -79,6 +79,7 @@ dependencies = [
     "ipython>=9.8.0",
     "harmonypy>=0.0.10",
     "rpy2>=3.6.4",
+    "prefect>=3.0",
 ]
 
 [build-system]
