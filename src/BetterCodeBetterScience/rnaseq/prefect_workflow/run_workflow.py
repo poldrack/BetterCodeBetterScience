@@ -7,8 +7,13 @@ Or with arguments:
     python -m BetterCodeBetterScience.rnaseq.prefect_workflow.run_workflow --force-from 8
 """
 
-import argparse
+# Disable numba JIT to avoid compatibility issues with Prefect/pynndescent
+# This must be set BEFORE importing any numba-dependent packages
 import os
+
+os.environ["NUMBA_DISABLE_JIT"] = "1"
+
+import argparse
 from pathlib import Path
 
 from dotenv import load_dotenv
