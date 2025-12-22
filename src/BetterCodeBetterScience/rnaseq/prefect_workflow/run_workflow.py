@@ -7,13 +7,14 @@ Or with arguments:
     python -m BetterCodeBetterScience.rnaseq.prefect_workflow.run_workflow --force-from 8
 """
 
-# Disable numba JIT to avoid compatibility issues with Prefect/pynndescent
-# This must be set BEFORE importing any numba-dependent packages
-import os
-
-os.environ["NUMBA_DISABLE_JIT"] = "1"
+# Pre-warm numba JIT compilation BEFORE importing Prefect
+# This avoids the Prefect/numba compatibility issue where Prefect's initialization
+# interferes with numba's JIT compilation of pynndescent functions.
+# See: https://github.com/ray-project/ray/issues/44714
+import pynndescent  # noqa: F401 - triggers numba JIT compilation
 
 import argparse
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
