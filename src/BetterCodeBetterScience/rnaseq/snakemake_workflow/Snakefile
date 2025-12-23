@@ -1,0 +1,100 @@
+"""Main Snakemake workflow for scRNA-seq immune aging analysis.
+
+This workflow is functionally equivalent to the Prefect and stateless workflows.
+It processes scRNA-seq data through 11 steps:
+
+Global Steps (1-7):
+1. Data Download
+2. Data Filtering
+3. Quality Control
+4. Preprocessing
+5. Dimensionality Reduction
+6. Clustering
+7. Pseudobulking (discovers cell types)
+
+Per-Cell-Type Steps (8-11):
+8. Differential Expression
+9. Pathway Analysis (GSEA)
+10. Overrepresentation Analysis (Enrichr)
+11. Predictive Modeling
+
+Usage:
+    # Run full workflow
+    snakemake --cores 8 --config datadir=/path/to/data
+
+    # Dry run (see what would be executed)
+    snakemake -n --config datadir=/path/to/data
+
+    # Force re-run from a specific rule
+    snakemake --cores 8 --forcerun dimensionality_reduction --config datadir=/path/to/data
+
+    # Run only preprocessing (steps 1-6)
+    snakemake --cores 8 clustering --config datadir=/path/to/data
+"""
+
+from pathlib import Path
+
+from snakemake.utils import min_version
+
+# Require Snakemake 8.0 or higher
+min_version("8.0")
+
+
+# Load configuration
+configfile: "config/config.yaml"
+
+
+# Validate required config
+if config.get("datadir") is None:
+    raise ValueError(
+        "datadir must be provided via --config datadir=/path/to/data"
+    )
+
+DATADIR = Path(config["datadir"])
+DATASET = config["dataset_name"]
+
+# Derived paths
+CHECKPOINT_DIR = DATADIR / "workflow" / "checkpoints"
+RESULTS_DIR = DATADIR / "workflow" / "results"
+FIGURE_DIR = DATADIR / "workflow" / "figures"
+LOG_DIR = DATADIR / "workflow" / "logs"
+
+
+# Include modular rule files
+include: "rules/common.smk"
+include: "rules/preprocessing.smk"
+include: "rules/pseudobulk.smk"
+include: "rules/per_cell_type.smk"
+
+
+# Default target: all analyses complete
+rule all:
+    input:
+        # Global preprocessing outputs
+        CHECKPOINT_DIR / f"dataset-{DATASET}_step-06_desc-clustered.h5ad",
+        # Aggregated per-cell-type results (triggers dynamic rules)
+        RESULTS_DIR / "workflow_complete.txt",
+
+
+# Rule to aggregate all per-cell-type results
+rule aggregate_results:
+    input:
+        aggregate_per_cell_type_outputs,
+    output:
+        RESULTS_DIR / "workflow_complete.txt",
+    log:
+        LOG_DIR / "aggregate_results.log",
+    script:
+        "scripts/aggregate_results.py"
+
+
+# Preprocessing-only target (stops at step 6)
+rule preprocessing_only:
+    input:
+        CHECKPOINT_DIR / f"dataset-{DATASET}_step-06_desc-clustered.h5ad",
+
+
+# Pseudobulk-only target (stops at step 7)
+rule pseudobulk_only:
+    input:
+        CHECKPOINT_DIR / f"dataset-{DATASET}_step-07_desc-pseudobulk.h5ad",
