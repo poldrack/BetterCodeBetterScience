@@ -1,0 +1,145 @@
+"""Simple correlation Snakemake workflow.
+
+This workflow demonstrates Snakemake features with a simple pandas-based analysis:
+1. Load two datasets from URLs
+2. Filter to numerical columns
+3. Join the datasets
+4. Compute Spearman correlation
+5. Generate a clustered heatmap
+
+Usage:
+    # Run full workflow
+    snakemake --cores 1 --config output_dir=/path/to/output
+
+    # Dry run
+    snakemake -n --config output_dir=/path/to/output
+
+    # Generate report
+    snakemake --report report.html --config output_dir=/path/to/output
+"""
+
+from pathlib import Path
+
+from snakemake.utils import min_version
+
+min_version("8.0")
+
+
+# Load configuration
+configfile: "config/config.yaml"
+
+
+# Global report
+report: "report/workflow.rst"
+
+
+# Validate required config
+if config.get("output_dir") is None:
+    raise ValueError("output_dir must be provided via --config output_dir=/path/to/output")
+
+OUTPUT_DIR = Path(config["output_dir"])
+DATA_DIR = OUTPUT_DIR / "data"
+RESULTS_DIR = OUTPUT_DIR / "results"
+FIGURES_DIR = OUTPUT_DIR / "figures"
+
+
+# Default target
+rule all:
+    input:
+        FIGURES_DIR / "correlation_heatmap.png",
+
+
+# Step 1a: Download meaningful variables data
+rule download_meaningful_variables:
+    output:
+        DATA_DIR / "meaningful_variables.csv",
+    params:
+        url=config["meaningful_variables_url"],
+    log:
+        OUTPUT_DIR / "logs" / "download_meaningful_variables.log",
+    script:
+        "scripts/download_data.py"
+
+
+# Step 1b: Download demographics data
+rule download_demographics:
+    output:
+        DATA_DIR / "demographics.csv",
+    params:
+        url=config["demographics_url"],
+    log:
+        OUTPUT_DIR / "logs" / "download_demographics.log",
+    script:
+        "scripts/download_data.py"
+
+
+# Step 2a: Filter meaningful variables to numerical columns
+rule filter_meaningful_variables:
+    input:
+        DATA_DIR / "meaningful_variables.csv",
+    output:
+        DATA_DIR / "meaningful_variables_numerical.csv",
+    log:
+        OUTPUT_DIR / "logs" / "filter_meaningful_variables.log",
+    script:
+        "scripts/filter_data.py"
+
+
+# Step 2b: Filter demographics to numerical columns
+rule filter_demographics:
+    input:
+        DATA_DIR / "demographics.csv",
+    output:
+        DATA_DIR / "demographics_numerical.csv",
+    log:
+        OUTPUT_DIR / "logs" / "filter_demographics.log",
+    script:
+        "scripts/filter_data.py"
+
+
+# Step 3: Join the two datasets
+rule join_datasets:
+    input:
+        meaningful_vars=DATA_DIR / "meaningful_variables_numerical.csv",
+        demographics=DATA_DIR / "demographics_numerical.csv",
+    output:
+        DATA_DIR / "joined_data.csv",
+    log:
+        OUTPUT_DIR / "logs" / "join_datasets.log",
+    script:
+        "scripts/join_data.py"
+
+
+# Step 4: Compute correlation matrix
+rule compute_correlation:
+    input:
+        DATA_DIR / "joined_data.csv",
+    output:
+        RESULTS_DIR / "correlation_matrix.csv",
+    params:
+        method=config["correlation_method"],
+    log:
+        OUTPUT_DIR / "logs" / "compute_correlation.log",
+    script:
+        "scripts/compute_correlation.py"
+
+
+# Step 5: Generate clustered heatmap
+rule generate_heatmap:
+    input:
+        RESULTS_DIR / "correlation_matrix.csv",
+    output:
+        report(
+            FIGURES_DIR / "correlation_heatmap.png",
+            caption="report/heatmap.rst",
+            category="Results",
+        ),
+    params:
+        figsize=config["heatmap"]["figsize"],
+        cmap=config["heatmap"]["cmap"],
+        vmin=config["heatmap"]["vmin"],
+        vmax=config["heatmap"]["vmax"],
+    log:
+        OUTPUT_DIR / "logs" / "generate_heatmap.log",
+    script:
+        "scripts/generate_heatmap.py"

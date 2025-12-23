@@ -3,6 +3,37 @@
 Open problems marked with [ ]
 Fixed problems marked with [x]
 
+[x] I would like to generate a new example of a very simple pandas-based data analysis workflow for demonstrating the features of Prefect and snakemake. Put the new code into src/BetterCodeBetterScience/simple_workflow.  The example should include separate modules that implement each of the following functions:
+- load these two files (using the first column as the index for each):
+  - https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
+  - https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
+- Filter out any non-numerical variables from each
+- join the two data frames based on the index
+- compute the correlation matrix across all measures using Spearman correlation
+- generate a clustered heatmap from the correlation matrix using Seaborn
+    - Created `simple_workflow/` directory with modular functions:
+      - `load_data.py`: Functions to load CSV data from URLs with optional caching
+      - `filter_data.py`: Functions to filter dataframes to numerical columns only
+      - `join_data.py`: Functions to join dataframes based on index
+      - `correlation.py`: Functions to compute Spearman correlation matrices
+      - `visualization.py`: Functions to generate clustered heatmaps with Seaborn
+    - Created `prefect_workflow/` subdirectory:
+      - `tasks.py`: Prefect task definitions wrapping each workflow function
+      - `flows.py`: Main workflow flow orchestrating all steps
+      - `run_workflow.py`: CLI entry point
+      - Usage: `python run_workflow.py --output-dir ./output`
+    - Created `snakemake_workflow/` subdirectory:
+      - `Snakefile`: Workflow rules with dependencies
+      - `config/config.yaml`: Configuration for URLs and heatmap settings
+      - `scripts/*.py`: Scripts for each workflow step
+      - `report/`: RST files for Snakemake report generation
+      - Usage: `snakemake --cores 1 --config output_dir=/path/to/output`
+    - Created `make_workflow/` subdirectory:
+      - `Makefile`: GNU Make-based workflow with proper dependencies
+      - `scripts/*.py`: Standalone CLI scripts for each step
+      - Usage: `make OUTPUT_DIR=/path/to/output all`
+
+
 [x] For the Snakemake workflow I would like to use the Snakemake report generating functions to create a report showing the results from each of the analyses.
     - Added `report: "report/workflow.rst"` global declaration to Snakefile
     - Created `report/` directory with RST caption files for each figure type
