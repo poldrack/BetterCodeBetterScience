@@ -45,6 +45,7 @@ rule quality_control:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
     output:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
+    threads: workflow.cores
     params:
         min_genes=config["qc"]["min_genes"],
         max_genes=config["qc"]["max_genes"],
@@ -65,6 +66,7 @@ rule preprocess:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
     output:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 4, "preprocessed"),
+    threads: workflow.cores
     params:
         target_sum=config["preprocessing"]["target_sum"],
         n_top_genes=config["preprocessing"]["n_top_genes"],
@@ -81,6 +83,7 @@ rule dimensionality_reduction:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 4, "preprocessed"),
     output:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 5, "dimreduced"),
+    threads: workflow.cores
     params:
         batch_key=config["dimred"]["batch_key"],
         n_neighbors=config["dimred"]["n_neighbors"],

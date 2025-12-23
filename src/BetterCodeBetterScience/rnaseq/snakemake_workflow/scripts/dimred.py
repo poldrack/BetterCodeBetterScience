@@ -1,6 +1,12 @@
 """Snakemake script for Step 5: Dimensionality Reduction."""
+# ruff: noqa: F821
 
+import os
 from pathlib import Path
+
+# Set thread count for numba/pynndescent before importing scanpy
+os.environ["NUMBA_NUM_THREADS"] = str(snakemake.threads)
+os.environ["OMP_NUM_THREADS"] = str(snakemake.threads)
 
 from BetterCodeBetterScience.rnaseq.modular_workflow.dimensionality_reduction import (
     run_dimensionality_reduction_pipeline,
@@ -13,7 +19,8 @@ from BetterCodeBetterScience.rnaseq.stateless_workflow.checkpoint import (
 
 def main():
     """Run dimensionality reduction pipeline."""
-    # ruff: noqa: F821
+    print(f"Running with {snakemake.threads} threads")
+
     input_file = Path(snakemake.input[0])
     output_file = Path(snakemake.output[0])
 
