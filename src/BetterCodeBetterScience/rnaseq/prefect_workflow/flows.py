@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import yaml
 from prefect import flow, get_run_logger
 
 from BetterCodeBetterScience.rnaseq.prefect_workflow.tasks import (
@@ -31,6 +32,31 @@ from BetterCodeBetterScience.rnaseq.stateless_workflow.execution_log import (
     create_execution_log,
     serialize_parameters,
 )
+
+
+def get_default_config_path() -> Path:
+    """Get the path to the default config file bundled with the package."""
+    return Path(__file__).parent / "config" / "config.yaml"
+
+
+def load_config(config_path: Path | None = None) -> dict[str, Any]:
+    """Load workflow configuration from YAML file.
+
+    Parameters
+    ----------
+    config_path : Path, optional
+        Path to config file. If None, uses the default config bundled with the package.
+
+    Returns
+    -------
+    dict
+        Configuration dictionary
+    """
+    if config_path is None:
+        config_path = get_default_config_path()
+
+    with open(config_path) as f:
+        return yaml.safe_load(f)
 
 
 def setup_file_logging(log_dir: Path) -> tuple[Path, logging.FileHandler]:
@@ -73,10 +99,8 @@ def setup_file_logging(log_dir: Path) -> tuple[Path, logging.FileHandler]:
 @flow(name="immune_aging_scrna_workflow", log_prints=False)
 def run_workflow(
     datadir: Path,
-    dataset_name: str = "OneK1K",
-    url: str = "https://datasets.cellxgene.cziscience.com/a3f5651f-cd1a-4d26-8165-74964b79b4f2.h5ad",
+    config_path: Path | None = None,
     force_from_step: int | None = None,
-    min_samples_per_cell_type: int = 10,
 ) -> dict[str, Any]:
     """Run the complete immune aging scRNA-seq workflow with Prefect.
 
@@ -86,14 +110,10 @@ def run_workflow(
     ----------
     datadir : Path
         Base directory for data files
-    dataset_name : str
-        Name of the dataset
-    url : str
-        URL to download data from
+    config_path : Path, optional
+        Path to config file. If None, uses the default config bundled with the package.
     force_from_step : int, optional
         If provided, forces re-run from this step onwards
-    min_samples_per_cell_type : int
-        Minimum samples required per cell type to run steps 8-11
 
     Returns
     -------
@@ -102,17 +122,23 @@ def run_workflow(
     """
     logger = get_run_logger()
 
-    # Setup directories
-    figure_dir = datadir / "workflow/figures"
+    # Load configuration
+    config = load_config(config_path)
+    dataset_name = config["dataset_name"]
+    url = config["url"]
+    min_samples_per_cell_type = config["min_samples_per_cell_type"]
+
+    # Setup directories (using wf_prefect folder)
+    figure_dir = datadir / "wf_prefect/figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
 
-    checkpoint_dir = datadir / "workflow/checkpoints"
+    checkpoint_dir = datadir / "wf_prefect/checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-    results_dir = datadir / "workflow/results/per_cell_type"
+    results_dir = datadir / "wf_prefect/results/per_cell_type"
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    log_dir = datadir / "workflow/logs"
+    log_dir = datadir / "wf_prefect/logs"
     log_dir.mkdir(parents=True, exist_ok=True)
 
     # Set up file logging
@@ -163,11 +189,7 @@ def run_workflow(
         logger.info("STEP 2: DATA FILTERING")
         logger.info("=" * 60)
 
-        step2_params = {
-            "cutoff_percentile": 1.0,
-            "min_cells_per_celltype": 10,
-            "percent_donors": 0.95,
-        }
+        step2_params = config["filtering"]
         step_record = execution_log.add_step(
             step_number=2,
             step_name="data_filtering",
@@ -198,14 +220,7 @@ def run_workflow(
         logger.info("STEP 3: QUALITY CONTROL")
         logger.info("=" * 60)
 
-        step3_params = {
-            "min_genes": 200,
-            "max_genes": 6000,
-            "min_counts": 500,
-            "max_counts": 30000,
-            "max_hb_pct": 5.0,
-            "expected_doublet_rate": 0.06,
-        }
+        step3_params = config["qc"]
         step_record = execution_log.add_step(
             step_number=3,
             step_name="quality_control",
@@ -234,11 +249,7 @@ def run_workflow(
         logger.info("STEP 4: PREPROCESSING")
         logger.info("=" * 60)
 
-        step4_params = {
-            "target_sum": 1e4,
-            "n_top_genes": 3000,
-            "batch_key": "donor_id",
-        }
+        step4_params = config["preprocessing"]
         step_record = execution_log.add_step(
             step_number=4,
             step_name="preprocessing",
@@ -265,11 +276,7 @@ def run_workflow(
         logger.info("STEP 5: DIMENSIONALITY REDUCTION")
         logger.info("=" * 60)
 
-        step5_params = {
-            "batch_key": "donor_id",
-            "n_neighbors": 30,
-            "n_pcs": 40,
-        }
+        step5_params = config["dimred"]
         step_record = execution_log.add_step(
             step_number=5,
             step_name="dimensionality_reduction",
@@ -297,7 +304,7 @@ def run_workflow(
         logger.info("STEP 6: CLUSTERING")
         logger.info("=" * 60)
 
-        step6_params = {"resolution": 1.0}
+        step6_params = config["clustering"]
         step_record = execution_log.add_step(
             step_number=6,
             step_name="clustering",
@@ -323,12 +330,7 @@ def run_workflow(
         logger.info("STEP 7: PSEUDOBULKING")
         logger.info("=" * 60)
 
-        step7_params = {
-            "group_col": "cell_type",
-            "donor_col": "donor_id",
-            "metadata_cols": ["development_stage", "sex"],
-            "min_cells": 10,
-        }
+        step7_params = config["pseudobulk"]
         step_record = execution_log.add_step(
             step_number=7,
             step_name="pseudobulking",
@@ -393,15 +395,21 @@ def run_workflow(
         for i, cell_type in enumerate(valid_cell_types):
             logger.info(f"\n[{i + 1}/{len(valid_cell_types)}] Processing: {cell_type}")
 
+            # Get config for per-cell-type steps
+            de_config = config["differential_expression"]
+            gsea_config = config["pathway_analysis"]
+            enrichr_config = config["overrepresentation"]
+            pred_config = config["predictive_modeling"]
+
             # Log combined steps 8-11 for this cell type
             step_record = execution_log.add_step(
                 step_number=8,
                 step_name=f"per_cell_type_analysis ({cell_type})",
                 parameters=serialize_parameters(
                     cell_type=cell_type,
-                    design_factors=["age_scaled", "sex"],
-                    gene_sets=["MSigDB_Hallmark_2020"],
-                    n_splits=5,
+                    design_factors=de_config["design_factors"],
+                    gene_sets=gsea_config["gene_sets"],
+                    n_splits=pred_config["n_splits"],
                 ),
             )
 
@@ -412,8 +420,8 @@ def run_workflow(
                     cell_type=cell_type,
                     var_to_feature=var_to_feature,
                     output_dir=results_dir,
-                    design_factors=["age_scaled", "sex"],
-                    n_cpus=8,
+                    design_factors=de_config["design_factors"],
+                    n_cpus=de_config["n_cpus"],
                 )
 
                 # Get metadata for this cell type (for predictive modeling)
@@ -430,8 +438,8 @@ def run_workflow(
                     de_results=de_result["de_results"],
                     cell_type=cell_type,
                     output_dir=results_dir,
-                    gene_sets=["MSigDB_Hallmark_2020"],
-                    n_top=10,
+                    gene_sets=gsea_config["gene_sets"],
+                    n_top=gsea_config["n_top"],
                 )
 
                 # Step 10: Overrepresentation Analysis (Enrichr)
@@ -439,9 +447,9 @@ def run_workflow(
                     de_results=de_result["de_results"],
                     cell_type=cell_type,
                     output_dir=results_dir,
-                    gene_sets=["MSigDB_Hallmark_2020"],
-                    padj_threshold=0.05,
-                    n_top=10,
+                    gene_sets=enrichr_config["gene_sets"],
+                    padj_threshold=enrichr_config["padj_threshold"],
+                    n_top=enrichr_config["n_top"],
                 )
 
                 # Step 11: Predictive Modeling
@@ -450,7 +458,7 @@ def run_workflow(
                     metadata=metadata_ct,
                     cell_type=cell_type,
                     output_dir=results_dir,
-                    n_splits=5,
+                    n_splits=pred_config["n_splits"],
                 )
 
                 all_results["per_cell_type"][cell_type] = {
@@ -515,7 +523,7 @@ def run_workflow(
 def analyze_single_cell_type(
     datadir: Path,
     cell_type: str,
-    dataset_name: str = "OneK1K",
+    config_path: Path | None = None,
 ) -> dict[str, Any]:
     """Run analysis for a single cell type (useful for debugging/testing).
 
@@ -527,8 +535,8 @@ def analyze_single_cell_type(
         Base directory for data files
     cell_type : str
         Cell type to analyze
-    dataset_name : str
-        Name of the dataset
+    config_path : Path, optional
+        Path to config file. If None, uses the default config bundled with the package.
 
     Returns
     -------
@@ -537,8 +545,16 @@ def analyze_single_cell_type(
     """
     logger = get_run_logger()
 
-    checkpoint_dir = datadir / "workflow/checkpoints"
-    results_dir = datadir / "workflow/results/per_cell_type"
+    # Load configuration
+    config = load_config(config_path)
+    dataset_name = config["dataset_name"]
+    de_config = config["differential_expression"]
+    gsea_config = config["pathway_analysis"]
+    enrichr_config = config["overrepresentation"]
+    pred_config = config["predictive_modeling"]
+
+    checkpoint_dir = datadir / "wf_prefect/checkpoints"
+    results_dir = datadir / "wf_prefect/results/per_cell_type"
     results_dir.mkdir(parents=True, exist_ok=True)
 
     # Load required checkpoints
@@ -567,6 +583,8 @@ def analyze_single_cell_type(
         cell_type=cell_type,
         var_to_feature=var_to_feature,
         output_dir=results_dir,
+        design_factors=de_config["design_factors"],
+        n_cpus=de_config["n_cpus"],
     )
 
     # Get metadata
@@ -583,12 +601,17 @@ def analyze_single_cell_type(
         de_results=de_result["de_results"],
         cell_type=cell_type,
         output_dir=results_dir,
+        gene_sets=gsea_config["gene_sets"],
+        n_top=gsea_config["n_top"],
     )
 
     enrichr_result = overrepresentation_task(
         de_results=de_result["de_results"],
         cell_type=cell_type,
         output_dir=results_dir,
+        gene_sets=enrichr_config["gene_sets"],
+        padj_threshold=enrichr_config["padj_threshold"],
+        n_top=enrichr_config["n_top"],
     )
 
     prediction_result = predictive_modeling_task(
@@ -596,6 +619,7 @@ def analyze_single_cell_type(
         metadata=metadata_ct,
         cell_type=cell_type,
         output_dir=results_dir,
+        n_splits=pred_config["n_splits"],
     )
 
     return {

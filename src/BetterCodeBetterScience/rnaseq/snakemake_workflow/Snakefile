@@ -53,11 +53,11 @@ if config.get("datadir") is None:
 DATADIR = Path(config["datadir"])
 DATASET = config["dataset_name"]
 
-# Derived paths
-CHECKPOINT_DIR = DATADIR / "workflow" / "checkpoints"
-RESULTS_DIR = DATADIR / "workflow" / "results"
-FIGURE_DIR = DATADIR / "workflow" / "figures"
-LOG_DIR = DATADIR / "workflow" / "logs"
+# Derived paths (using wf_snakemake folder)
+CHECKPOINT_DIR = DATADIR / "wf_snakemake" / "checkpoints"
+RESULTS_DIR = DATADIR / "wf_snakemake" / "results"
+FIGURE_DIR = DATADIR / "wf_snakemake" / "figures"
+LOG_DIR = DATADIR / "wf_snakemake" / "logs"
 
 
 # Include modular rule files

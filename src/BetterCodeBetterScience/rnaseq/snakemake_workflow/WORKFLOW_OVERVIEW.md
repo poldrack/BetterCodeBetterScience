@@ -20,13 +20,13 @@ The workflow is divided into two phases:
 │  Step 1: Download ──► Step 2: Filter ──► Step 3: QC ──► Step 4: Preprocess
 │                                                               │         │
 │                                                               ▼         │
-│                       Step 7: Pseudobulk ◄── Step 6: Cluster ◄── Step 5: DimRed
+│             Step 7: Pseudobulk ◄── Step 6: Cluster ◄── Step 5: DimRed.  |
 │                              │                                          │
 └──────────────────────────────┼──────────────────────────────────────────┘
                                │
                                ▼ (discovers N cell types)
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    PER-CELL-TYPE STEPS (8-11)                           │
+│                    PER-CELL-TYPE STEPS (8-11)                            │
 │                    Runs in parallel for each cell type                   │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
@@ -34,11 +34,11 @@ The workflow is divided into two phases:
 │                                                                          │
 │    Step 8: Differential Expression                                       │
 │         │                                                                │
-│         ├──► Step 9: GSEA (Pathway Analysis)                            │
+│         ├──► Step 9: GSEA (Pathway Analysis)                             │
 │         │                                                                │
-│         ├──► Step 10: Enrichr (Overrepresentation)                      │
+│         ├──► Step 10: Enrichr (Overrepresentation)                       │
 │         │                                                                │
-│         └──► Step 11: Predictive Modeling (Age Prediction)              │
+│         └──► Step 11: Predictive Modeling (Age Prediction)               │
 │                                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -314,7 +314,7 @@ The workflow is divided into two phases:
 ## Output Structure
 
 ```
-{datadir}/workflow/
+{datadir}/wf_snakemake/
 ├── checkpoints/
 │   ├── dataset-{name}_step-02_desc-filtered.h5ad
 │   ├── dataset-{name}_step-03_desc-qc.h5ad

@@ -5,6 +5,9 @@ Usage:
 
 Or with arguments:
     python -m BetterCodeBetterScience.rnaseq.prefect_workflow.run_workflow --force-from 8
+
+With custom config:
+    python -m BetterCodeBetterScience.rnaseq.prefect_workflow.run_workflow --config /path/to/config.yaml
 """
 
 import argparse
@@ -15,6 +18,7 @@ from dotenv import load_dotenv
 
 from BetterCodeBetterScience.rnaseq.prefect_workflow.flows import (
     analyze_single_cell_type,
+    load_config,
     run_workflow,
 )
 
@@ -31,10 +35,11 @@ def main():
         help="Base directory for data files (default: from DATADIR env var)",
     )
     parser.add_argument(
-        "--dataset-name",
-        type=str,
-        default="OneK1K",
-        help="Name of the dataset (default: OneK1K)",
+        "--config",
+        type=Path,
+        default=None,
+        dest="config_path",
+        help="Path to config file (default: uses bundled config/config.yaml)",
     )
     parser.add_argument(
         "--force-from",
@@ -42,13 +47,6 @@ def main():
         default=None,
         dest="force_from_step",
         help="Force re-run from this step onwards (1-11)",
-    )
-    parser.add_argument(
-        "--min-samples",
-        type=int,
-        default=10,
-        dest="min_samples",
-        help="Minimum samples per cell type for steps 8-11 (default: 10)",
     )
     parser.add_argument(
         "--cell-type",
@@ -68,6 +66,16 @@ def main():
 
     # Load environment variables
     load_dotenv()
+
+    # Load configuration
+    config = load_config(args.config_path)
+    dataset_name = config["dataset_name"]
+    min_samples = config["min_samples_per_cell_type"]
+
+    if args.config_path:
+        print(f"Using config file: {args.config_path}")
+    else:
+        print("Using default bundled config")
 
     # Get data directory
     if args.datadir is not None:
@@ -90,9 +98,9 @@ def main():
             load_checkpoint,
         )
 
-        checkpoint_dir = datadir / "workflow/checkpoints"
+        checkpoint_dir = datadir / "wf_prefect/checkpoints"
         pb_checkpoint = checkpoint_dir / bids_checkpoint_name(
-            args.dataset_name, 7, "pseudobulk"
+            dataset_name, 7, "pseudobulk"
         )
 
         if not pb_checkpoint.exists():
@@ -108,9 +116,7 @@ def main():
         print("-" * 60)
         for ct in sorted(cell_types):
             count = cell_type_counts[ct]
-            status = (
-                "OK" if count >= args.min_samples else f"< {args.min_samples} samples"
-            )
+            status = "OK" if count >= min_samples else f"< {min_samples} samples"
             print(f"  {ct}: {count} samples ({status})")
         return
 
@@ -120,7 +126,7 @@ def main():
         results = analyze_single_cell_type(
             datadir=datadir,
             cell_type=args.cell_type,
-            dataset_name=args.dataset_name,
+            config_path=args.config_path,
         )
         print("\nResults:")
         print(f"  DE genes: {len(results['de']['de_results'])}")
@@ -141,9 +147,8 @@ def main():
 
     results = run_workflow(
         datadir=datadir,
-        dataset_name=args.dataset_name,
+        config_path=args.config_path,
         force_from_step=args.force_from_step,
-        min_samples_per_cell_type=args.min_samples,
     )
 
     # Print summary
