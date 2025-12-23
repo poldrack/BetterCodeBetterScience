@@ -39,6 +39,12 @@ rule pathway_analysis:
         de_results=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "de_results.parquet",
     output:
         gsea_results=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "gsea_results.pkl",
+        fig_gsea=report(
+            RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "gsea_pathways.png",
+            caption="report/gsea.rst",
+            category="Step 9: Pathway Analysis (GSEA)",
+            subcategory="{cell_type}",
+        ),
     params:
         cell_type=lambda wildcards: wildcards.cell_type,
         gene_sets=config["pathway_analysis"]["gene_sets"],
@@ -59,6 +65,12 @@ rule overrepresentation:
     output:
         enr_up=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "enrichr_up.pkl",
         enr_down=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "enrichr_down.pkl",
+        fig_enrichr=report(
+            RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "enrichr_pathways.png",
+            caption="report/enrichr.rst",
+            category="Step 10: Overrepresentation Analysis",
+            subcategory="{cell_type}",
+        ),
     params:
         cell_type=lambda wildcards: wildcards.cell_type,
         gene_sets=config["overrepresentation"]["gene_sets"],
@@ -84,6 +96,12 @@ rule predictive_modeling:
         / "per_cell_type"
         / "{cell_type}"
         / "prediction_results.pkl",
+        fig_prediction=report(
+            RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "age_prediction_performance.png",
+            caption="report/prediction.rst",
+            category="Step 11: Predictive Modeling",
+            subcategory="{cell_type}",
+        ),
     params:
         cell_type=lambda wildcards: wildcards.cell_type,
         n_splits=config["predictive_modeling"]["n_splits"],

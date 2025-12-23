@@ -44,6 +44,10 @@ min_version("8.0")
 configfile: "config/config.yaml"
 
 
+# Global report description
+report: "report/workflow.rst"
+
+
 # Validate required config
 if config.get("datadir") is None:
     raise ValueError(

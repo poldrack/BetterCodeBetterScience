@@ -27,7 +27,12 @@ rule filter_data:
     input:
         DATADIR / f"dataset-{DATASET}_subset-immune_raw.h5ad",
     output:
-        CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
+        checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
+        fig_donor_counts=report(
+            FIGURE_DIR / "donor_cell_counts_distribution.png",
+            caption="report/filtering.rst",
+            category="Step 2: Filtering",
+        ),
     params:
         cutoff_percentile=config["filtering"]["cutoff_percentile"],
         min_cells_per_celltype=config["filtering"]["min_cells_per_celltype"],
@@ -44,7 +49,27 @@ rule quality_control:
     input:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
     output:
-        CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
+        checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
+        fig_violin=report(
+            FIGURE_DIR / "qc_violin_plots.png",
+            caption="report/qc_violin.rst",
+            category="Step 3: Quality Control",
+        ),
+        fig_scatter=report(
+            FIGURE_DIR / "qc_scatter_doublets.png",
+            caption="report/qc_scatter.rst",
+            category="Step 3: Quality Control",
+        ),
+        fig_hemoglobin=report(
+            FIGURE_DIR / "hemoglobin_distribution.png",
+            caption="report/hemoglobin.rst",
+            category="Step 3: Quality Control",
+        ),
+        fig_doublet_umap=report(
+            FIGURE_DIR / "doublet_detection_umap.png",
+            caption="report/doublet_umap.rst",
+            category="Step 3: Quality Control",
+        ),
     threads: workflow.cores
     params:
         min_genes=config["qc"]["min_genes"],
@@ -82,7 +107,17 @@ rule dimensionality_reduction:
     input:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 4, "preprocessed"),
     output:
-        CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 5, "dimreduced"),
+        checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 5, "dimreduced"),
+        fig_pca=report(
+            FIGURE_DIR / "pca_cell_type.png",
+            caption="report/pca.rst",
+            category="Step 5: Dimensionality Reduction",
+        ),
+        fig_umap=report(
+            FIGURE_DIR / "umap_total_counts.png",
+            caption="report/umap.rst",
+            category="Step 5: Dimensionality Reduction",
+        ),
     threads: workflow.cores
     params:
         batch_key=config["dimred"]["batch_key"],
@@ -100,7 +135,12 @@ rule clustering:
     input:
         CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 5, "dimreduced"),
     output:
-        CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 6, "clustered"),
+        checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 6, "clustered"),
+        fig_clustering=report(
+            FIGURE_DIR / "umap_cell_type_leiden.png",
+            caption="report/clustering.rst",
+            category="Step 6: Clustering",
+        ),
     params:
         resolution=config["clustering"]["resolution"],
         figure_dir=str(FIGURE_DIR),

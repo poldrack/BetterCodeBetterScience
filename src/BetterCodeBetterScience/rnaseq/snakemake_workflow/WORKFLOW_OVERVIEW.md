@@ -363,6 +363,50 @@ snakemake --cores 16 preprocessing_only --config datadir=/path/to/data
 
 # Force re-run from a specific step
 snakemake --cores 16 --forcerun dimensionality_reduction --config datadir=/path/to/data
+
+# Generate HTML report (after workflow completes)
+snakemake --report /path/to/data/wf_snakemake/report.html --config datadir=/path/to/data
+
+# Generate ZIP report (for larger reports)
+snakemake --report /path/to/data/wf_snakemake/report.zip --config datadir=/path/to/data
+```
+
+---
+
+## Report Generation
+
+The workflow includes Snakemake's built-in report generation functionality. After the workflow completes, you can generate a self-contained HTML report that includes:
+
+- **Runtime statistics**: Execution times for each rule
+- **Provenance information**: Input/output file tracking
+- **Workflow topology**: Visual representation of rule dependencies
+- **Analysis results**: Figures from each analysis step
+
+### Report Contents
+
+The report organizes results by analysis step:
+
+| Category | Contents |
+|----------|----------|
+| Step 2: Filtering | Donor cell count distribution |
+| Step 3: Quality Control | QC violin plots, scatter plots, hemoglobin distribution, doublet UMAP |
+| Step 5: Dimensionality Reduction | PCA and UMAP visualizations |
+| Step 6: Clustering | UMAP with cell type and cluster annotations |
+| Step 7: Pseudobulking | Pseudobulk sample characteristics |
+| Step 9: Pathway Analysis (GSEA) | GSEA pathway plots per cell type |
+| Step 10: Overrepresentation Analysis | Enrichr pathway plots per cell type |
+| Step 11: Predictive Modeling | Age prediction performance per cell type |
+
+### Using the Makefile
+
+If using the provided Makefile:
+
+```bash
+# Generate HTML report
+make report
+
+# Generate ZIP report (recommended for many cell types)
+make report-zip
 ```
 
 ---

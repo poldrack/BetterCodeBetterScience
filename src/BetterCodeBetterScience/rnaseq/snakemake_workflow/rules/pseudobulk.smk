@@ -26,6 +26,12 @@ checkpoint pseudobulk:
         cell_types=CHECKPOINT_DIR / f"dataset-{DATASET}_step-07_cell_types.json",
         # Gene name mapping (needed for DE analysis)
         var_to_feature=CHECKPOINT_DIR / f"dataset-{DATASET}_step-07_var_to_feature.json",
+        # Pseudobulk figure
+        fig_pseudobulk=report(
+            FIGURE_DIR / "pseudobulk_violin.png",
+            caption="report/pseudobulk.rst",
+            category="Step 7: Pseudobulking",
+        ),
     params:
         group_col=config["pseudobulk"]["group_col"],
         donor_col=config["pseudobulk"]["donor_col"],

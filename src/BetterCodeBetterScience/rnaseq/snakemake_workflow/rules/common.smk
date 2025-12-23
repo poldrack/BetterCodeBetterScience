@@ -86,6 +86,10 @@ def aggregate_per_cell_type_outputs(wildcards):
                 ct_dir / "enrichr_up.pkl",
                 ct_dir / "enrichr_down.pkl",
                 ct_dir / "prediction_results.pkl",
+                # Figures for report
+                ct_dir / "figures" / "gsea_pathways.png",
+                ct_dir / "figures" / "enrichr_pathways.png",
+                ct_dir / "figures" / "age_prediction_performance.png",
             ]
         )
 

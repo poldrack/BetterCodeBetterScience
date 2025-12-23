@@ -3,6 +3,17 @@
 Open problems marked with [ ]
 Fixed problems marked with [x]
 
+[x] For the Snakemake workflow I would like to use the Snakemake report generating functions to create a report showing the results from each of the analyses.
+    - Added `report: "report/workflow.rst"` global declaration to Snakefile
+    - Created `report/` directory with RST caption files for each figure type
+    - Updated preprocessing.smk rules (filtering, qc, dimred, clustering) to declare figures as outputs with `report()` wrapper
+    - Updated pseudobulk.smk checkpoint to include pseudobulk figure with `report()` wrapper
+    - Updated per_cell_type.smk rules (GSEA, Enrichr, prediction) to include figures with `report()` wrapper and cell_type subcategory
+    - Updated common.smk `aggregate_per_cell_type_outputs()` to include figure files
+    - Added `report` and `report-zip` targets to Makefile
+    - Updated WORKFLOW_OVERVIEW.md with report generation documentation
+    - Usage: `snakemake --report report.html --config datadir=/path/to/data` or `make report`
+
 [x] For the Prefect workflow, the default parameters for each workflow module are embedded in the python code for the workflow. I would rather that they be defined using a configuration file.  Please extract all of the parameters into a configuration file (using whatever format you think is most appropriate) and read those in during workflow execution rather than hard-coding.
     - Created `prefect_workflow/config/config.yaml` with all workflow parameters
     - Parameters organized by step: filtering, qc, preprocessing, dimred, clustering, pseudobulk, differential_expression, pathway_analysis, overrepresentation, predictive_modeling
