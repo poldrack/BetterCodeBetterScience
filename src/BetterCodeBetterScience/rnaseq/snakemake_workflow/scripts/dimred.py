@@ -22,7 +22,7 @@ def main():
     print(f"Running with {snakemake.threads} threads")
 
     input_file = Path(snakemake.input[0])
-    output_file = Path(snakemake.output[0])
+    output_file = Path(snakemake.output.checkpoint)
 
     # Get parameters
     batch_key = snakemake.params.batch_key

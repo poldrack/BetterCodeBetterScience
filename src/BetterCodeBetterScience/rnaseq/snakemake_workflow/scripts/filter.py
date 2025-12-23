@@ -15,7 +15,7 @@ def main():
     """Load data and run filtering pipeline."""
     # ruff: noqa: F821
     input_file = Path(snakemake.input[0])
-    output_file = Path(snakemake.output[0])
+    output_file = Path(snakemake.output.checkpoint)
 
     # Get parameters
     cutoff_percentile = snakemake.params.cutoff_percentile

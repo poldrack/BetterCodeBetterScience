@@ -15,7 +15,7 @@ def main():
     """Run quality control pipeline."""
     # ruff: noqa: F821
     input_file = Path(snakemake.input[0])
-    output_file = Path(snakemake.output[0])
+    output_file = Path(snakemake.output.checkpoint)
 
     # Get parameters
     min_genes = snakemake.params.min_genes
