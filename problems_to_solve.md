@@ -3,6 +3,7 @@
 Open problems marked with [ ]
 Fixed problems marked with [x]
 
+
 [x] I would now like to add another workflow, with code saved to src/BetterCodeBetterScience/rnaseq/snakemake_workflow. This workflow will use the Snakemake workflow manager (https://snakemake.readthedocs.io/en/stable/index.html); otherwise it should be functionally equivalent to the other workflows already developed.
     - Created `snakemake_workflow/` directory with:
       - `Snakefile`: Main workflow entry point
