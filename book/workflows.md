@@ -108,14 +108,17 @@ I developed the initial version of this workflow as many researchers would: by c
 
 #### The problem of in-place operations
 
-What I found as I developed the workflow is that I increasingly ran into problems that arose because the state of particular objects had changed.  This occurred for two reasons at different points.  In some cases it occurred because I saved a new version of the object to the same name, resulting in an object with different structure than before.  
+What I found as I developed the workflow is that I increasingly ran into problems that arose because the state of particular objects had changed.  This occurred for two reasons at different points.  In some cases it occurred because I saved a new version of the object to the same name, resulting in an object with different structure than before.  Second, and more insidiously, it occurred when an object passed into a function is modified by the function internally.  This is known as an *in-place* operation, in which a function modifies an object directly rather than returning a new object that can be assigned to a variable.  
+
+In-place operations can make code particularly difficult to debug in the context of a Jupyter notebook, because it's a case where out-of-order execution can result in very confusing results or errors, since the changes that were made in-place may not be obvious.  For this reason, I generally avoid any kind of in-place operations if possible.  Rather, any functions should immediately create a copy of the object that was passed in, and then do its work on that copy, which is returned at the end of the function for assignment to a new variable.  One can then re-assign it to the same variable name if desired, which is more transparent than an in-place operation but still makes the workflow dependent on the exact state of execution and can lead to confusion when debugging.  Some packages allow a feature called "copy-on-write" which defers actually copying the data in memory until it is actually modified, which can make copying more efficient. 
+
+If one must modify objects in-place, then it is good practice to announce this loudly.  The loudest way to do this would be to put "inplace" in the function name. Another cleaner but less loud way is through conventions regarding function naming; for example, in PyTorch it is a convention that any function that ends with an underscore (e.g. `tensor.mul_(x)`) performs an in-place operation whereas the same function without the underscore (`tensor.mul(x)`) returns a new object. Another way that some packages enable explicit in-place operations is through a function argument (e.g. `inplace=True` in pandas), though this is being phased out from many functions in Pandas because "It is generally seen (at least by several pandas maintainers and educators) as bad practice and often unnecessary" ([PDEP-8](https://pandas.pydata.org/pdeps/0008-inplace-methods-in-pandas.html)). 
+
+One way to prevent in-place operations altogether is to use data types that are *immutable*, meaning that they can't be changed once created.  This is one of the central principles in *functional programming* languages (such as Haskell), where all data types are immutable, such that one is required to create a new object any time data are modified.  Some native data types in Python are immutable (such as tuples and frozensets), and some data science packages also provide immutable data types; in particular, the Polars package (which is meant to be a high-performance alternative to pandas) implements its version of a data frame as an immutable object, and the JAX package (for high-performance numerical computation and machine learning) implements immutable numerical arrays.
 
 #### Converting from Jupyter notebook to a runnable python script
 
-As we discussed in an earlier chapter, converting a Jupyter notebook to a pure python script is easy using `jupytext`.  This results in a script that can be run from the command line.  However, there can be some commands that will block execution of the script; in particular, plotting commands can open windows that will block execution until they are closed.  To prevent this, and to ensure that the results of the plots are saved for later examination, I replaced all of the `plt.show()` commands that display a figure to the screen with `plt.savefig()` commands that save the figures to a file in the results directory.  (This was an easy job for the Copilot agent to complete.) 
-
-- had to prevent plots from being displayed because this blocked execution
-- used copilot to find and fix all plotting commands to save them to file rather than showing
+As we discussed in an earlier chapter, converting a Jupyter notebook to a pure Python script is easy using `jupytext`.  This results in a script that can be run from the command line.  However, there can be some commands that will block execution of the script; in particular, plotting commands can open windows that will block execution until they are closed.  To prevent this, and to ensure that the results of the plots are saved for later examination, I replaced all of the `plt.show()` commands that display a figure to the screen with `plt.savefig()` commands that save the figures to a file in the results directory.  (This was an easy job for the Copilot agent to complete.) 
 
 ## Decomposing a complex workflow
 
@@ -301,6 +304,7 @@ It's also worth noting that there are a number of domain-specific workflow engin
 #### A general-purpose workflow management example: Snakemake
 
 
+
 The first time that I ran my workflow using snakemake, I noticed that it was substantially slower than when I ran it with Prefect.  When I asked Claude about this, it gave me a reasonable answer:
 
 > The Snakemake rules don't specify a threads directive. By default, Snakemake runs each job with 1 thread, which limits parallelization of computationally intensive operations like neighbor computation and UMAP (which use numba internally).
@@ -315,7 +319,7 @@ I asked Claude to fix this, and it returned the following change:
 >  4. Set NUMBA_NUM_THREADS and OMP_NUM_THREADS environment variables in dimred.py
 >   In contrast, Prefect tasks run in the main process with access to all CPUs by default, which is why it was faster.
 
-This solves the problem but it's an odd choice: in particular, it will probably fail if there are fewer than 8 threads available on the system. Snakemake actually take a command line argument (`--cores`) to specify the number of cores to use, so I instead asked Claude to have Snakemake use the number of cores specified at the command line rather than an arbitrary number that might fail if the requested number of cores are not available.
+This solves the problem but it's an odd choice: in particular, it will probably fail if there are fewer than 8 threads available on the system. Snakemake actually take a command line argument (`--cores`) to specify the number of cores to use, so I instead asked Claude to have Snakemake use the number of cores specified at the command line rather than an arbitrary number that might fail if the requested number of cores are not available. We will discuss optimization further in a later chapter.
 
 
 ## Modularity and reusability
