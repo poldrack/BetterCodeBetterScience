@@ -41,6 +41,11 @@ def main():
         Path(snakemake.params.figure_dir) if snakemake.params.figure_dir else None
     )
 
+    # Create output directories
+    output_pseudobulk.parent.mkdir(parents=True, exist_ok=True)
+    if figure_dir:
+        figure_dir.mkdir(parents=True, exist_ok=True)
+
     # Load step 2 checkpoint to get var_to_feature mapping (has feature_name)
     print(f"Loading filtered data for var_to_feature: {filtered_checkpoint}")
     adata_filtered = load_checkpoint(filtered_checkpoint)
