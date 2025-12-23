@@ -25,7 +25,8 @@ def sanitize_cell_type(cell_type: str) -> str:
 def main():
     """Run pseudobulking pipeline and output cell types JSON."""
     qc_checkpoint = Path(snakemake.input.qc_checkpoint)
-    clustered_checkpoint = Path(snakemake.input.clustered_checkpoint)
+    # Note: clustered_checkpoint is listed as input for dependency ordering
+    # but not used here - we use QC checkpoint for both counts and gene names
     output_pseudobulk = Path(snakemake.output.pseudobulk)
     output_cell_types = Path(snakemake.output.cell_types)
     output_var_to_feature = Path(snakemake.output.var_to_feature)
@@ -40,17 +41,17 @@ def main():
         Path(snakemake.params.figure_dir) if snakemake.params.figure_dir else None
     )
 
-    # Load step 3 checkpoint (raw counts in .X)
+    # Load step 3 checkpoint (raw counts in .X, has feature_name annotations)
     print(f"Loading raw counts from: {qc_checkpoint}")
     adata_raw = load_checkpoint(qc_checkpoint)
     print(f"Loaded: {adata_raw}")
 
-    # Load clustered data to get var_to_feature mapping
-    print(f"Loading clustered data from: {clustered_checkpoint}")
-    adata_clustered = load_checkpoint(clustered_checkpoint)
+    # Get var_to_feature mapping from QC checkpoint (before HVG selection)
+    # Step 6 (clustered) may not have feature_name after preprocessing
     var_to_feature = dict(
-        zip(adata_clustered.var_names, adata_clustered.var["feature_name"])
+        zip(adata_raw.var_names, adata_raw.var["feature_name"])
     )
+    print(f"Built var_to_feature mapping with {len(var_to_feature)} genes")
 
     # Run pseudobulking on raw counts
     print("Running pseudobulking pipeline...")
