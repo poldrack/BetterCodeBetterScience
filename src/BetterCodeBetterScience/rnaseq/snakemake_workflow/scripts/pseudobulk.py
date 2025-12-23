@@ -48,10 +48,17 @@ def main():
 
     # Get var_to_feature mapping from QC checkpoint (before HVG selection)
     # Step 6 (clustered) may not have feature_name after preprocessing
-    var_to_feature = dict(
-        zip(adata_raw.var_names, adata_raw.var["feature_name"])
-    )
-    print(f"Built var_to_feature mapping with {len(var_to_feature)} genes")
+    # Fall back to var_names if feature_name column doesn't exist
+    if "feature_name" in adata_raw.var.columns:
+        var_to_feature = dict(
+            zip(adata_raw.var_names, adata_raw.var["feature_name"])
+        )
+        print("Built var_to_feature mapping from feature_name column")
+    else:
+        # Use var_names as feature names (they may already be gene symbols)
+        var_to_feature = dict(zip(adata_raw.var_names, adata_raw.var_names))
+        print("No feature_name column found, using var_names as feature names")
+    print(f"var_to_feature mapping has {len(var_to_feature)} genes")
 
     # Run pseudobulking on raw counts
     print("Running pseudobulking pipeline...")
