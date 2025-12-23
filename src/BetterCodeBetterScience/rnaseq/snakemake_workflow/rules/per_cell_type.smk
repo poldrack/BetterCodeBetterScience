@@ -41,7 +41,7 @@ rule pathway_analysis:
         gsea_results=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "gsea_results.pkl",
         fig_gsea=report(
             RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "gsea_pathways.png",
-            caption="report/gsea.rst",
+            caption="../report/gsea.rst",
             category="Step 9: Pathway Analysis (GSEA)",
             subcategory="{cell_type}",
         ),
@@ -67,7 +67,7 @@ rule overrepresentation:
         enr_down=RESULTS_DIR / "per_cell_type" / "{cell_type}" / "enrichr_down.pkl",
         fig_enrichr=report(
             RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "enrichr_pathways.png",
-            caption="report/enrichr.rst",
+            caption="../report/enrichr.rst",
             category="Step 10: Overrepresentation Analysis",
             subcategory="{cell_type}",
         ),
@@ -98,7 +98,7 @@ rule predictive_modeling:
         / "prediction_results.pkl",
         fig_prediction=report(
             RESULTS_DIR / "per_cell_type" / "{cell_type}" / "figures" / "age_prediction_performance.png",
-            caption="report/prediction.rst",
+            caption="../report/prediction.rst",
             category="Step 11: Predictive Modeling",
             subcategory="{cell_type}",
         ),

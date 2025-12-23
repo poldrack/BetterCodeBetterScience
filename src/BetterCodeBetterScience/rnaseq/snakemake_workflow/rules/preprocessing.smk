@@ -30,7 +30,7 @@ rule filter_data:
         checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
         fig_donor_counts=report(
             FIGURE_DIR / "donor_cell_counts_distribution.png",
-            caption="report/filtering.rst",
+            caption="../report/filtering.rst",
             category="Step 2: Filtering",
         ),
     params:
@@ -52,22 +52,22 @@ rule quality_control:
         checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
         fig_violin=report(
             FIGURE_DIR / "qc_violin_plots.png",
-            caption="report/qc_violin.rst",
+            caption="../report/qc_violin.rst",
             category="Step 3: Quality Control",
         ),
         fig_scatter=report(
             FIGURE_DIR / "qc_scatter_doublets.png",
-            caption="report/qc_scatter.rst",
+            caption="../report/qc_scatter.rst",
             category="Step 3: Quality Control",
         ),
         fig_hemoglobin=report(
             FIGURE_DIR / "hemoglobin_distribution.png",
-            caption="report/hemoglobin.rst",
+            caption="../report/hemoglobin.rst",
             category="Step 3: Quality Control",
         ),
         fig_doublet_umap=report(
             FIGURE_DIR / "doublet_detection_umap.png",
-            caption="report/doublet_umap.rst",
+            caption="../report/doublet_umap.rst",
             category="Step 3: Quality Control",
         ),
     threads: workflow.cores
@@ -110,12 +110,12 @@ rule dimensionality_reduction:
         checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 5, "dimreduced"),
         fig_pca=report(
             FIGURE_DIR / "pca_cell_type.png",
-            caption="report/pca.rst",
+            caption="../report/pca.rst",
             category="Step 5: Dimensionality Reduction",
         ),
         fig_umap=report(
             FIGURE_DIR / "umap_total_counts.png",
-            caption="report/umap.rst",
+            caption="../report/umap.rst",
             category="Step 5: Dimensionality Reduction",
         ),
     threads: workflow.cores
@@ -138,7 +138,7 @@ rule clustering:
         checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 6, "clustered"),
         fig_clustering=report(
             FIGURE_DIR / "umap_cell_type_leiden.png",
-            caption="report/clustering.rst",
+            caption="../report/clustering.rst",
             category="Step 6: Clustering",
         ),
     params:
