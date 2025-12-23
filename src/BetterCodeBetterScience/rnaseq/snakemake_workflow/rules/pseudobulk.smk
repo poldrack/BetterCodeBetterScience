@@ -13,7 +13,9 @@ IMPORTANT: This uses 'checkpoint' instead of 'rule' because:
 # Step 7: Pseudobulking (CHECKPOINT - enables dynamic per-cell-type rules)
 checkpoint pseudobulk:
     input:
-        # Step 3 provides raw counts in .X and var_to_feature mapping
+        # Step 2 provides feature_name column for var_to_feature mapping
+        filtered_checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 2, "filtered"),
+        # Step 3 provides raw counts in .X (after QC filtering)
         qc_checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 3, "qc"),
         # Step 6 listed for workflow ordering (ensures clustering completes first)
         clustered_checkpoint=CHECKPOINT_DIR / bids_checkpoint_name(DATASET, 6, "clustered"),

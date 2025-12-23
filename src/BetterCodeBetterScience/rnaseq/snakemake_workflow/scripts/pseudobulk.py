@@ -24,9 +24,9 @@ def sanitize_cell_type(cell_type: str) -> str:
 
 def main():
     """Run pseudobulking pipeline and output cell types JSON."""
+    filtered_checkpoint = Path(snakemake.input.filtered_checkpoint)
     qc_checkpoint = Path(snakemake.input.qc_checkpoint)
     # Note: clustered_checkpoint is listed as input for dependency ordering
-    # but not used here - we use QC checkpoint for both counts and gene names
     output_pseudobulk = Path(snakemake.output.pseudobulk)
     output_cell_types = Path(snakemake.output.cell_types)
     output_var_to_feature = Path(snakemake.output.var_to_feature)
@@ -41,24 +41,18 @@ def main():
         Path(snakemake.params.figure_dir) if snakemake.params.figure_dir else None
     )
 
-    # Load step 3 checkpoint (raw counts in .X, has feature_name annotations)
+    # Load step 2 checkpoint to get var_to_feature mapping (has feature_name)
+    print(f"Loading filtered data for var_to_feature: {filtered_checkpoint}")
+    adata_filtered = load_checkpoint(filtered_checkpoint)
+    var_to_feature = dict(
+        zip(adata_filtered.var_names, adata_filtered.var["feature_name"])
+    )
+    print(f"Built var_to_feature mapping with {len(var_to_feature)} genes")
+
+    # Load step 3 checkpoint for raw counts (after QC filtering)
     print(f"Loading raw counts from: {qc_checkpoint}")
     adata_raw = load_checkpoint(qc_checkpoint)
     print(f"Loaded: {adata_raw}")
-
-    # Get var_to_feature mapping from QC checkpoint (before HVG selection)
-    # Step 6 (clustered) may not have feature_name after preprocessing
-    # Fall back to var_names if feature_name column doesn't exist
-    if "feature_name" in adata_raw.var.columns:
-        var_to_feature = dict(
-            zip(adata_raw.var_names, adata_raw.var["feature_name"])
-        )
-        print("Built var_to_feature mapping from feature_name column")
-    else:
-        # Use var_names as feature names (they may already be gene symbols)
-        var_to_feature = dict(zip(adata_raw.var_names, adata_raw.var_names))
-        print("No feature_name column found, using var_names as feature names")
-    print(f"var_to_feature mapping has {len(var_to_feature)} genes")
 
     # Run pseudobulking on raw counts
     print("Running pseudobulking pipeline...")
