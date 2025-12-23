@@ -112,6 +112,8 @@ What I found as I developed the workflow is that I increasingly ran into problem
 
 #### Converting from Jupyter notebook to a runnable python script
 
+As we discussed in an earlier chapter, converting a Jupyter notebook to a pure python script is easy using `jupytext`.  This results in a script that can be run from the command line.  However, there can be some commands that will block execution of the script; in particular, plotting commands can open windows that will block execution until they are closed.  To prevent this, and to ensure that the results of the plots are saved for later examination, I replaced all of the `plt.show()` commands that display a figure to the screen with `plt.savefig()` commands that save the figures to a file in the results directory.  (This was an easy job for the Copilot agent to complete.) 
+
 - had to prevent plots from being displayed because this blocked execution
 - used copilot to find and fix all plotting commands to save them to file rather than showing
 
@@ -143,8 +145,6 @@ In addition to a conceptual breakdown, there are also other reasons that one mig
 - There may be points where one might need to restart the computation (e.g. due to computational cost).
 - There may be sections where one might wish to swap in a new method or different parameterization.
 - There may be points where the output could be reusable elsewhere.
-
-
 
 ## Stateless workflows
 
@@ -263,11 +263,59 @@ Another potentially helpful solution is to compress the checkpoint data if they 
 
 Combining these strategies of reducing data duplication, eliminating some intermediate checkpoints, and compressing the stored data, our final pipeline generates about 13 GB worth of checkpoint data, substantially smaller than the initial 64 GB.  With all checkpoints generated, the entire workflow completes in less than four minutes, with only three time-consuming steps being rerun each time.   The initial execution of the workflow is a few minutes longer due to the extra time needed to read and write compressed checkpoint files, but these few minutes are hardly noticeable for a workflow that takes more than two hours to complete.
 
+The use of a modular architecture for our stateless workflow helps to separate the actual workflow components from the execution logic of the workflow.  One important benefit of this is that it allows us to plug those modules into any other workflow system, and as long as the inputs are correct it should work. We will see that next when we create new versions of this workflow using two common workflow engines.
 
 ### Using a workflow engine
 
+There is a wide variety of workflow engines available for data analysis workflows, most of which are centered around the concept of an "execution graph."  This is a graph in the sense described by graph theory, which refers to a set of nodes that are connected by lines (known as "edges").  Workflow execution graphs are a particular kind of graph known as a *directed acyclic graph*, or *DAG* for short. Each node in the graph represents a single step in the workflow, and each edge represents the dependency relationships that exist between nodes.  DAGs have two important features.  First, the edges are directed, which means that they move in one direction that is represented graphically as an arrow.  These represent the dependencies within the workflow.  For example, in our workflow step 1 (obtaining the data) must occur before step 2 (filtering the data), so the graph would have an edge from step 1 with an arrow pointing at step 2.  Second, the graph is *acyclic*, which means that it doesn't have any cycles, that is, it never circles back on itself.  Cycles would be problematic, since they could result in workflows that executed in an infinite loop as the cycle repeated itself.  
+
+Most workflow engines provide tools to visualize a workflow as a DAG. #DAG-fig shows our example workflow visualized using the Snakemake tool that we will introduce below:
+
+```{figure} images/snakemake-DAG.png
+:label: DAG-fig
+:align: center
+:width: 300px
+
+The execution graph for the RNA-seq analysis workflow visualized as a DAG.
+```
+
+The use of DAGs to represent workflows provides a number of important benefits:
+
+- The engine can identify independent pathways through the graph, which can then be executed in parallel
+- If one node of the graph changes, the engine can identify which downstream nodes need to be rerun
+- If a node fails, the engine can continue with executing the nodes that don't depend on the failed node either directly or indirectly
+
+Another benefit of using a workflow engine is that they generally deal automatically with checkpointing and caching of intermediate results.  
+
+#### General-purpose versus domain-specific workflow engines
+
+With the growth of data science within industry and research, there has been an explosion of new workflow management systems that aim to solve particular problems; a list of these can be found at [awesome-workflow-engines](https://github.com/meirwah/awesome-workflow-engines).  One important distinction between engines is the degree to which the workflow definition is built into the code, or whether it is defined in a *domain-specific language* (DSL).  We will look at two examples below, one of which (Prefect) builds the workflow details in the code, and the other (Snakemake) uses a specialized syntax built on Python to define the workflow.
+
+It's also worth noting that there are a number of domain-specific workflow engines that are specialized for particular kinds of data and workflows.  Examples include [Galaxy](https://galaxyproject.org/) which is specialized for bioinformatics and genomics, and [Nipype](https://nipype.readthedocs.io/en/latest/index.html) which is specialized for neuroimaging analysis workflows. If your research community uses one of these then it's worth exploring that engine as your first option, since it will probably be well supported within the community. However, a benefit of using a general-purpose engine is that they will often be better maintained and supported, and AI tools will likely have more examples to work from in generating workflows.
+
+#### A language-specific workflow management example: Prefect
 
 
+
+
+#### A general-purpose workflow management example: Snakemake
+
+
+The first time that I ran my workflow using snakemake, I noticed that it was substantially slower than when I ran it with Prefect.  When I asked Claude about this, it gave me a reasonable answer:
+
+> The Snakemake rules don't specify a threads directive. By default, Snakemake runs each job with 1 thread, which limits parallelization of computationally intensive operations like neighbor computation and UMAP (which use numba internally).
+
+I asked Claude to fix this, and it returned the following change:
+
+
+>   Fixes applied:
+>  1. Added threads: 8 to dimensionality_reduction rule
+>  2. Added threads: 8 to quality_control rule (Scrublet)
+>  3. Added threads: 4 to preprocess rule
+>  4. Set NUMBA_NUM_THREADS and OMP_NUM_THREADS environment variables in dimred.py
+>   In contrast, Prefect tasks run in the main process with access to all CPUs by default, which is why it was faster.
+
+This solves the problem but it's an odd choice: in particular, it will probably fail if there are fewer than 8 threads available on the system. Snakemake actually take a command line argument (`--cores`) to specify the number of cores to use, so I instead asked Claude to have Snakemake use the number of cores specified at the command line rather than an arbitrary number that might fail if the requested number of cores are not available.
 
 
 ## Modularity and reusability
@@ -326,14 +374,6 @@ also look at arrow for columnar data - look into arrow immutability
 
 - dask, xarray
 
-## Checkpointing
-
-- pipeline state should be files on disk, not in memory
-- functions don't pass large objects in memory, they simply pass file names
-- for modern formats like parquet (others?) reading is very fast so the penalty is minimal
-
-## Precomputing expensive/common operations
-
 
 ## Tracking provenance
 
@@ -354,8 +394,6 @@ also look at arrow for columnar data - look into arrow immutability
 https://workflowhub.eu/
 
 
- - use narps as the working example 
-
 
 ## Error handling and robustness
 
@@ -374,21 +412,6 @@ https://workflowhub.eu/
 
 
  
-## Simple workflow management with Makefiles
-
-
-
-## Python workflow management with checkpoints
-
-
-
-## Workflow management systems for complex workflows
-
-- introduce DAGs
-
-- general purpose vs domain specific
-    - overview various engines
-
 
 
 
