@@ -224,16 +224,56 @@ def detect_doublets_per_donor(
     return adata_combined
 
 
+def compute_umap_for_qc(adata: ad.AnnData, n_pcs: int = 30) -> ad.AnnData:
+    """Compute a simple UMAP embedding for QC visualization.
+
+    This computes a quick UMAP on the raw counts for visualizing
+    doublet detection results. This is separate from the main
+    dimensionality reduction in step 5.
+
+    Parameters
+    ----------
+    adata : AnnData
+        AnnData object (raw counts in .X)
+    n_pcs : int
+        Number of principal components to use
+
+    Returns
+    -------
+    AnnData
+        AnnData with UMAP coordinates in .obsm['X_umap']
+    """
+    # Work on a copy to avoid modifying the original
+    adata_temp = adata.copy()
+
+    # Basic preprocessing for UMAP computation
+    sc.pp.normalize_total(adata_temp, target_sum=1e4)
+    sc.pp.log1p(adata_temp)
+    sc.pp.highly_variable_genes(adata_temp, n_top_genes=2000, flavor="seurat_v3")
+    sc.pp.pca(adata_temp, n_comps=n_pcs, use_highly_variable=True)
+    sc.pp.neighbors(adata_temp, n_neighbors=15, n_pcs=n_pcs)
+    sc.tl.umap(adata_temp)
+
+    # Copy UMAP coordinates back to original
+    adata.obsm["X_umap"] = adata_temp.obsm["X_umap"]
+
+    return adata
+
+
 def plot_doublets(adata: ad.AnnData, figure_dir: Path | None = None) -> None:
     """Visualize doublet detection results on UMAP.
 
     Parameters
     ----------
     adata : AnnData
-        AnnData object with doublet annotations
+        AnnData object with doublet annotations and UMAP coordinates
     figure_dir : Path, optional
         Directory to save figures
     """
+    if "X_umap" not in adata.obsm:
+        print("Warning: No UMAP coordinates found, skipping doublet plot")
+        return
+
     sc.pl.umap(adata, color=["doublet_score", "predicted_doublet"], size=20, show=False)
     if figure_dir is not None:
         plt.savefig(
@@ -312,8 +352,15 @@ def run_qc_pipeline(
         adata, min_genes, max_genes, min_counts, max_counts, max_hb_pct
     )
 
-    # Detect and filter doublets
+    # Detect doublets
     adata = detect_doublets_per_donor(adata, expected_doublet_rate)
+
+    # Compute UMAP for doublet visualization (before filtering)
+    print("Computing UMAP for doublet visualization...")
+    adata = compute_umap_for_qc(adata)
+    plot_doublets(adata, figure_dir)
+
+    # Filter doublets
     adata = filter_doublets(adata)
 
     # Save raw counts for HVG selection (step 4) and pseudobulking (step 7)
