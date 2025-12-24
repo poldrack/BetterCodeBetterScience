@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Download data from URL and save to CSV.
+"""Download data files.
 
 Usage:
-    python download_data.py <url> <output_path>
+    python download_data.py <data_dir>
 """
 
 import sys
@@ -10,25 +10,27 @@ from pathlib import Path
 
 import pandas as pd
 
+MV_URL = "https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv"
+DEMO_URL = "https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv"
+
 
 def main():
-    """Download data from URL."""
-    if len(sys.argv) != 3:
-        print("Usage: python download_data.py <url> <output_path>")
+    """Download both data files."""
+    if len(sys.argv) != 2:
+        print("Usage: python download_data.py <data_dir>")
         sys.exit(1)
 
-    url = sys.argv[1]
-    output_path = Path(sys.argv[2])
+    data_dir = Path(sys.argv[1])
 
-    # Create output directory
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    # Download meaningful variables
+    mv_df = pd.read_csv(MV_URL, index_col=0)
+    mv_df.to_csv(data_dir / "meaningful_variables.csv")
+    print(f"Downloaded meaningful_variables.csv ({len(mv_df)} rows)")
 
-    # Download and save
-    df = pd.read_csv(url, index_col=0)
-    df.to_csv(output_path)
-
-    print(f"Downloaded {len(df)} rows from {url}")
-    print(f"Saved to {output_path}")
+    # Download demographics
+    demo_df = pd.read_csv(DEMO_URL, index_col=0)
+    demo_df.to_csv(data_dir / "demographics.csv")
+    print(f"Downloaded demographics.csv ({len(demo_df)} rows)")
 
 
 if __name__ == "__main__":

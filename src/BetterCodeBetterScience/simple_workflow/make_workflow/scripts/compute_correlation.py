@@ -2,7 +2,7 @@
 """Compute Spearman correlation matrix.
 
 Usage:
-    python compute_correlation.py <input_path> <output_path>
+    python compute_correlation.py <data_dir> <results_dir>
 """
 
 import sys
@@ -18,24 +18,20 @@ from BetterCodeBetterScience.simple_workflow.correlation import (
 def main():
     """Compute Spearman correlation matrix."""
     if len(sys.argv) != 3:
-        print("Usage: python compute_correlation.py <input_path> <output_path>")
+        print("Usage: python compute_correlation.py <data_dir> <results_dir>")
         sys.exit(1)
 
-    input_path = Path(sys.argv[1])
-    output_path = Path(sys.argv[2])
+    data_dir = Path(sys.argv[1])
+    results_dir = Path(sys.argv[2])
 
-    # Load data
-    df = pd.read_csv(input_path, index_col=0)
-    print(f"Loaded {df.shape} from {input_path}")
+    # Load joined data
+    df = pd.read_csv(data_dir / "joined_data.csv", index_col=0)
+    print(f"Loaded joined data: {df.shape}")
 
     # Compute correlation
     corr_matrix = compute_spearman_correlation(df)
-    print(f"Computed Spearman correlation matrix: {corr_matrix.shape}")
-
-    # Save
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    corr_matrix.to_csv(output_path)
-    print(f"Saved to {output_path}")
+    corr_matrix.to_csv(results_dir / "correlation_matrix.csv")
+    print(f"Saved correlation matrix: {corr_matrix.shape}")
 
 
 if __name__ == "__main__":
