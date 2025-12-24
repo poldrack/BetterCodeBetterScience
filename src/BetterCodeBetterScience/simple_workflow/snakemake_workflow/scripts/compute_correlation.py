@@ -12,8 +12,8 @@ from BetterCodeBetterScience.simple_workflow.correlation import (
 def main():
     """Compute Spearman correlation matrix."""
     # ruff: noqa: F821
-    input_path = Path(snakemake.input[0])
-    output_path = Path(snakemake.output[0])
+    input_path = Path(snakemake.input[0]).expanduser()
+    output_path = Path(snakemake.output[0]).expanduser()
     method = snakemake.params.method
 
     # Load data

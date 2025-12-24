@@ -9,7 +9,7 @@ def main():
     """Download data from URL."""
     # ruff: noqa: F821
     url = snakemake.params.url
-    output_path = Path(snakemake.output[0])
+    output_path = Path(snakemake.output[0]).expanduser()
 
     # Create output directory
     output_path.parent.mkdir(parents=True, exist_ok=True)

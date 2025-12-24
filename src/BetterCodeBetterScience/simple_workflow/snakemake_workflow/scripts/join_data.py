@@ -10,9 +10,9 @@ from BetterCodeBetterScience.simple_workflow.join_data import join_dataframes
 def main():
     """Join the two datasets."""
     # ruff: noqa: F821
-    mv_path = Path(snakemake.input.meaningful_vars)
-    demo_path = Path(snakemake.input.demographics)
-    output_path = Path(snakemake.output[0])
+    mv_path = Path(snakemake.input.meaningful_vars).expanduser()
+    demo_path = Path(snakemake.input.demographics).expanduser()
+    output_path = Path(snakemake.output[0]).expanduser()
 
     # Load data
     meaningful_vars = pd.read_csv(mv_path, index_col=0)
