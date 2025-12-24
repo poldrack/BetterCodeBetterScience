@@ -41,6 +41,12 @@ OUTPUT_DIR = Path(config["output_dir"])
 DATA_DIR = OUTPUT_DIR / "data"
 RESULTS_DIR = OUTPUT_DIR / "results"
 FIGURES_DIR = OUTPUT_DIR / "figures"
+LOGS_DIR = OUTPUT_DIR / "logs"
+
+
+# Create output directories at workflow start
+onstart:
+    shell(f"mkdir -p {DATA_DIR} {RESULTS_DIR} {FIGURES_DIR} {LOGS_DIR}")
 
 
 # Default target
