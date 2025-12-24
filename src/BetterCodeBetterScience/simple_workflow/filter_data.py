@@ -53,3 +53,4 @@ def filter_demographics(df: pd.DataFrame) -> pd.DataFrame:
         Filtered dataframe with only numerical columns
     """
     return filter_numerical_columns(df)
+
