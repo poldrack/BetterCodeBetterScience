@@ -20,7 +20,7 @@ Third, we care about the *engineering quality* of the code, which includes:
 
 - *Maintainability*: The workflow is structured and documented so that others (including your future self) can easily maintain, update, and extend it in the future.
 - *Modularity*: The workflow is composed of a set of independently testable modules, which can be swapped in or out relatively easily.
-- *Idempotency*: This term from computer science means that the result of the workflow does not change after its first successful run, which allows safely rerunning the workflow when there is a failure.
+- *Idempotency*: This term from computer science means that the result of the workflow does not change after its first successful run, which allows safely rerunning the workflow.
 - *Traceability*:  All operations are logged, and provenance information is stored for outputs.
 
 Finally, we care about the *efficiency* of the workflow implementation. This includes:
@@ -91,16 +91,107 @@ Name: EverArrested, dtype: float64
 
 Note that `pandas` data frames also include an explicit `.pipe` method that allows using arbitrary functions within a pipeline.  While these kinds of pipelines can be useful for simple data processing operations, they can become very difficult to debug, so I would generally avoid using complex functions within a method chain.
 
+## A simple workflow example
 
-## An example of a complex workflow
+Most real scientific workflows are complex and can often run for hours, and we will encounter such a complex workflow later in the chapter. However, we will start our discussion of workflows with a relatively simple and fast-running example that will help us understand the basic concepts of workflow execution. We will use the same data as above (from Eisenberg et al.) to perform a simple workflow:
 
-In this chapter we will focus primarily on complex workflows that have many stages. I will use a running example to show how to move from a monolithic analysis script to a well-structured and usable workflow that meets most of the desired features described earlier.  For this example I will use an analysis of single-cell RNA-sequencing data to determine how gene expression in immune system cells changes with age. This analysis will utilize a [large openly available dataset](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1) that includes data from about 1.3 million immune system cells for about 35K transcripts.  I chose this particular example for several reasons:
+- Load the demographic and meaningful variables files
+- Filter out any non-numeric variables from each data frame
+- Join the data frames using their shared index
+- Compute the correlation matrix across all variables
+- Generate a clustered heatmap for the correlation matrix
+
+### Running a simple workflow using UNIX make
+
+One of the simplest ways to organize a workflow is using the UNIX `make` command, which executes commands defined in a file named `Makefile`.  `make` is a very handy general-purpose tool that every user of UNIX systems should become familiar with.  The Makefile defines a set of labeled commands, like this:
+
+```Makefile
+
+all: step1 step2
+
+step1:
+    python step1.py
+
+step2:
+    python step2.py
+```
+
+In this case, the command `make step1` will run `python step1.py`, `make step2` will run `python step2.py`, and `make all` will run both of those commands. This should already show you why `make` is such a handy tool: Any time there is a command that you run regularly in a particular directory, you can put it into a `Makefile` and then execute it with just a single `make` call.  Here is how we could build a very simple Makefile to run our simple workflow:
+
+```Makefile
+# Simple Correlation Workflow using Make
+#
+# Usage:
+#   make all              - Run full workflow
+#   make clean            - Remove output directory
+
+# if OUTPUT_DIR isn't already defined, set it to the default
+OUTPUT_DIR ?= ./output
+
+# run commands even if files exist with these names
+.PHONY: all clean
+
+all:
+	mkdir -p $(OUTPUT_DIR)/data $(OUTPUT_DIR)/results $(OUTPUT_DIR)/figures
+	python scripts/download_data.py $(OUTPUT_DIR)/data
+	python scripts/filter_data.py $(OUTPUT_DIR)/data
+	python scripts/join_data.py $(OUTPUT_DIR)/data
+	python scripts/compute_correlation.py $(OUTPUT_DIR)/data $(OUTPUT_DIR)/results
+	python scripts/generate_heatmap.py $(OUTPUT_DIR)/results $(OUTPUT_DIR)/figures
+
+clean:
+	rm -rf $(OUTPUT_DIR)
+```
+
+We can run the entire workflow by simply running `make all`.  We could also take advantage of another feature of `make`: it only triggers the action if a file with the name of the action doesn't exist.  Thus, if the command was `make results/output.txt`, then the action would only be triggered if the file does not exist.  This is why we had to put the `.PHONY` command in the makefile above: it's telling `make` that those are not meant to be interpreted as file names, but rather as commands, so that they will be run even if files named "all" or "clean" exist.
+
+For a very simple workflow `make` can be useful, but we will see below why this wouldn't be sufficient for a complex workflow.  For those workflows we could either build our own more complex workflow management system, or we could use an existing software tool that is built to manage workflow execution, known as a *workflow engine*.  Later in the chapter I will show an example of a purpose-built workflow management system, but for this first example we will now turn to a general-purpose workflow engine.
+
+### Using a workflow engine
+
+There is a wide variety of workflow engines available for data analysis workflows, most of which are centered around the concept of an "execution graph".  This is a graph in the sense described by graph theory, which refers to a set of nodes that are connected by lines (known as "edges").  Workflow execution graphs are a particular kind of graph known as a *directed acyclic graph*, or *DAG* for short. Each node in the graph represents a single step in the workflow, and each edge represents the dependency relationships that exist between nodes.  DAGs have two important features.  First, the edges are directed, which means that they move in one direction that is represented graphically as an arrow.  These represent the dependencies within the workflow.  For example, in our workflow step 1 (obtaining the data) must occur before step 2 (filtering the data), so the graph would have an edge from step 1 with an arrow pointing at step 2.  Second, the graph is *acyclic*, which means that it doesn't have any cycles, that is, it never circles back on itself.  Cycles would be problematic, since they could result in workflows that executed in an infinite loop as the cycle repeated itself.  
+
+Most workflow engines provide tools to visualize a workflow as a DAG. #simpleDAG-fig shows our example workflow visualized using the Snakemake tool that we will introduce below:
+
+```{figure} images/simple-DAG.png
+:label: simpleDAG-fig
+:align: center
+:width: 300px
+
+The execution graph for the simple example analysis workflow visualized as a DAG.
+```
+
+The use of DAGs to represent workflows provides a number of important benefits:
+
+- The engine can identify independent pathways through the graph, which can then be executed in parallel
+- If one node of the graph changes, the engine can identify which downstream nodes need to be rerun
+- If a node fails, the engine can continue with executing the nodes that don't depend on the failed node either directly or indirectly
+
+There are a couple of additional benefits to using a workflow engine, which we will discuss in more detail in the context of a more complex workflow. The first is that they generally deal automatically with the storage of intermediate results (known as *checkpointing*), which can help speed up execution when nothing has changed.  The second is that the workflow engine uses the execution graph to optimize the computation, only performing those operations that are actually needed.  This is similar in spirit to the concept of *lazy execution* used by packages like Polars, in which the system optimizes computational efficiency by first analyzing the full computational graph.
+
+#### General-purpose versus domain-specific workflow engines
+
+With the growth of data science within industry and research, there has been an explosion of new workflow management systems that aim to solve particular problems; a list of these can be found at [awesome-workflow-engines](https://github.com/meirwah/awesome-workflow-engines).  One important distinction between engines is the degree to which the workflow definition is built into the code, or whether it is defined in a *domain-specific language* (DSL).  We will look at two examples below, one of which (Prefect) builds the workflow details in the code, and the other (Snakemake) uses a specialized syntax built on Python to define the workflow.
+
+It's also worth noting that there are a number of domain-specific workflow engines that are specialized for particular kinds of data and workflows.  Examples include [Galaxy](https://galaxyproject.org/) which is specialized for bioinformatics and genomics, and [Nipype](https://nipype.readthedocs.io/en/latest/index.html) which is specialized for neuroimaging analysis workflows. If your research community uses one of these then it's worth exploring that engine as your first option, since it will probably be well supported within the community. However, a benefit of using a general-purpose engine is that they will often be better maintained and supported, and AI tools will likely have more examples to work from in generating workflows.
+
+### Using the Snakemake workflow engine
+
+
+
+- show how one can run snakemake with an output file name to reconstruct that file (using --force if it already exists)
+
+## Scaling to complex workflows
+
+We now turn to a more realistic and complex scientific data analysis workflow. For this example I will use an analysis of single-cell RNA-sequencing data to determine how gene expression in immune system cells changes with age. This analysis will utilize a [large openly available dataset](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1) that includes data from 982 people comprising about 1.3 million immune system cells for about 35K transcripts.  I chose this particular example for several reasons:
 
 - It is a realistic example of a workflow that a researcher might actually perform.
 - The data are large enough to call for a real workflow management scheme, but small enough to be processed on a single laptop (assuming it has decent memory). 
 - The workflow has many different steps, some of which can take a significant amount of time (over 30 minutes)
 - There is an established Python library ([scanpy](https://scanpy.readthedocs.io/en/stable/)) that implements the necessary workflow components.
 - It's an example outside of my own research domain, to help demonstrate the applicability of the book's ideas across a broader set of data types.
+
+I will use this example to show how to move from a monolithic analysis script to a well-structured and usable workflow that meets most of the desired features described above. 
 
 ### Starting point: One huge notebook
 
@@ -268,11 +359,8 @@ Combining these strategies of reducing data duplication, eliminating some interm
 
 The use of a modular architecture for our stateless workflow helps to separate the actual workflow components from the execution logic of the workflow.  One important benefit of this is that it allows us to plug those modules into any other workflow system, and as long as the inputs are correct it should work. We will see that next when we create new versions of this workflow using two common workflow engines.
 
+
 ### Using a workflow engine
-
-There is a wide variety of workflow engines available for data analysis workflows, most of which are centered around the concept of an "execution graph."  This is a graph in the sense described by graph theory, which refers to a set of nodes that are connected by lines (known as "edges").  Workflow execution graphs are a particular kind of graph known as a *directed acyclic graph*, or *DAG* for short. Each node in the graph represents a single step in the workflow, and each edge represents the dependency relationships that exist between nodes.  DAGs have two important features.  First, the edges are directed, which means that they move in one direction that is represented graphically as an arrow.  These represent the dependencies within the workflow.  For example, in our workflow step 1 (obtaining the data) must occur before step 2 (filtering the data), so the graph would have an edge from step 1 with an arrow pointing at step 2.  Second, the graph is *acyclic*, which means that it doesn't have any cycles, that is, it never circles back on itself.  Cycles would be problematic, since they could result in workflows that executed in an infinite loop as the cycle repeated itself.  
-
-Most workflow engines provide tools to visualize a workflow as a DAG. #DAG-fig shows our example workflow visualized using the Snakemake tool that we will introduce below:
 
 ```{figure} images/snakemake-DAG.png
 :label: DAG-fig
@@ -282,22 +370,10 @@ Most workflow engines provide tools to visualize a workflow as a DAG. #DAG-fig s
 The execution graph for the RNA-seq analysis workflow visualized as a DAG.
 ```
 
-The use of DAGs to represent workflows provides a number of important benefits:
-
-- The engine can identify independent pathways through the graph, which can then be executed in parallel
-- If one node of the graph changes, the engine can identify which downstream nodes need to be rerun
-- If a node fails, the engine can continue with executing the nodes that don't depend on the failed node either directly or indirectly
-
-There are a couple of additional benefits to using a workflow engine. The first is that they generally deal automatically with checkpointing and caching of intermediate results.  The second is that the workflow engine uses the execution graph to optimize the computation, only performing those operations that are actually needed.  This is similar in spirit to the concept of *lazy execution* used by packages like Polars, in which the system optimizes computational efficiency by first analyzing the full computational graph.
-
-#### General-purpose versus domain-specific workflow engines
-
-With the growth of data science within industry and research, there has been an explosion of new workflow management systems that aim to solve particular problems; a list of these can be found at [awesome-workflow-engines](https://github.com/meirwah/awesome-workflow-engines).  One important distinction between engines is the degree to which the workflow definition is built into the code, or whether it is defined in a *domain-specific language* (DSL).  We will look at two examples below, one of which (Prefect) builds the workflow details in the code, and the other (Snakemake) uses a specialized syntax built on Python to define the workflow.
-
-It's also worth noting that there are a number of domain-specific workflow engines that are specialized for particular kinds of data and workflows.  Examples include [Galaxy](https://galaxyproject.org/) which is specialized for bioinformatics and genomics, and [Nipype](https://nipype.readthedocs.io/en/latest/index.html) which is specialized for neuroimaging analysis workflows. If your research community uses one of these then it's worth exploring that engine as your first option, since it will probably be well supported within the community. However, a benefit of using a general-purpose engine is that they will often be better maintained and supported, and AI tools will likely have more examples to work from in generating workflows.
 
 ### A language-specific workflow management example: Prefect
 
+- First build a very simple workflow example using Prefect
 
 #### Configuration management
 
@@ -307,6 +383,7 @@ The initial version of the Prefect workflow generated by Claude had the default 
 
 ### A general-purpose workflow management example: Snakemake
 
+- First build the simple example using snakemake
 
 #### Pipeline optimization
 
@@ -324,7 +401,7 @@ I asked Claude to fix this, and it returned the following change:
 >  4. Set NUMBA_NUM_THREADS and OMP_NUM_THREADS environment variables in dimred.py
 >   In contrast, Prefect tasks run in the main process with access to all CPUs by default, which is why it was faster.
 
-This solves the problem but it's an odd choice: in particular, it will probably fail if there are fewer than 8 threads available on the system. Snakemake actually take a command line argument (`--cores`) to specify the number of cores to use, so I instead asked Claude to have Snakemake use the number of cores specified at the command line rather than an arbitrary number that might fail if the requested number of cores are not available. We will discuss optimization in much greater detail in a later chapter.
+This solves the problem but it's a brittle soluution: in particular, it will probably fail if there are fewer than 8 threads available on the system and it won't take advantage of more than 8 if they are available. Snakemake actually take a command line argument (`--cores`) to specify the number of cores to use, so I instead asked Claude to have Snakemake use the number of cores specified at the command line rather than an arbitrary number that might not be optimal. We will discuss optimization in much greater detail in a later chapter, but whenever a pipeline takes much longer to run using a workflow manager than one would expect, it's likely that there is optimization to be done.
 
 
 
@@ -363,10 +440,6 @@ https://workflowhub.eu/
 
 
 ## Report generation
-
-
- 
-
 
 
 ## Scaling workflows
