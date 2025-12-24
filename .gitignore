@@ -5,6 +5,10 @@ __pycache__
 .hypothesis
 .env
 ._*
+.snakemake
+
+# Workflow output directories
+**/simple_workflow/*/output/
 
 data
 exports
