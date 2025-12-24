@@ -13,7 +13,7 @@ import seaborn as sns
 def generate_clustered_heatmap(
     corr_matrix: pd.DataFrame,
     output_path: Path | None = None,
-    figsize: tuple[int, int] = (12, 10),
+    figsize: tuple[int, int] = (8, 10),
     cmap: str = "coolwarm",
     vmin: float = -1.0,
     vmax: float = 1.0,
@@ -49,13 +49,12 @@ def generate_clustered_heatmap(
         figsize=figsize,
         dendrogram_ratio=(0.1, 0.1),
         cbar_pos=(0.02, 0.8, 0.03, 0.15),
-        xticklabels=True,
+        xticklabels=False,
         yticklabels=True,
     )
 
-    # Rotate x-axis labels for readability
-    plt.setp(g.ax_heatmap.get_xticklabels(), rotation=90, fontsize=6)
-    plt.setp(g.ax_heatmap.get_yticklabels(), rotation=0, fontsize=6)
+    # Set y-axis label font size
+    plt.setp(g.ax_heatmap.get_yticklabels(), rotation=0, fontsize=3)
 
     # Set title
     g.fig.suptitle("Clustered Correlation Heatmap (Spearman)", y=1.02, fontsize=14)
@@ -63,7 +62,7 @@ def generate_clustered_heatmap(
     # Save if output path provided
     if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        g.savefig(output_path, dpi=150, bbox_inches="tight")
+        g.savefig(output_path, dpi=300, bbox_inches="tight")
 
     return g
 
