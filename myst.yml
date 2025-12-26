@@ -23,7 +23,7 @@ project:
     - file: book/project_organization.md
     - file: book/data_management.md
 # - file: workflows
-# - file: validation_robustness.md
+# - file: validation.md
 # - file: performance
 # - file: HPC
 # - file: sharing
