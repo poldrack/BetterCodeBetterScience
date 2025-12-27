@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import shutil
 
-from BetterCodeBetterScience.narps.bids_utils import (
+from bettercode.narps.bids_utils import (
     parse_bids_filename,
     find_bids_files,
     modify_bids_filename,

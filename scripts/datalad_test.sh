@@ -8,7 +8,7 @@ datalad download-url -d . -O my_datalad_repo/data/ https://raw.githubusercontent
 
 datalad unlock my_datalad_repo/data/demographics.csv
 
-python src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
+python src/bettercode/modify_data.py my_datalad_repo/data/demographics.csv
 
 datalad status
 

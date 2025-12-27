@@ -303,7 +303,7 @@ In order for Snakemake to execute each of our modules, we need to wrap those mod
 ```python
 from pathlib import Path
 import pandas as pd
-from BetterCodeBetterScience.simple_workflow.visualization import (
+from bettercode.simple_workflow.visualization import (
     generate_clustered_heatmap,
 )
 
@@ -574,7 +574,7 @@ Another important feature of a workflow related to statelessness is *idempotency
 
 I asked Claude Code to help with this:
 
-> I would like to modify the workflow described in src/BetterCodeBetterScience/rnaseq/modular_workflow/run_workflow.py to make it execute in a stateless way through the use of checkpointing.  Please analyze the code and suggest the best way to accomplish this.
+> I would like to modify the workflow described in src/bettercode/rnaseq/modular_workflow/run_workflow.py to make it execute in a stateless way through the use of checkpointing.  Please analyze the code and suggest the best way to accomplish this.
 
 After analyzing the codebase Claude came up with three proposed solutions to the problem:
 
@@ -588,7 +588,7 @@ Here we will examine the first (recommended) option and the third solution; whil
 
 We start with a custom approach in order to get a better view of the details of workflow orchestration. It's important to note that I generally would not recommend building one's one custom workflow manager, at least not before trying a general-purpose workflow engine, but I will show an example of a custom workflow engine in order to provide a better understanding of the detailed process of workflow management.  We start with a prompt:
 
-> let's implement the recommended Stateless Workflow with Checkpointing.  Please generate new code within src/BetterCodeBetterScience/rnaseq/stateless_workflow.
+> let's implement the recommended Stateless Workflow with Checkpointing.  Please generate new code within src/bettercode/rnaseq/stateless_workflow.
 
 The resulting code worked straight out of the box, but it didn't maintain any sort of log of its processing, which can be very useful.  In particular, I wanted to log the time required to execute each step in the workflow, for use in optimization that I will discuss further below.  I asked Claude to add this:
 

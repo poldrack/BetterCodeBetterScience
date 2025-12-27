@@ -5,7 +5,7 @@
 import pytest
 import requests
 import time
-from BetterCodeBetterScience.textmining.textmining import (
+from bettercode.textmining.textmining import (
     get_PubmedIDs_for_query,
     parse_year_from_Pubmed_record,
     get_record_from_PubmedID,

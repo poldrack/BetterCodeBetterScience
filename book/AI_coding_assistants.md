@@ -96,7 +96,7 @@ def linear_regression_normal_eq(X: np.ndarray, y: np.ndarray) -> np.ndarray:
 ```
 
 Unlike the previous examples, the code now includes type hints.
-It's always a bad idea to generalize from a single result, so we ran these prompts through ChatGPT 10 times each (using the Openai API to generate them programmatically; see the [notebook](../src/BetterCodeBetterScience/incontext_learning_example.ipynb)).
+It's always a bad idea to generalize from a single result, so we ran these prompts through ChatGPT 10 times each (using the Openai API to generate them programmatically; see the [notebook](../src/bettercode/incontext_learning_example.ipynb)).
 Here are the function signatures generated for each of the 10 runs without mentioning type hints:
 
 ```
@@ -272,7 +272,7 @@ In addition to the time and labor of running things by hand, it is also a recipe
 
 You might be asking at this point, "What's an API"? The acronym stands for "Application Programming Interface", which is a method by which one can programmatically send commands to and receive responses from a computer system, which could be local or remote[^1].
 To understand this better, let's see how to send a chat command and receive a response from the Claude language model.
-The full outline is in [the notebook](https://github.com/poldrack/BetterCodeBetterScience/blob/main/src/BetterCodeBetterScience/language_model_api_prompting.ipynb).
+The full outline is in [the notebook](https://github.com/poldrack/BetterCodeBetterScience/blob/main/src/bettercode/language_model_api_prompting.ipynb).
 Coding agents are very good at generating code to perform API calls, so I used Claude Sonnet 4 to generate the example code in the notebook:
 
 ```python
@@ -358,7 +358,7 @@ Let's see how we could get the previous example to return a JSON object containi
 Here we will use a function called `send_prompt_to_claude()` that wraps the call to the model object and returns the text from the result:
 
 ```python
-from BetterCodeBetterScience.llm_utils import send_prompt_to_claude
+from bettercode.llm_utils import send_prompt_to_claude
 
 json_prompt = """
 What is the capital of France? 
