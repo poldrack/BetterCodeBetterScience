@@ -9,6 +9,9 @@ clean:
 run:
 	snakemake --cores 1 --config output_dir=$(OUTPUT_DIR)
 
+lint:
+	snakemake --lint --cores 1 --config output_dir=$(OUTPUT_DIR)
+
 dryrun:
 	snakemake --dry-run --cores 1 --config output_dir=$(OUTPUT_DIR)
 
@@ -17,3 +20,7 @@ report:
 
 graph:
 	snakemake --rulegraph --config output_dir=$(OUTPUT_DIR) --cores 2 | dot -Tpng -Gdpi=300  > output/rulegraph.png
+
+export-env:
+	-mkdir envs
+	micromamba env export -n bettercode > envs/bettercode.yml
