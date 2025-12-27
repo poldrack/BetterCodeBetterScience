@@ -41,5 +41,7 @@ checkpoint pseudobulk:
         figure_dir=str(FIGURE_DIR),
     log:
         LOG_DIR / "step07_pseudobulk.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/pseudobulk.py"

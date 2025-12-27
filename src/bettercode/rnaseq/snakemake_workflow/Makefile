@@ -7,7 +7,7 @@ rulegraph:
 
 # Run the full workflow
 run:
-	snakemake --cores 8 --config datadir=$(DATADIR)/immune_aging/wf_snakemake/
+	snakemake --cores 8 --sdm conda --config datadir=$(DATADIR)/immune_aging/wf_snakemake/
 # Generate HTML report (run after workflow completes)
 report:
 	snakemake --report $(DATADIR)/immune_aging/wf_snakemake/report.html --config datadir=$(DATADIR)/immune_aging/

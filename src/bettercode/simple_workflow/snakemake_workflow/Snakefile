@@ -63,6 +63,8 @@ rule download_meaningful_variables:
         url=config["meaningful_variables_url"],
     log:
         OUTPUT_DIR / "logs" / "download_meaningful_variables.log",
+    conda:
+        "bettercode"
     script:
         "scripts/download_data.py"
 
@@ -75,6 +77,8 @@ rule download_demographics:
         url=config["demographics_url"],
     log:
         OUTPUT_DIR / "logs" / "download_demographics.log",
+    conda:
+        "bettercode"
     script:
         "scripts/download_data.py"
 
@@ -87,6 +91,8 @@ rule filter_meaningful_variables:
         DATA_DIR / "meaningful_variables_numerical.csv",
     log:
         OUTPUT_DIR / "logs" / "filter_meaningful_variables.log",
+    conda:
+        "bettercode"
     script:
         "scripts/filter_data.py"
 
@@ -99,6 +105,8 @@ rule filter_demographics:
         DATA_DIR / "demographics_numerical.csv",
     log:
         OUTPUT_DIR / "logs" / "filter_demographics.log",
+    conda:
+        "bettercode"
     script:
         "scripts/filter_data.py"
 
@@ -112,6 +120,8 @@ rule join_datasets:
         DATA_DIR / "joined_data.csv",
     log:
         OUTPUT_DIR / "logs" / "join_datasets.log",
+    conda:
+        "bettercode"
     script:
         "scripts/join_data.py"
 
@@ -126,6 +136,8 @@ rule compute_correlation:
         method=config["correlation_method"],
     log:
         OUTPUT_DIR / "logs" / "compute_correlation.log",
+    conda:
+        "bettercode"
     script:
         "scripts/compute_correlation.py"
 
@@ -147,5 +159,7 @@ rule generate_heatmap:
         vmax=config["heatmap"]["vmax"],
     log:
         OUTPUT_DIR / "logs" / "generate_heatmap.log",
+    conda:
+        "bettercode"
     script:
         "scripts/generate_heatmap.py"

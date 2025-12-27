@@ -88,6 +88,8 @@ rule aggregate_results:
         RESULTS_DIR / "workflow_complete.txt",
     log:
         LOG_DIR / "aggregate_results.log",
+    conda:
+        "bettercode"
     script:
         "scripts/aggregate_results.py"
 
