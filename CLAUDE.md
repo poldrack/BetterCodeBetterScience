@@ -31,7 +31,7 @@ rm -rf book/_build
 pytest
 
 # Run tests with coverage
-pytest --cov=src/BetterCodeBetterScience --cov-report term-missing
+pytest --cov=src/bettercode --cov-report term-missing
 
 # Run specific test modules
 pytest tests/textmining/
@@ -62,7 +62,7 @@ pre-commit run --all-files
 ## Project Structure
 
 - `book/` - MyST markdown chapters (configured in myst.yml)
-- `src/BetterCodeBetterScience/` - Example Python code referenced in book chapters
+- `src/bettercode/` - Example Python code referenced in book chapters
 - `tests/` - Test examples demonstrating testing concepts from the book
 - `data/` - Data files for examples
 - `scripts/` - Utility scripts

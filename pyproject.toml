@@ -1,5 +1,5 @@
 [project]
-name = "BetterCodeBetterScience"
+name = "bettercode"
 version = "0.1.0"
 description = "Code for BetterCodeBetterScience book"
 readme = "README.md"
@@ -89,7 +89,7 @@ build-backend = "hatchling.build"
 
 # add script entry points here
 [project.scripts]
-check-links = "BetterCodeBetterScience.check_links:main"
+check-links = "bettercode.check_links:main"
 
 [tool.codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file

@@ -3,7 +3,7 @@
 Open problems marked with [ ]
 Fixed problems marked with [x]
 
-[x] I would like to generate a new example of a very simple pandas-based data analysis workflow for demonstrating the features of Prefect and snakemake. Put the new code into src/BetterCodeBetterScience/simple_workflow.  The example should include separate modules that implement each of the following functions:
+[x] I would like to generate a new example of a very simple pandas-based data analysis workflow for demonstrating the features of Prefect and snakemake. Put the new code into src/bettercode/simple_workflow.  The example should include separate modules that implement each of the following functions:
 - load these two files (using the first column as the index for each):
   - https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/meaningful_variables_clean.csv
   - https://raw.githubusercontent.com/IanEisenberg/Self_Regulation_Ontology/refs/heads/master/Data/Complete_02-16-2019/demographics.csv
@@ -58,7 +58,7 @@ Fixed problems marked with [x]
     - Updated Snakefile to use `wf_snakemake/` for CHECKPOINT_DIR, RESULTS_DIR, FIGURE_DIR, LOG_DIR
     - Updated WORKFLOW_OVERVIEW.md to reflect new output structure
 
-[x] I would now like to add another workflow, with code saved to src/BetterCodeBetterScience/rnaseq/snakemake_workflow. This workflow will use the Snakemake workflow manager (https://snakemake.readthedocs.io/en/stable/index.html); otherwise it should be functionally equivalent to the other workflows already developed.
+[x] I would now like to add another workflow, with code saved to src/bettercode/rnaseq/snakemake_workflow. This workflow will use the Snakemake workflow manager (https://snakemake.readthedocs.io/en/stable/index.html); otherwise it should be functionally equivalent to the other workflows already developed.
     - Created `snakemake_workflow/` directory with:
       - `Snakefile`: Main workflow entry point
       - `config/config.yaml`: All workflow parameters with defaults
@@ -73,7 +73,7 @@ Fixed problems marked with [x]
     - Added `snakemake>=8.0` dependency to pyproject.toml
     - Usage: `snakemake --cores 8 --config datadir=/path/to/data`  
 
-[x] I would like to add a new workflow, with code saved to src/BetterCodeBetterScience/rnaseq/prefect_workflow. This workflow will use the Prefect workflow manager (https://github.com/PrefectHQ/prefect) to manage the workflow that was previously developed in src/BetterCodeBetterScience/rnaseq/stateless_workflow. The one new feature that I would like to add here is to perform steps 8-11 separately on each different cell type that survives the initial filtering.
+[x] I would like to add a new workflow, with code saved to src/bettercode/rnaseq/prefect_workflow. This workflow will use the Prefect workflow manager (https://github.com/PrefectHQ/prefect) to manage the workflow that was previously developed in src/bettercode/rnaseq/stateless_workflow. The one new feature that I would like to add here is to perform steps 8-11 separately on each different cell type that survives the initial filtering.
     - Created `prefect_workflow/` directory with:
       - `tasks.py`: Prefect task definitions wrapping modular workflow functions
       - `flows.py`: Main workflow flow with parallel per-cell-type analysis

@@ -758,7 +758,7 @@ C = 299792458
 We could then import this from our module within the iPython shell:
 
 ```
-In: from BetterCodeBetterScience.constants import C
+In: from bettercode.constants import C
 
 In: C
 Out: 299792458
@@ -793,7 +793,7 @@ class Constants:
 Then within our iPython shell, we generate an instance of the Constants class, and see what happens if we try to change the value once it's instantiated:
 
 ```
-In: from BetterCodeBetterScience.constants import Constants
+In: from bettercode.constants import Constants
 
 In: constants = Constants()
 
@@ -806,7 +806,7 @@ AttributeError                            Traceback (most recent call last)
 Cell In[4], line 1
 ----> 1 constants.C = 42
 
-File ~/Dropbox/code/BetterCodeBetterScience/src/BetterCodeBetterScience/constants.py:11, in Constants.__setattr__(self, name, value)
+File ~/Dropbox/code/BetterCodeBetterScience/src/bettercode/constants.py:11, in Constants.__setattr__(self, name, value)
      10 def __setattr__(self, name, value):
 ---> 11     raise AttributeError("Constants cannot be modified")
 
@@ -847,8 +847,8 @@ We see that `ruff` detects both formatting problems (such as the lack of spaces 
 We can also use `ruff` from the command line to detect and fix code problems:
 
 ```bash
-❯ ruff check src/BetterCodeBetterScience/formatting_example.py
-src/BetterCodeBetterScience/formatting_example.py:6:1: F403 `from numpy.random import *` used; unable to detect undefined names
+❯ ruff check src/bettercode/formatting_example.py
+src/bettercode/formatting_example.py:6:1: F403 `from numpy.random import *` used; unable to detect undefined names
   |
 4 | # Poorly formatted code for linting example
 5 |
@@ -858,7 +858,7 @@ src/BetterCodeBetterScience/formatting_example.py:6:1: F403 `from numpy.random i
 8 | mynum=randint(0,100)
   |
 
-src/BetterCodeBetterScience/formatting_example.py:8:7: F405 `randint` may be undefined, or defined from star imports
+src/bettercode/formatting_example.py:8:7: F405 `randint` may be undefined, or defined from star imports
   |
 6 | from numpy.random import *
 7 |
@@ -872,12 +872,12 @@ Found 2 errors.
 Most linters can also automatically fix the issues that they detect in the code. `ruff` modifies the file in place, so we will first create a copy (so that our original remains intact) and then run the formatter on that copy:
 
 ```bash
-❯ cp src/BetterCodeBetterScience/formatting_example.py src/BetterCodeBetterScience/formatting_example_ruff.py
+❯ cp src/bettercode/formatting_example.py src/bettercode/formatting_example_ruff.py
 
-❯ ruff format src/BetterCodeBetterScience/formatting_example_ruff.py
+❯ ruff format src/bettercode/formatting_example_ruff.py
 1 file reformatted
 
-❯ diff src/BetterCodeBetterScience/formatting_example.py src/BetterCodeBetterScience/formatting_example_ruff.py
+❯ diff src/bettercode/formatting_example.py src/bettercode/formatting_example_ruff.py
 1,3d0
 <
 <

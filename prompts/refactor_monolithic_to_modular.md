@@ -2,7 +2,7 @@ Prompt: please read CLAUDE.md for guidelines, and then read refactor_monolithic_
 
 # Goal
 
-src/BetterCodeBetterScience/rnaseq/immune_scrnaseq_monolithic.py is currently a single monolithic script for a data analysis workflow.  I would like to refactor it into a modular script based on the following decomposition of the workflow:
+src/bettercode/rnaseq/immune_scrnaseq_monolithic.py is currently a single monolithic script for a data analysis workflow.  I would like to refactor it into a modular script based on the following decomposition of the workflow:
 
 - Data (down)loading
 - Data filtering (removing subjects or cell types with insufficient observations)
@@ -23,5 +23,5 @@ src/BetterCodeBetterScience/rnaseq/immune_scrnaseq_monolithic.py is currently a 
 - Overrepresentation analysis (Enrichr)
 - Predictive modeling
 
-Please generate a new set of scripts within a new directory called `src/BetterCodeBetterScience/rnaseq/modular_workflow` that implements the same workflow in a modular way.
+Please generate a new set of scripts within a new directory called `src/bettercode/rnaseq/modular_workflow` that implements the same workflow in a modular way.
 

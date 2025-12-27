@@ -2,7 +2,7 @@ from hypothesis import given, assume, strategies as st
 from hypothesis.extra import numpy as nps
 from scipy.stats import linregress
 import numpy as np
-from BetterCodeBetterScience.my_linear_regression import (
+from bettercode.my_linear_regression import (
     linear_regression,
     _validate_input,
 )

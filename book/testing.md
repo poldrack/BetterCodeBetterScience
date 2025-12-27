@@ -103,10 +103,10 @@ def test_escape_velocity():
 We can run this using `pytest` (more about this later), which tells us that the test passes:
 
 ```bash
-❯ pytest src/BetterCodeBetterScience/escape_velocity.py
+❯ pytest src/bettercode/escape_velocity.py
 ====================== test session starts ======================
 
-src/BetterCodeBetterScience/escape_velocity.py ..          [100%]
+src/bettercode/escape_velocity.py ..          [100%]
 
 ======================= 1 passed in 0.10s =======================
 ```
@@ -116,10 +116,10 @@ If the returned value didn't match the known value (within a given level of tole
 For example, if we had mis-specified the expected value as 1186.0, we would have seen an error like this:
 
 ```bash
-❯ pytest src/BetterCodeBetterScience/escape_velocity.py
+❯ pytest src/bettercode/escape_velocity.py
 ====================== test session starts ======================
 
-src/BetterCodeBetterScience/escape_velocity.py F          [100%]
+src/bettercode/escape_velocity.py F          [100%]
 
 =========================== FAILURES ===========================
 _____________________ test_escape_velocity _____________________
@@ -138,9 +138,9 @@ E       assert False
 E        +  where False = <function allclose at 0x101403370>(1186.0, 11185.97789184991)
 E        +    where <function allclose at 0x101403370> = np.allclose
 
-src/BetterCodeBetterScience/escape_velocity.py:26: AssertionError
+src/bettercode/escape_velocity.py:26: AssertionError
 ===================== short test summary info =====================
-FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity - AssertionError: Test failed!
+FAILED src/bettercode/escape_velocity.py::test_escape_velocity - AssertionError: Test failed!
 ======================== 1 failed in 0.11s ========================
 ```
 
@@ -280,11 +280,11 @@ def test_find_outliers_identical_values():
 Running this with the original function definition, we see that it fails:
 
 ```python
-❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+❯ pytest src/bettercode/bug_driven_testing.py
 =========================== test session starts ===========================
 collected 2 items
 
-src/BetterCodeBetterScience/bug_driven_testing.py .F                [100%]
+src/bettercode/bug_driven_testing.py .F                [100%]
 
 ================================ FAILURES =================================
 ___________________ test_find_outliers_identical_values ___________________
@@ -294,7 +294,7 @@ ___________________ test_find_outliers_identical_values ___________________
 
 >       outliers = find_outliers(data, threshold=2.0)
 
-src/BetterCodeBetterScience/bug_driven_testing.py:50:
+src/bettercode/bug_driven_testing.py:50:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 data = [5, 5, 5, 5, 5], threshold = 2.0
@@ -327,9 +327,9 @@ data = [5, 5, 5, 5, 5], threshold = 2.0
 >           z_score = abs(value - mean) / std  # Bug: std can be 0!
 E           ZeroDivisionError: float division by zero
 
-src/BetterCodeBetterScience/bug_driven_testing.py:31: ZeroDivisionError
+src/bettercode/bug_driven_testing.py:31: ZeroDivisionError
 ========================= short test summary info =========================
-FAILED src/BetterCodeBetterScience/bug_driven_testing.py::test_find_outliers_identical_values
+FAILED src/bettercode/bug_driven_testing.py::test_find_outliers_identical_values
  - ZeroDivisionError: float division by zero
 ======================= 1 failed, 1 passed in 0.10s =======================
 ```
@@ -347,11 +347,11 @@ Here we add a comment to explain the intention of the statement.
 Running the tests now will show that the problem is fixed:
 
 ```python
-❯ pytest src/BetterCodeBetterScience/bug_driven_testing.py
+❯ pytest src/bettercode/bug_driven_testing.py
 =========================== test session starts ===========================
 collected 2 items
 
-src/BetterCodeBetterScience/bug_driven_testing.py ..                [100%]
+src/bettercode/bug_driven_testing.py ..                [100%]
 
 ============================ 2 passed in 0.08s ============================
 
@@ -546,7 +546,7 @@ def test_distance_same_y():
 Now that we have our tests, we can run them using the `pytest` command:
 
 ```bash
-pytest src/BetterCodeBetterScience/distance_testing
+pytest src/bettercode/distance_testing
 ```
 
 This command will cause pytest to search (by default) for any files named `test_*.py` or `*_test.py` in the relevant path, and the select any functions whose name starts with the prefix "test".
@@ -567,7 +567,7 @@ In our research, it was not uncommon for ChatGPT to generate incorrect test valu
 Once we fix the expected value for that test (the square root of 89), then we can rerun the tests and see that they have passed:
 
 ```bash
-python -m pytest pytest src/BetterCodeBetterScience/distance_testing
+python -m pytest pytest src/bettercode/distance_testing
 ==================== test session starts =====================                                     
 
 src/codingforscience/simple_testing/test_distance.py . [ 16%]
@@ -608,7 +608,7 @@ def test_escape_velocity():
 When we run this test (renaming it `test_escape_velocity_gpt4`), we see that one of the tests fails:
 
 ```bash
-❯ pytest src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4
+❯ pytest src/bettercode/escape_velocity.py::test_escape_velocity_gpt4
 ==================================== test session starts ====================================
 platform darwin -- Python 3.12.0, pytest-8.4.1, pluggy-1.5.0
 rootdir: /Users/poldrack/Dropbox/code/BetterCodeBetterScience
@@ -616,7 +616,7 @@ configfile: pyproject.toml
 plugins: cov-5.0.0, anyio-4.6.0, hypothesis-6.115.3, mock-3.14.0
 collected 1 item
 
-src/BetterCodeBetterScience/escape_velocity.py F                                      [100%]
+src/bettercode/escape_velocity.py F                                      [100%]
 
 ========================================= FAILURES ==========================================
 _________________________________ test_escape_velocity_gpt4 _________________________________
@@ -643,9 +643,9 @@ E         comparison failed
 E         Obtained: 59564.97
 E         Expected: 60202.716344497014 ± 60.2027
 
-src/BetterCodeBetterScience/escape_velocity.py:52: AssertionError
+src/bettercode/escape_velocity.py:52: AssertionError
 ================================== short test summary info ==================================
-FAILED src/BetterCodeBetterScience/escape_velocity.py::test_escape_velocity_gpt4 - assert 60202.716344497014 ± 60.2027 == 59564.97
+FAILED src/bettercode/escape_velocity.py::test_escape_velocity_gpt4 - assert 60202.716344497014 ± 60.2027 == 59564.97
 ===================================== 1 failed in 0.12s =====================================
 ```
  
@@ -814,7 +814,7 @@ The `pytest-cov` extension for the `pytest` testing package can provide us with 
 ---------- coverage: platform darwin, python 3.12.0-final-0 ----------
 Name                                                   Stmts   Miss  Cover   Missing
 ------------------------------------------------------------------------------------
-src/BetterCodeBetterScience/textmining/textmining.py      30      1    97%   70
+src/bettercode/textmining/textmining.py      30      1    97%   70
 ------------------------------------------------------------------------------------
 TOTAL                                                     30      1    97%
 ```
@@ -1207,7 +1207,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/property_based_testing/test_propertybased_smoke.py:19: in test_linear_regression_without_validation
     params = linear_regression(X, y, validate=False)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/BetterCodeBetterScience/my_linear_regression.py:61: in linear_regression
+src/bettercode/my_linear_regression.py:61: in linear_regression
     return np.linalg.inv(X.T @ X) @ X.T @ y
            ^^^^^^^^^^^^^^^^^^^^^^
 .venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:615: in inv

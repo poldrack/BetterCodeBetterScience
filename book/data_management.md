@@ -471,7 +471,7 @@ df_merged = pd.concat([df1, df2, df3], ignore_index=True)
 
 The most common file formats are *comma-separated value* (CSV) or *tab-separated value* (TSV) files.  Both of these have the benefit of being represented in plain text, so their contents can be easily examined without any special software.  I generally prefer to use tabs rather than commas as the separator (or *delimiter*), primarily because they can more easily naturally represent longer pieces of text that may include commas. These can also be represented using CSV, but they require additional processing in order to *escape* the commas within the text so that they are not interpreted as delimiters.  
 
-Text file formats like CSV and TSV are nice for their ease of interpretability, but they are highly inefficient for large data compared to optimized file formats, such as the *Parquet* format.  To see this in action, I loaded a brain image and saved all of the non-zero data points (857,785 to be exact) to a data frame, which I then saved to CSV and Parquet formats; see [the management notebook](src/BetterCodeBetterScience/data_management.ipynb) for details.  Looking at the resulting files, we can see that the Parquet file is only about 20% the size of the CSV file:
+Text file formats like CSV and TSV are nice for their ease of interpretability, but they are highly inefficient for large data compared to optimized file formats, such as the *Parquet* format.  To see this in action, I loaded a brain image and saved all of the non-zero data points (857,785 to be exact) to a data frame, which I then saved to CSV and Parquet formats; see [the management notebook](src/bettercode/data_management.ipynb) for details.  Looking at the resulting files, we can see that the Parquet file is only about 20% the size of the CSV file:
 
 ```bash
 ➤  du -sk /tmp/brain_tabular.*
@@ -718,7 +718,7 @@ In this section we discuss data organization. The most important principle of da
 
 ### File granularity
 
-One common decision that we need to make when managing data is to save data in more smaller files versus fewer larger files.  The right answer to this question depends in part on how we will have to access the data.  If we only need to access a small portion of the data and we can easily determine which file to open to obtain those data, then it probably makes sense to save many small files.  However, if we need to combine data across many small files, then it likely makes sense to save the data as one large file.  For example, in the [data management notebook](src/BetterCodeBetterScience/data_management.ipynb) there is an example where we create a large (10000 x 100000) matrix of random numbers, and save them either to a single file or to a separate file for each row.  When loading these data, the loading of the single file is about 5 times faster than loading the individual files.
+One common decision that we need to make when managing data is to save data in more smaller files versus fewer larger files.  The right answer to this question depends in part on how we will have to access the data.  If we only need to access a small portion of the data and we can easily determine which file to open to obtain those data, then it probably makes sense to save many small files.  However, if we need to combine data across many small files, then it likely makes sense to save the data as one large file.  For example, in the [data management notebook](src/bettercode/data_management.ipynb) there is an example where we create a large (10000 x 100000) matrix of random numbers, and save them either to a single file or to a separate file for each row.  When loading these data, the loading of the single file is about 5 times faster than loading the individual files.
 
 Another consideration about the number of files has to do with storage systems that are commonly used on high-performance computing systems.  On these systems, it is common to have separate quotas for total space used (e.g., in terabytes) as well as for the number of *inodes*, which are structures that store information about files and folders on a UNIX filesystem. Thus, generating many small files (e.g., millions) can sometimes cause problems on these systems. For this reason, we generally err on the side of generating fewer larger files versus more smaller files when working on high-performance computing systems.
 
@@ -1038,7 +1038,7 @@ unlock(ok): my_datalad_repo/data/demographics.csv (file)
 We then use a Python script to make the change, which in this case is removing some columns from the dataset:
 
 ```bash
-➤  python src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
+➤  python src/bettercode/modify_data.py my_datalad_repo/data/demographics.csv
 
 ```
 
@@ -1074,7 +1074,7 @@ nothing to save, working tree clean
 Although the previous example was meant to provide background on how DataLad works, in practice there is actually a much easier way to accomplish these steps, which is by using the [`datalad run`](https://docs.datalad.org/en/stable/generated/man/datalad-run.html) command. This command will automatically take care of fetching and unlocking the relevant files, running the command, and then committing the files back in, generating a commit message that tracks the specific command that was used:
 
 ```bash
-➤  datalad run -i my_datalad_repo/data/demographics.csv -o my_datalad_repo/data/demographics.csv -- uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv
+➤  datalad run -i my_datalad_repo/data/demographics.csv -o my_datalad_repo/data/demographics.csv -- uv run src/bettercode/modify_data.py my_datalad_repo/data/demographics.csv
 [INFO   ] Making sure inputs are available (this may take some time)
 unlock(ok): my_datalad_repo/data/demographics.csv (file)
 [INFO   ] == Command start (output follows) =====
@@ -1082,7 +1082,7 @@ unlock(ok): my_datalad_repo/data/demographics.csv (file)
 Uninstalled 1 package in 1ms
 Installed 1 package in 1ms
 [INFO   ] == Command exit (modification check follows) =====
-run(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience (dataset) [uv run src/BetterCodeBetterScience/modif...]
+run(ok): /Users/poldrack/Dropbox/code/BetterCodeBetterScience (dataset) [uv run src/bettercode/modif...]
 add(ok): data/demographics.csv (file)
 save(ok): my_datalad_repo (dataset)
 add(ok): my_datalad_repo (dataset)
@@ -1095,12 +1095,12 @@ commit 3ef3b94a0abffec6a8db7570a97339f48ee728ed (HEAD -> text/datamgmt-Nov3)
 Author: Russell Poldrack <poldrack@gmail.com>
 Date:   Mon Dec 15 13:28:06 2025 -0800
 
-    [DATALAD RUNCMD] uv run src/BetterCodeBetterScience/modif...
+    [DATALAD RUNCMD] uv run src/bettercode/modif...
 
     === Do not change lines below ===
     {
      "chain": [],
-     "cmd": "uv run src/BetterCodeBetterScience/modify_data.py my_datalad_repo/data/demographics.csv",
+     "cmd": "uv run src/bettercode/modify_data.py my_datalad_repo/data/demographics.csv",
      "exit": 0,
      "extra_inputs": [],
      "inputs": [
@@ -1220,7 +1220,7 @@ The question that I will ask is as follows: How well can the biological similari
 - A dataset of genome-wise association study (GWAS) results for specific traits obtained from [here](https://www.ebi.ac.uk/gwas/docs/file-downloads).
 - Abstracts that refer to each of the traits identified in the GWAS result, obtained from the [PubMed](https://pubmed.ncbi.nlm.nih.gov/) database.  
 
-I will not present all of the code for each step; this can be found [here](src/BetterCodeBetterScience/database_example_funcs.py) and [here](src/BetterCodeBetterScience/database.py). Rather, I will show portions that are particularly relevant to the databases being used. 
+I will not present all of the code for each step; this can be found [here](src/bettercode/database_example_funcs.py) and [here](src/bettercode/database.py). Rather, I will show portions that are particularly relevant to the databases being used. 
 
 ### Adding GWAS data to a document store
 
@@ -1236,7 +1236,7 @@ In this case, looking at the data we see that several columns contain multiple v
 gwas_data = get_exploded_gwas_data()
 ```
 
-We can now import the data from this data frame into a MongoDB collection, mapping each unique trait to the genes that are reported as being associated with it.  First I generated a separate function that sets up a MongoDB collection (see `setup_mongo_collection` [here](src/BetterCodeBetterScience/database.py)).  We can then use that function to set up our gene set collection:
+We can now import the data from this data frame into a MongoDB collection, mapping each unique trait to the genes that are reported as being associated with it.  First I generated a separate function that sets up a MongoDB collection (see `setup_mongo_collection` [here](src/bettercode/database.py)).  We can then use that function to set up our gene set collection:
 
 
 ```python
