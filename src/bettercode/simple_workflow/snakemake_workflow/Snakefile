@@ -24,6 +24,8 @@ from snakemake.utils import min_version
 
 min_version("8.0")
 
+# Initialize conda for non-interactive shells (if available)
+shell.prefix("[ -f ~/miniconda3/etc/profile.d/conda.sh ] && source ~/miniconda3/etc/profile.d/conda.sh; ")
 
 # Load configuration
 configfile: "config/config.yaml"
@@ -64,7 +66,7 @@ rule download_meaningful_variables:
     log:
         OUTPUT_DIR / "logs" / "download_meaningful_variables.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/download_data.py"
 
@@ -78,7 +80,7 @@ rule download_demographics:
     log:
         OUTPUT_DIR / "logs" / "download_demographics.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/download_data.py"
 
@@ -92,7 +94,7 @@ rule filter_meaningful_variables:
     log:
         OUTPUT_DIR / "logs" / "filter_meaningful_variables.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/filter_data.py"
 
@@ -106,7 +108,7 @@ rule filter_demographics:
     log:
         OUTPUT_DIR / "logs" / "filter_demographics.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/filter_data.py"
 
@@ -121,7 +123,7 @@ rule join_datasets:
     log:
         OUTPUT_DIR / "logs" / "join_datasets.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/join_data.py"
 
@@ -137,7 +139,7 @@ rule compute_correlation:
     log:
         OUTPUT_DIR / "logs" / "compute_correlation.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/compute_correlation.py"
 
@@ -160,6 +162,6 @@ rule generate_heatmap:
     log:
         OUTPUT_DIR / "logs" / "generate_heatmap.log",
     conda:
-        "bettercode"
+        "envs/simple.yml"
     script:
         "scripts/generate_heatmap.py"
