@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from bettercode.simple_workflow.filter_data import (
-    filter_numerical_columns,
-)
+
+def filter_numerical_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter a dataframe to keep only numerical columns."""
+    return df.select_dtypes(include=["number"])
 
 
 def main():
