@@ -24,8 +24,6 @@ from snakemake.utils import min_version
 
 min_version("8.0")
 
-# Initialize conda for non-interactive shells (if available)
-shell.prefix("[ -f ~/miniconda3/etc/profile.d/conda.sh ] && source ~/miniconda3/etc/profile.d/conda.sh; ")
 
 # Load configuration
 configfile: "config/config.yaml"
