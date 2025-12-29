@@ -4,9 +4,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from bettercode.simple_workflow.correlation import (
-    compute_correlation_matrix,
-)
+
+def compute_correlation_matrix(
+    df: pd.DataFrame,
+    method: str = "spearman",
+) -> pd.DataFrame:
+    """Compute correlation matrix using the specified method."""
+    return df.corr(method=method)
 
 
 def main():

@@ -3,14 +3,14 @@ OUTPUT_DIR := /Users/poldrack/data_unsynced/BCBS/simple_workflow/wf_snakemake
 .PHONY: run report graph
 
 clean:
-	-rm .snakemake
+	-rm -rf .snakemake
 	-rm -rf $(OUTPUT_DIR)/*
 
 run:
-	snakemake --cores 1 --config output_dir=$(OUTPUT_DIR)
+	snakemake --cores 1 --sdm conda --config output_dir=$(OUTPUT_DIR)
 
 lint:
-	snakemake --lint --cores 1 --config output_dir=$(OUTPUT_DIR)
+	snakemake --sdm conda --lint --cores 1 --config output_dir=$(OUTPUT_DIR)
 
 dryrun:
 	snakemake --dry-run --cores 1 --config output_dir=$(OUTPUT_DIR)
@@ -23,4 +23,4 @@ graph:
 
 export-env:
 	-mkdir envs
-	micromamba env export -n bettercode > envs/bettercode.yml
+	conda env export -n bettercode > envs/bettercode.yml

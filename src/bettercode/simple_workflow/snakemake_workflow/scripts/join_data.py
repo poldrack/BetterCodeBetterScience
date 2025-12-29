@@ -4,7 +4,14 @@ from pathlib import Path
 
 import pandas as pd
 
-from bettercode.simple_workflow.join_data import join_dataframes
+
+def join_dataframes(
+    df1: pd.DataFrame,
+    df2: pd.DataFrame,
+    how: str = "inner",
+) -> pd.DataFrame:
+    """Join two dataframes based on their index."""
+    return df1.join(df2, how=how, lsuffix="_mv", rsuffix="_demo")
 
 
 def main():

@@ -505,6 +505,18 @@ total                              5
 
 Similarly, Snakemake will rerun the workflow if any of the scripts used to run the workflow are modified.  However, it's important to note that it will not identify changes in the modules that are imported.  In that case you would need to rerun the workflow in order to re-execute the relevant steps.
 
+#### Reproducible environments with Conda
+
+after installing miniconda:
+
+
+```bash
+conda create -c conda-forge -c bioconda -c nodefaults -n bettercode snakemake
+conda activate bettercode
+pip install -e .
+```
+
+
 ## Scaling to a complex workflow
 
 We now turn to a more realistic and complex scientific data analysis workflow. For this example I will use an analysis of single-cell RNA-sequencing data to determine how gene expression in immune system cells changes with age. This analysis will utilize a [large openly available dataset](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1) that includes data from 982 people comprising about 1.3 million peripheral blood mononuclear cells (i.e. white blood cells) for about 35K transcripts.  I chose this particular example for several reasons:

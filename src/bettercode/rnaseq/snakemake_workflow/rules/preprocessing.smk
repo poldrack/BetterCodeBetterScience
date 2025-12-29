@@ -18,6 +18,8 @@ rule download_data:
         url=config["url"],
     log:
         LOG_DIR / "step01_download.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/download.py"
 
@@ -40,6 +42,8 @@ rule filter_data:
         figure_dir=str(FIGURE_DIR),
     log:
         LOG_DIR / "step02_filtering.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/filter.py"
 
@@ -81,6 +85,8 @@ rule quality_control:
         figure_dir=str(FIGURE_DIR),
     log:
         LOG_DIR / "step03_qc.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/qc.py"
 
@@ -98,6 +104,8 @@ rule preprocess:
         batch_key=config["preprocessing"]["batch_key"],
     log:
         LOG_DIR / "step04_preprocessing.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/preprocess.py"
 
@@ -126,6 +134,8 @@ rule dimensionality_reduction:
         figure_dir=str(FIGURE_DIR),
     log:
         LOG_DIR / "step05_dimred.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/dimred.py"
 
@@ -146,5 +156,7 @@ rule clustering:
         figure_dir=str(FIGURE_DIR),
     log:
         LOG_DIR / "step06_clustering.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/cluster.py"

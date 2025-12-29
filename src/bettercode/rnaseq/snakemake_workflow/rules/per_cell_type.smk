@@ -29,6 +29,8 @@ rule differential_expression:
     threads: config["differential_expression"]["n_cpus"]
     log:
         LOG_DIR / "step08_de_{cell_type}.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/differential_expression.py"
 
@@ -54,6 +56,8 @@ rule pathway_analysis:
         ),
     log:
         LOG_DIR / "step09_gsea_{cell_type}.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/gsea.py"
 
@@ -81,6 +85,8 @@ rule overrepresentation:
         ),
     log:
         LOG_DIR / "step10_enrichr_{cell_type}.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/enrichr.py"
 
@@ -110,5 +116,7 @@ rule predictive_modeling:
         ),
     log:
         LOG_DIR / "step11_prediction_{cell_type}.log",
+    conda:
+        "bettercode"
     script:
         "../scripts/prediction.py"
