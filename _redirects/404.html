@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting to Better Code, Better Science</title>
+  <script>
+    (function() {
+      // Get the current path (e.g., /BetterCodeBetterScience/testing/)
+      var path = window.location.pathname;
+
+      // Remove the old base path if present
+      var oldBase = '/BetterCodeBetterScience';
+      if (path.startsWith(oldBase)) {
+        path = path.substring(oldBase.length);
+      }
+
+      // Ensure path starts with /
+      if (!path.startsWith('/')) {
+        path = '/' + path;
+      }
+
+      // Build the new URL
+      var newUrl = 'https://bettercodebetterscience.github.io/book' + path;
+
+      // Preserve any hash or query string
+      newUrl += window.location.search + window.location.hash;
+
+      // Redirect
+      window.location.replace(newUrl);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=https://bettercodebetterscience.github.io/book/">
+  </noscript>
+</head>
+<body>
+  <p>This site has moved. Redirecting to <a href="https://bettercodebetterscience.github.io/book/">Better Code, Better Science</a>...</p>
+</body>
+</html>
